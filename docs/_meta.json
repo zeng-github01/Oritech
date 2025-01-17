@@ -1,9 +1,30 @@
 {
-  "getting_started": "\uD83D\uDCD5 Getting Started",
-  "resources": "\uD83E\uDEA8 Resources",
-  "tools": "\uD83D\uDD28 Tools",
-  "logistics": "\uD83D\uDEDE Logistics",
-  "processing": "\uD83D\uDEE0\uFE0F Processing",
-  "interaction": "\uD83E\uDEF3 World Interaction",
-  "arcane": "\uD83E\uDE84 Arcane"
+  "getting_started": {
+    "name": "\uD83D\uDCD5 Getting Started",
+    "icon": null
+  },
+  "resources": {
+    "name": "\uD83E\uDEA8 Resources",
+    "icon": null
+  },
+  "tools": {
+    "name": "\uD83D\uDD28 Tools",
+    "icon": null
+  },
+  "logistics": {
+    "name": "\uD83D\uDEDE Logistics",
+    "icon": null
+  },
+  "processing": {
+    "name": "\uD83D\uDEE0\uFE0F Processing",
+    "icon": null
+  },
+  "interaction": {
+    "name": "\uD83E\uDEF3 World Interaction",
+    "icon": null
+  },
+  "arcane": {
+    "name": "\uD83E\uDE84 Arcane",
+    "icon": null
+  }
 }

@@ -1,5 +1,7 @@
 {
   "id": "oritech",
-  "platform": "modrinth",
-  "slug": "oritech"
+  "platforms": {
+    "curseforge": "oritech",
+    "modrinth": "oritech"
+  }
 }
