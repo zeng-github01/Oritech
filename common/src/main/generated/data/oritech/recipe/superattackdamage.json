@@ -1,0 +1,39 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:enderic_compound"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:gold_block"
+      }
+    }
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:enderic_compound"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:fluxite"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:blaze_rod"
+      }
+    }
+  ],
+  "rfCost": 500000000,
+  "time": 2800
+}

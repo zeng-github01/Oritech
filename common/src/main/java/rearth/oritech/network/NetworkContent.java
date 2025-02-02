@@ -22,6 +22,8 @@ import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -36,6 +38,7 @@ import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -130,6 +133,23 @@ public class NetworkContent {
     
     public record PumpWorkSyncPacket(BlockPos position, String fluidType, long workedAt) {
     }
+    
+    public record AugmentInstallTriggerPacket(BlockPos position, Identifier id, int operationId) {
+    }
+    
+    public record LoadPlayerAugmentsToMachinePacket(BlockPos position) {
+    }
+    
+    public record OpenAugmentScreenPacket(BlockPos position) {
+    }
+    
+    public record AugmentPlayerTogglePacket(Identifier id) {
+    }
+    
+    public record AugmentDataPacket(BlockPos position, List<Identifier> allResearched, List<Identifier> researchBlocks, List<Boolean> researchStates, List<Identifier> activeResearches, List<Long> startedTimes, List<Integer> researchTimes) {
+    }
+    
+    public record AugmentOperationSyncPacket(Identifier id, int operation) {}
     
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn, String fluidTypeOut,
                                             long amountOut) {
@@ -247,6 +267,8 @@ public class NetworkContent {
             if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
+            } else if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof SimpleEnergyStorage storage) {
+                storage.setAmount(message.currentEnergy);
             }
             
         }));
@@ -508,6 +530,32 @@ public class NetworkContent {
             
         }));
         
+        
+        MACHINE_CHANNEL.registerClientbound(AugmentDataPacket.class, ((message, access) -> {
+            
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof AugmentApplicationEntity enhancer) {
+                enhancer.handleAugmentUpdatePacket(message);
+            }
+            
+        }));
+        
+        
+        MACHINE_CHANNEL.registerClientbound(AugmentOperationSyncPacket.class, ((message, access) -> {
+            var player = access.player();
+            
+            var augmentInstance = PlayerAugments.allAugments.get(message.id);
+            if (message.operation == PlayerAugments.AugmentOperation.ADD.ordinal()) {
+                augmentInstance.installToPlayer(player);
+            } else if (message.operation == PlayerAugments.AugmentOperation.REMOVE.ordinal()) {
+                augmentInstance.removeFromPlayer(player);
+            } else if (message.operation == PlayerAugments.AugmentOperation.TOGGLE.ordinal()) {
+                augmentInstance.toggle(player);
+            }
+            
+        }));
+        
         MACHINE_CHANNEL.registerClientbound(ReactorUIDataPacket.class, ((message, access) -> {
             
             var entity = access.player().getWorld().getBlockEntity(message.position);
@@ -605,6 +653,50 @@ public class NetworkContent {
             if (message.fluidAmount > 0)
                 stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.fluidAmount));
             
+        });
+        
+        UI_CHANNEL.registerServerbound(AugmentInstallTriggerPacket.class, (message, access) -> {
+            var player = access.player();
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof AugmentApplicationEntity modifierEntity) {
+                var operation = PlayerAugments.AugmentOperation.values()[message.operationId];
+                switch (operation) {
+                    case RESEARCH -> {
+                        modifierEntity.researchAugment(message.id);
+                    }
+                    case ADD -> {
+                        modifierEntity.installAugmentToPlayer(message.id, player);
+                    }
+                    case REMOVE -> {
+                        modifierEntity.removeAugmentFromPlayer(message.id, player);
+                    }
+                }
+            }
+        });
+        
+        UI_CHANNEL.registerServerbound(LoadPlayerAugmentsToMachinePacket.class, (message, access) -> {
+            var player = access.player();
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof AugmentApplicationEntity modifierEntity) {
+                modifierEntity.loadResearchesFromPlayer(player);
+            }
+        });
+        
+        UI_CHANNEL.registerServerbound(OpenAugmentScreenPacket.class, (message, access) -> {
+            var player = access.player();
+            var entity = access.player().getWorld().getBlockEntity(message.position);
+            
+            if (entity instanceof AugmentApplicationEntity modifierEntity) {
+                modifierEntity.screenInvOverride = true;
+                player.openHandledScreen(modifierEntity);
+            }
+        });
+        
+        UI_CHANNEL.registerServerbound(AugmentPlayerTogglePacket.class, (message, access) -> {
+            var player = access.player();
+            AugmentApplicationEntity.toggleAugmentForPlayer(message.id, player);
         });
         
     }

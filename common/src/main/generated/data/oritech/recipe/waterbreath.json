@@ -1,0 +1,37 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:biosteel_ingot"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:conduit"
+      }
+    }
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:prismarine_crystals"
+      }
+    },
+    {
+      "count": 48,
+      "ingredient": {
+        "item": "oritech:biosteel_ingot"
+      }
+    },
+    {
+      "ingredient": {
+        "item": "minecraft:heart_of_the_sea"
+      }
+    }
+  ],
+  "rfCost": 50000000,
+  "time": 800
+}

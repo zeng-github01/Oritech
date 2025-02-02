@@ -1,0 +1,39 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:raw_biopolymer"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "c:ingots/iron"
+      }
+    }
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:raw_biopolymer"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:small_plutonium_pellet"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "oritech:biomass"
+      }
+    }
+  ],
+  "rfCost": 300000000,
+  "time": 1600
+}

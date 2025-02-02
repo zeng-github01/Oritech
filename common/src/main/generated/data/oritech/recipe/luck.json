@@ -1,0 +1,39 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "minecraft:lapis_block"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:redstone_block"
+      }
+    }
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "tag": "c:ingots/electrum"
+      }
+    },
+    {
+      "count": 48,
+      "ingredient": {
+        "item": "minecraft:lapis_block"
+      }
+    },
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "minecraft:gold_block"
+      }
+    }
+  ],
+  "rfCost": 200000000,
+  "time": 1800
+}

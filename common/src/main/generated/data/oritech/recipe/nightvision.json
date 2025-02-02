@@ -1,0 +1,45 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:enderic_lens"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:glowstone"
+      }
+    },
+    {
+      "count": 8,
+      "ingredient": {
+        "item": "minecraft:redstone_lamp"
+      }
+    }
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:gold_block"
+      }
+    },
+    {
+      "count": 48,
+      "ingredient": {
+        "item": "oritech:enderic_lens"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:glowstone"
+      }
+    }
+  ],
+  "rfCost": 50000000,
+  "time": 2400
+}

@@ -1,0 +1,39 @@
+{
+  "type": "oritech:augment",
+  "applyCost": [
+    {
+      "count": 32,
+      "ingredient": {
+        "item": "oritech:energite_ingot"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "minecraft:redstone_block"
+      }
+    }
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:energite_ingot"
+      }
+    },
+    {
+      "count": 48,
+      "ingredient": {
+        "item": "oritech:flux_gate"
+      }
+    },
+    {
+      "count": 64,
+      "ingredient": {
+        "item": "oritech:duratium_ingot"
+      }
+    }
+  ],
+  "rfCost": 450000000,
+  "time": 2400
+}
