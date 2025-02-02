@@ -43,11 +43,11 @@ import rearth.oritech.client.ui.DroneScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
-import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.item.tools.LaserTargetDesignator;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -86,7 +86,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
 
         @Override
         public boolean canInsert(ItemStack stack) {
-            return stack.getItem().equals(ItemContent.TARGET_DESIGNATOR);
+            return stack.getItem() instanceof LaserTargetDesignator;
         }
     };
     
@@ -154,7 +154,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
     private void checkPositionCard() {
         
         var source = cardInventory.heldStacks.get(0);
-        if (source.getItem().equals(ItemContent.TARGET_DESIGNATOR) && source.contains(ComponentContent.TARGET_POSITION.get())) {
+        if (source.getItem() instanceof LaserTargetDesignator && source.contains(ComponentContent.TARGET_POSITION.get())) {
             var target = source.get(ComponentContent.TARGET_POSITION.get());
             setTargetFromDesignator(target);
         } else {
