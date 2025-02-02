@@ -30,7 +30,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENERGY_PIPE_ENTITY, pos, state);
         
-        isSuperConductor = state.getBlock().equals(BlockContent.SUPERCONDUCTOR_CONNECTION);
+        isSuperConductor = state.getBlock().equals(BlockContent.SUPERCONDUCTOR_CONNECTION) || state.getBlock().equals(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION);
         
         if (isSuperConductor) {
             energyStorage = new SimpleEnergyStorage(Oritech.CONFIG.superConductorTransferRate(), Oritech.CONFIG.superConductorTransferRate(), Oritech.CONFIG.superConductorTransferRate());

@@ -36,6 +36,6 @@ public class SuperConductorDuctBlock extends GenericPipeDuctBlock {
 
 	@Override
 	public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(World world) {
-		return ENERGY_PIPE_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+		return SuperConductorBlock.SUPERCONDUCTOR_DATA.computeIfAbsent(world.getRegistryKey().getValue(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
 	}
 }
