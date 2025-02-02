@@ -297,20 +297,6 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         }
     }
     
-    // todo remove this debug
-    public void onUse(PlayerEntity player) {
-        
-        if (player.isSneaking()) {
-            System.out.println("resetting all augments!");
-            
-            for (var augmentId : PlayerAugments.allAugments.keySet()) {
-                var isInstalled = hasPlayerAugment(augmentId, player);
-                if (isInstalled)
-                    removeAugmentFromPlayer(augmentId, player);
-            }
-        }
-    }
-    
     public void loadAvailableStations(PlayerEntity player) {
         var facing = this.getCachedState().get(Properties.HORIZONTAL_FACING);
         

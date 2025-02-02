@@ -75,8 +75,8 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
         for (var facing : Properties.HORIZONTAL_FACING.getValues()) {
             
             result[facing.ordinal()] = VoxelShapes.union(
-              Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0, 0, 1, 2/16f, 1), facing, BlockFace.FLOOR),
-              Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 3/16f, 14/16f, 1f, 1f, 1f), facing, BlockFace.FLOOR)
+              Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 0, 0, 1, 2 / 16f, 1), facing, BlockFace.FLOOR),
+              Geometry.rotateVoxelShape(VoxelShapes.cuboid(0, 3 / 16f, 14 / 16f, 1f, 1f, 1f), facing, BlockFace.FLOOR)
             );
         }
         
@@ -153,8 +153,6 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
     
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        
-        ((AugmentApplicationEntity) world.getBlockEntity(pos)).onUse(player);
         
         if (world.isClient)
             return ActionResult.SUCCESS;
