@@ -1,0 +1,13 @@
+The cybernetic update!
+- Add new cybernetic augmentation system. This includes a new central multiblock, as well as 3 new research station blocks for it.
+- Add chinese wiki translation (Huge thanks to @OakPlatinum)
+- Add glowing sections to some machines (Assembler, Enderic Laser, Basic Generator)
+- Change particle accelerator curve calculations, making diagonals more efficient. This should make more "round" accelerators more efficient. This won't (or shouldn't) break existing designs.
+- Improve/Add some tooltips.
+- Fix framed / duct superconductors not working.
+- Fix fuels from other mods not working in the basic generator on neoforge.
+- Fix oil being tagged as water on neoforge.
+- Fix client disconnects with pulverizer particles.
+- Fix addons not disconnecting from some machines (mostly enderic lasers, and a few other blocks).
+- Fix machine core interaction issues with some other mods that don't properly invalidate their caches on blockstate updates (looking at you AE2).
+- Fix particle accelerator visuals being too long when exiting the collider.
