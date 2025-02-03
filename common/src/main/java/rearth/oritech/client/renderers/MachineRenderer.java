@@ -5,10 +5,19 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     public MachineRenderer(String modelPath) {
         super(new MachineModel<>(modelPath));
+    }
+    
+    public MachineRenderer(String modelPath, boolean glowing) {
+        super(new MachineModel<>(modelPath));
+        
+        if (glowing) {
+            addRenderLayer(new AutoGlowingGeoLayer<>(this));
+        }
     }
     
     @Override

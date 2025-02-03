@@ -17,6 +17,7 @@ import rearth.oritech.util.Geometry;
 import software.bernie.geckolib.animatable.GeoAnimatable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 import java.util.HashMap;
 
@@ -25,6 +26,7 @@ import static net.minecraft.client.render.RenderPhase.VIEW_OFFSET_Z_LAYERING;
 public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     public LaserArmRenderer(String modelPath) {
         super(new LaserArmModel<>(modelPath));
+        addRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
     
     // Modified RenderLayer.LINES
