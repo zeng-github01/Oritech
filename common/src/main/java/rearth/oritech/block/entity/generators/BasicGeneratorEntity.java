@@ -1,10 +1,9 @@
 package rearth.oritech.block.entity.generators;
 
+import dev.architectury.registry.fuel.FuelRegistry;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.item.BucketItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Pair;
@@ -22,12 +21,9 @@ import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
-    
-    public static final Map<Item, Integer> FUEL_MAP = AbstractFurnaceBlockEntity.createFuelTimeMap();
     
     public BasicGeneratorEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, pos, state, Oritech.CONFIG.generators.basicGeneratorData.energyPerTick());
@@ -48,7 +44,7 @@ public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
         var firstItem = this.getInputView().get(0);
         if (firstItem.isEmpty() || firstItem.getItem() instanceof BucketItem) return;
         
-        var fuelTime = FUEL_MAP.getOrDefault(firstItem.getItem(), 0);
+        var fuelTime = FuelRegistry.get(firstItem);
         if (fuelTime > 0) {
             if (firstItem.getItem() instanceof BucketItem) {
                 this.getInputView().set(0, ItemVariant.of(Items.BUCKET, firstItem.getComponentChanges()).toStack());
