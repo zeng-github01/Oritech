@@ -47,6 +47,7 @@ public class MachineFrameBlock extends Block {
     public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
         super.appendTooltip(stack, context, tooltip, options);
         tooltip.add(Text.translatable("tooltip.oritech.machine_frame").formatted(Formatting.GRAY, Formatting.ITALIC));
+        tooltip.add(Text.translatable("tooltip.oritech.machine_frame.1", Oritech.CONFIG.processingMachines.machineFrameMaxLength(), Oritech.CONFIG.processingMachines.machineFrameMaxLength()).formatted(Formatting.GRAY));
     }
     
     @Override
