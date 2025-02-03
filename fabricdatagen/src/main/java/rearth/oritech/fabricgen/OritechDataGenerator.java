@@ -12,7 +12,6 @@ public class OritechDataGenerator implements DataGeneratorEntrypoint {
 		pack.addProvider(ModelGenerator::new);
 		pack.addProvider(BlockLootGenerator::new);
 		pack.addProvider(BlockTagGenerator::new);
-		pack.addProvider(FluidTagGenerator::new);
 		pack.addProvider(ItemTagGenerator::new);
 		pack.addProvider(RecipeGenerator::new);
 		pack.addProvider(AdvancementGenerator::new);
