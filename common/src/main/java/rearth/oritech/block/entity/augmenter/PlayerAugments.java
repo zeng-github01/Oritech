@@ -1,6 +1,9 @@
 package rearth.oritech.block.entity.augmenter;
 
 import com.mojang.serialization.Codec;
+import io.wispforest.owo.network.ClientAccess;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
@@ -395,6 +398,21 @@ public class PlayerAugments {
         for (var augment : allAugments.values()) {
             if (augment instanceof TickingAugment tickingAugment && augment.isInstalled(player) && augment.isEnabled(player))
                 tickingAugment.clientTick(player);
+        }
+    }
+    
+    @Environment(EnvType.CLIENT)
+    public static void handlePlayerAugmentOperation(NetworkContent.AugmentOperationSyncPacket message, ClientAccess access) {
+        
+        var player = access.player();
+        
+        var augmentInstance = PlayerAugments.allAugments.get(message.id());
+        if (message.operation() == PlayerAugments.AugmentOperation.ADD.ordinal()) {
+            augmentInstance.installToPlayer(player);
+        } else if (message.operation() == PlayerAugments.AugmentOperation.REMOVE.ordinal()) {
+            augmentInstance.removeFromPlayer(player);
+        } else if (message.operation() == PlayerAugments.AugmentOperation.TOGGLE.ordinal()) {
+            augmentInstance.toggle(player);
         }
     }
     

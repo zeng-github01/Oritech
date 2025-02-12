@@ -22,8 +22,8 @@ import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
-import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -543,16 +543,7 @@ public class NetworkContent {
         
         
         MACHINE_CHANNEL.registerClientbound(AugmentOperationSyncPacket.class, ((message, access) -> {
-            var player = access.player();
-            
-            var augmentInstance = PlayerAugments.allAugments.get(message.id);
-            if (message.operation == PlayerAugments.AugmentOperation.ADD.ordinal()) {
-                augmentInstance.installToPlayer(player);
-            } else if (message.operation == PlayerAugments.AugmentOperation.REMOVE.ordinal()) {
-                augmentInstance.removeFromPlayer(player);
-            } else if (message.operation == PlayerAugments.AugmentOperation.TOGGLE.ordinal()) {
-                augmentInstance.toggle(player);
-            }
+            if (access != null) PlayerAugments.handlePlayerAugmentOperation(message, access);   // this weird redict is need for server-only class-loading reasons?
             
         }));
         
