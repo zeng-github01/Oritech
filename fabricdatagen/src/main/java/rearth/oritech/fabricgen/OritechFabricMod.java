@@ -9,7 +9,6 @@ public final class OritechFabricMod implements ModInitializer {
         
         // Run our common setup.
         Oritech.runAllRegistries();
-        Oritech.DATAGEN = true;
         Oritech.initialize();
     }
 }

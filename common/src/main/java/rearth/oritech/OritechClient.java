@@ -38,11 +38,9 @@ public final class OritechClient {
         // used for augment UI
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (AUGMENT_SELECTOR.wasPressed() && activeScreen == null) {
-                System.out.println("opening screen");
                 activeScreen = new AugmentSelectionScreen();
                 client.setScreen(activeScreen);
             } else if (activeScreen != null && !InputUtil.isKeyPressed(MinecraftClient.getInstance().getWindow().getHandle(), AUGMENT_SELECTOR.boundKey.getCode())) {
-                System.out.println("closing screen! " + AUGMENT_SELECTOR.wasPressed());
                 activeScreen.close();
             }
         });
