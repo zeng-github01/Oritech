@@ -1,9 +1,10 @@
 The cybernetic update!
 - Add new cybernetic augmentation system. This includes a new central multiblock, as well as 3 new research station blocks for it.
-- Add chinese wiki translation (Huge thanks to @OakPlatinum)
+- Add chinese wiki translation (Huge thanks to @OakPlatinum).
+- Update translations from crowdin. Huge thanks to everyone working there!
 - Add glowing sections to some machines (Assembler, Enderic Laser, Basic Generator)
 - Change particle accelerator curve calculations, making diagonals more efficient. This should make more "round" accelerators more efficient. This won't (or shouldn't) break existing designs.
-- Improve/Add some tooltips.
+- Improve/add some tooltips to items & machines.
 - Fix framed / duct superconductors not working.
 - Fix fuels from other mods not working in the basic generator on neoforge.
 - Fix oil being tagged as water on neoforge.
