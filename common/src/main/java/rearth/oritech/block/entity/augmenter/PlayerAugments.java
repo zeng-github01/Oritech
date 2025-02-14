@@ -352,7 +352,7 @@ public class PlayerAugments {
         addAugmentAsset(stepAssist, 80, 50, List.of(superSpeedBoost.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
         addAugmentAsset(dwarf, 30, 90, List.of(hpBoost.id), BlockContent.SIMPLE_AUGMENT_STATION);    //
         addAugmentAsset(giant, 55, 90, List.of(dwarf.id, armor.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
-        addAugmentAsset(autoFeeder, 90, 90, List.of(armor.id, hpBoostMore.id), BlockContent.ADVANCED_AUGMENT_STATION);
+        addAugmentAsset(autoFeeder, 90, 90, List.of(armor.id, hpBoostMore.id), BlockContent.SIMPLE_AUGMENT_STATION);
         addAugmentAsset(armor, 30, 50, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
         addAugmentAsset(betterArmor, 105, 50, List.of(autoFeeder.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
         addAugmentAsset(ultimateArmor, 155, 50, List.of(betterArmor.id), BlockContent.ADVANCED_AUGMENT_STATION);
@@ -363,13 +363,13 @@ public class PlayerAugments {
         addAugmentAsset(weaponReach, 140, 70, List.of(blockReach.id), BlockContent.ADVANCED_AUGMENT_STATION);
         addAugmentAsset(blockReach, 115, 90, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);   //
         addAugmentAsset(farBlockReach, 140, 90, List.of(blockReach.id), BlockContent.ADVANCED_AUGMENT_STATION);    //
-        addAugmentAsset(miningSpeed, 30, 10, List.of(attackDamage.id, speedBoost.id), BlockContent.ADVANCED_AUGMENT_STATION);
-        addAugmentAsset(superMiningSpeed, 80, 10, List.of(miningSpeed.id, superSpeedBoost.id), BlockContent.ARCANE_AUGMENT_STATION);
-        addAugmentAsset(attackDamage, 5, 10, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);
+        addAugmentAsset(miningSpeed, 30, 10, List.of(attackDamage.id, speedBoost.id), BlockContent.SIMPLE_AUGMENT_STATION);
+        addAugmentAsset(superMiningSpeed, 80, 10, List.of(miningSpeed.id, superSpeedBoost.id), BlockContent.ADVANCED_AUGMENT_STATION);
+        addAugmentAsset(attackDamage, 5, 10, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
         addAugmentAsset(superAttackDamage, 180, 50, List.of(hpBoostUltra.id, ultimateArmor.id), BlockContent.ARCANE_AUGMENT_STATION);    //
         addAugmentAsset(luck, 55, 30, List.of(), BlockContent.ARCANE_AUGMENT_STATION);     //
         addAugmentAsset(gravity, 180, 10, List.of(flight.id), BlockContent.ARCANE_AUGMENT_STATION);
-        addAugmentAsset(waterBreathing, 5, 90   , List.of(), BlockContent.ADVANCED_AUGMENT_STATION);
+        addAugmentAsset(waterBreathing, 5, 90   , List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
         addAugmentAsset(magnet, 105, 10, List.of(superMiningSpeed.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
         addAugmentAsset(oreFinder, 130, 10, List.of(nightVision.id, magnet.id), BlockContent.ARCANE_AUGMENT_STATION);
     }
