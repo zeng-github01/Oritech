@@ -155,7 +155,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         
     }
     
-    public void researchAugment(Identifier augment) {
+    public void researchAugment(Identifier augment, boolean creative) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -169,7 +169,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         
         var recipe = (AugmentRecipe) world.getRecipeManager().get(augment).get().value();
         
-        energyStorage.setAmount(energyStorage.getAmount() - recipe.getRfCost());
+        var extracted = energyStorage.extract(recipe.getRfCost(), false);
         
         // remove available resources
         for (var wantedInput : recipe.getResearchCost()) {
@@ -200,7 +200,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             station.selectedResearch = augment;
             station.working = true;
             station.researchStartedAt = world.getTime();
-            station.workTime = recipe.getTime();
+            station.workTime = creative ? 5 : recipe.getTime();
             
             break;
             
