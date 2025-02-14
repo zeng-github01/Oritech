@@ -117,6 +117,8 @@ public class Config {
     public boolean tightCableHitboxes = true;
     @Sync(Option.SyncMode.NONE)
     public float machineVolumeMultiplier = 1f;
+    @Sync(Option.SyncMode.NONE)
+    public boolean showMachinePreview = true;
     
     public static class ProcessingMachines {
         

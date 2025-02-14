@@ -18,6 +18,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShapes;
 import org.joml.Matrix4f;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
 import rearth.oritech.block.blocks.storage.LargeStorageBlock;
@@ -41,11 +42,8 @@ public class BlockOutlineRenderer {
         var itemStack = player.getMainHandStack();
         var blockPos = ((BlockHitResult) client.crosshairTarget).getBlockPos();
         
-        try {
+        if (Oritech.CONFIG.showMachinePreview())
             renderBlockPlacementPreviewOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         renderPromethiumPickaxeOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
     }
     
