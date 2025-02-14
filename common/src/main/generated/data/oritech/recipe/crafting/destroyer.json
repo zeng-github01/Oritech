@@ -6,16 +6,16 @@
       "tag": "oritech:plating"
     },
     "c": {
-      "item": "oritech:advanced_computing_engine"
+      "item": "oritech:pulverizer_block"
     },
     "f": {
-      "item": "oritech:flux_gate"
+      "item": "oritech:motor"
     },
     "m": {
       "item": "oritech:motor"
     },
     "s": {
-      "item": "oritech:enderic_lens"
+      "item": "oritech:laser_arm_block"
     }
   },
   "pattern": [
