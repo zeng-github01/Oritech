@@ -56,8 +56,8 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     public final Set<Identifier> researchedAugments = new HashSet<>();
     
     // config
-    public static long maxEnergyTransfer = 50_000_000;
-    public static long maxEnergyStored = 500_000_000L;
+    public static long maxEnergyTransfer = Oritech.CONFIG.augmenterMaxEnergy() / 10;
+    public static long maxEnergyStored = Oritech.CONFIG.augmenterMaxEnergy();
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();

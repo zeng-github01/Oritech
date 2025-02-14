@@ -102,6 +102,9 @@ public class Config {
     public int idleWaitTicks = 200;
     public int blackHoleTachyonEnergy = 50_000;
     
+    @SectionHeader("augments")
+    public long augmenterMaxEnergy = 500_000_000L;
+    
     @SectionHeader("clientSettings")
     @Sync(Option.SyncMode.NONE)
     @RestartRequired

@@ -282,7 +282,8 @@ public class PlayerAugments {
     public static final PlayerAugment oreFinder = new PlayerTickingAugment(Oritech.id("orefinder"), true) {
         
         @Override
-        public void serverTick(PlayerEntity player) { }
+        public void serverTick(PlayerEntity player) {
+        }
         
         @Override
         public void clientTick(PlayerEntity player) {
@@ -369,7 +370,7 @@ public class PlayerAugments {
         addAugmentAsset(superAttackDamage, 180, 50, List.of(hpBoostUltra.id, ultimateArmor.id), BlockContent.ARCANE_AUGMENT_STATION);    //
         addAugmentAsset(luck, 55, 30, List.of(), BlockContent.ARCANE_AUGMENT_STATION);     //
         addAugmentAsset(gravity, 180, 10, List.of(flight.id), BlockContent.ARCANE_AUGMENT_STATION);
-        addAugmentAsset(waterBreathing, 5, 90   , List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
+        addAugmentAsset(waterBreathing, 5, 90, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
         addAugmentAsset(magnet, 105, 10, List.of(superMiningSpeed.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
         addAugmentAsset(oreFinder, 130, 10, List.of(nightVision.id, magnet.id), BlockContent.ARCANE_AUGMENT_STATION);
     }
@@ -377,6 +378,7 @@ public class PlayerAugments {
     private static void addAugmentAsset(PlayerAugment augment, int x, int y, List<Identifier> requirements, Block requiredStation) {
         allAugments.put(augment.id, augment);
         augmentAssets.put(augment.id, new AugmentExtraData(augment.id, requirements, Registries.BLOCK.getId(requiredStation), new Vector2i(x, y)));
+        augment.register();
     }
     
     // called when a client connect to a server
@@ -423,7 +425,8 @@ public class PlayerAugments {
     public interface TickingAugment {
         void serverTick(PlayerEntity player);
         
-        default void clientTick(PlayerEntity player) {}
+        default void clientTick(PlayerEntity player) {
+        }
     }
     
     public static abstract class PlayerAugment {
@@ -444,8 +447,11 @@ public class PlayerAugments {
         
         public abstract void removeFromPlayer(PlayerEntity player);
         
-        public void onInstalled(PlayerEntity player) { }
-        public void onRemoved(PlayerEntity player) {}
+        public void onInstalled(PlayerEntity player) {
+        }
+        
+        public void onRemoved(PlayerEntity player) {
+        }
         
         public void onPlayerLoad(PlayerEntity player) {
             
@@ -457,32 +463,39 @@ public class PlayerAugments {
             
         }
         
-        public void toggle(PlayerEntity player) { }
+        public void toggle(PlayerEntity player) {
+        }
         
-        public boolean isEnabled (PlayerEntity player) {return true;}
+        public boolean isEnabled(PlayerEntity player) {
+            return true;
+        }
+        
+        public void register() {}
         
     }
     
+    @SuppressWarnings("UnstableApiUsage")
     public static class PlayerCustomAugment extends PlayerAugment {
         
-        private final AttachmentType<Integer> OWN_TYPE = AttachmentRegistry.<Integer>builder()
-                                                                     .copyOnDeath()
-                                                                     .persistent(Codec.INT)
-                                                                     .initializer(() -> -1)
-                                                                     // .syncWith(PacketCodecs.VAR_INT.cast(), AttachmentSyncPredicate.targetOnly())   // because FFAPI isnt updated yet this cannot be used
-                                                                     .buildAndRegister(this.id);
-        
+        private AttachmentType<Integer> OWN_TYPE;
         
         protected PlayerCustomAugment(Identifier id) {
             this(id, false);
         }
         
         protected PlayerCustomAugment(Identifier id, boolean toggleable) {
-            this(id, toggleable, true);
+            super(id, toggleable, true);
         }
         
-        protected PlayerCustomAugment(Identifier id, boolean toggleable, boolean autoSync) {
-            super(id, toggleable, autoSync);
+        @Override
+        public void register() {
+            
+            OWN_TYPE = AttachmentRegistry.<Integer>builder()
+                         .copyOnDeath()
+                         .persistent(Codec.INT)
+                         .initializer(() -> -1)
+                         // .syncWith(PacketCodecs.VAR_INT.cast(), AttachmentSyncPredicate.targetOnly())   // because FFAPI isnt updated yet this cannot be used
+                         .buildAndRegister(this.id);
         }
         
         public AttachmentType<Integer> getOwnType() {
@@ -513,18 +526,23 @@ public class PlayerAugments {
         }
     }
     
+    @SuppressWarnings("UnstableApiUsage")
     public static class PlayerPortalAugment extends PlayerAugment {
         
-        private final AttachmentType<BlockPos> OWN_TYPE = AttachmentRegistry.<BlockPos>builder()
-                                                           .copyOnDeath()
-                                                           .persistent(BlockPos.CODEC)
-                                                           .initializer(() -> BlockPos.ORIGIN)
-                                                           // .syncWith(BlockPos.PACKET_CODEC.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
-                                                           .buildAndRegister(this.id);
-        
+        private AttachmentType<BlockPos> OWN_TYPE;
         
         protected PlayerPortalAugment(Identifier id, boolean toggleable) {
             super(id, toggleable, true);
+        }
+        
+        @Override
+        public void register() {
+            OWN_TYPE = AttachmentRegistry.<BlockPos>builder()
+                         .copyOnDeath()
+                         .persistent(BlockPos.CODEC)
+                         .initializer(() -> BlockPos.ORIGIN)
+                         // .syncWith(BlockPos.PACKET_CODEC.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
+                         .buildAndRegister(this.id);
         }
         
         public AttachmentType<BlockPos> getOwnType() {
@@ -569,7 +587,8 @@ public class PlayerAugments {
             var targetPos = player.getAttached(OWN_TYPE);
             if (targetPos == null) return;
             
-            var portalEntity = EntitiesContent.PORTAL_ENTITY.create((ServerWorld) world, spawner -> {}, BlockPos.ofFloored(spawnPos), SpawnReason.EVENT, false, false);
+            var portalEntity = EntitiesContent.PORTAL_ENTITY.create((ServerWorld) world, spawner -> {
+            }, BlockPos.ofFloored(spawnPos), SpawnReason.EVENT, false, false);
             if (portalEntity != null) {
                 portalEntity.setPosition(spawnPos);
                 portalEntity.setYaw(-player.getYaw() + 90);
@@ -606,6 +625,7 @@ public class PlayerAugments {
         protected PlayerStatEnhancingAugment(Identifier id, RegistryEntry<EntityAttribute> targetAttribute, float amount, EntityAttributeModifier.Operation operation, boolean toggleable) {
             this(id, targetAttribute, amount, operation, toggleable, false);
         }
+        
         protected PlayerStatEnhancingAugment(Identifier id, RegistryEntry<EntityAttribute> targetAttribute, float amount, EntityAttributeModifier.Operation operation, boolean toggleable, boolean autoSync) {
             super(id, toggleable, autoSync);
             this.targetAttribute = targetAttribute;
@@ -668,5 +688,7 @@ public class PlayerAugments {
         }
     }
     
-    public record AugmentExtraData(Identifier id, List<Identifier> requirements, Identifier requiredStation, Vector2i position) {}
+    public record AugmentExtraData(Identifier id, List<Identifier> requirements, Identifier requiredStation,
+                                   Vector2i position) {
+    }
 }
