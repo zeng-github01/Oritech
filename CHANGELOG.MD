@@ -1,0 +1,7 @@
+- Add preview renderer for multiblock machines.
+- Add options for augments to now be instantly researched in creative mode.
+- Add separate texture for disconnected machine extender blocks.
+- Add augmenter config options (for RF Storage).
+- Balance some early augments to only require the basic stations.
+- Change recipe for block destroyers, making them available a bit earlier.
+- Fix some compatibility issues with augment registration. These changes have been tested with Enigmatica 10 and ATM 10.
