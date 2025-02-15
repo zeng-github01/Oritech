@@ -71,6 +71,12 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
                 
                 if (furnaceCraftingFinished(activeRecipe)) {
                     craftFurnaceItem(activeRecipe);
+                    
+                    for (int i = 0; i < this.getBaseAddonData().extraChambers(); i++) {
+                        if (!canAddToSlot(recipeCandidate.get().value().getResult(world.getRegistryManager()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty()) break;
+                        craftFurnaceItem(activeRecipe);
+                    }
+                    
                     resetProgress();
                 }
                 
