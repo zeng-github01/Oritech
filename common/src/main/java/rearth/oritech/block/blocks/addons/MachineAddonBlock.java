@@ -185,13 +185,13 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
             var controllerEntity = world.getBlockEntity(Objects.requireNonNull(ownEntity).getControllerPos());
             
             if (controllerEntity instanceof MachineAddonController machineEntity) {
-                machineEntity.resetAddons();
+                machineEntity.initAddons(pos);
             }
         }
         
         return super.onBreak(world, pos, state, player);
     }
-
+    
     public AddonSettings getAddonSettings() {
         return addonSettings;
     }

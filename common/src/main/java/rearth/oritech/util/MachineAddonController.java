@@ -20,8 +20,10 @@ import java.util.*;
 
 public interface MachineAddonController {
     
+    // list of where actually connected addons are
     List<BlockPos> getConnectedAddons();
     
+    // a list of where addons could be placed
     List<BlockPos> getOpenSlots();
     
     BlockPos getMachinePos();
@@ -51,18 +53,38 @@ public interface MachineAddonController {
     }
     
     // to initialize everything, should be called when right-clicked
-    default void initAddons() {
-        getConnectedAddons().clear();
+    default void initAddons(BlockPos brokenAddon) {
         
-        var foundAddons = getAllAddons();
+        var foundAddons = getAllAddons(brokenAddon);
         
         gatherAddonStats(foundAddons);
         writeAddons(foundAddons);
+        updateEnergyContainer();
+        removeOldAddons(foundAddons);
+        
+        getConnectedAddons().clear();
         updateEnergyContainer();
         
         for (var addon : foundAddons) {
             getConnectedAddons().add(addon.pos());
         }
+    }
+    
+    private void removeOldAddons(List<AddonBlock> foundAddons) {
+        // remove/reset all old addons that are not connected anymore
+        for (var addon : getConnectedAddons()) {
+            if (foundAddons.stream().noneMatch(newAddon -> newAddon.pos().equals(addon))) {
+                var state = Objects.requireNonNull(getMachineWorld()).getBlockState(addon);
+                if (state.getBlock() instanceof MachineAddonBlock) {
+                    getMachineWorld().setBlockState(addon, state.with(MachineAddonBlock.ADDON_USED, false));
+                    getMachineWorld().updateNeighborsAlways(addon, state.getBlock());
+                }
+            }
+        }
+    }
+    
+    default void initAddons() {
+        initAddons(null);
     }
     
     // to be called if controller or one of the addons has been broken
@@ -81,7 +103,7 @@ public interface MachineAddonController {
     }
     
     // addon loading algorithm, called during init
-    default List<AddonBlock> getAllAddons() {
+    default List<AddonBlock> getAllAddons(BlockPos brokenAddon) {
         
         var maxIterationCount = (int) getCoreQuality() + 1;
         
@@ -122,6 +144,12 @@ public interface MachineAddonController {
                 
                 var candidate = world.getBlockState(candidatePos);
                 var candidateEntity = world.getBlockEntity(candidatePos);
+                
+                // if the candidate is the broken addon, skip it
+                if (candidatePos.equals(brokenAddon)) {
+                    openSlots.add(candidatePos);
+                    continue;
+                }
                 
                 // if the candidate is not an addon
                 if (!(candidate.getBlock() instanceof MachineAddonBlock addonBlock) || !(candidateEntity instanceof AddonBlockEntity candidateAddonEntity)) {
