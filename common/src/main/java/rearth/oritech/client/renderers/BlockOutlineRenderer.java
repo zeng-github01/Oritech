@@ -84,7 +84,7 @@ public class BlockOutlineRenderer {
             shape = VoxelShapes.union(shape, VoxelShapes.cuboid(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ(), worldOffset.getX() + 1, worldOffset.getY() + 1, worldOffset.getZ() + 1));
         }
         
-        WorldRenderer.drawCuboidShapeOutline(matrixStack, consumer.getBuffer(RenderLayer.getLines()), shape, 0, 0, 0, 1f, 1f, 1f, 0.35F);
+        WorldRenderer.drawCuboidShapeOutline(matrixStack, consumer.getBuffer(RenderLayer.getLines()), shape, 0, 0, 0, 1f, 1f, 1f, 0.7F);
         matrixStack.pop();
         
     }
