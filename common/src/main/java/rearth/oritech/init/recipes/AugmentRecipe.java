@@ -38,7 +38,7 @@ public class AugmentRecipe implements Recipe<RecipeInput> {
     
     @Override
     public ItemStack craft(RecipeInput input, RegistryWrapper.WrapperLookup lookup) {
-        throw new UnsupportedOperationException();
+        return ItemStack.EMPTY;
     }
     
     @Override
@@ -48,7 +48,7 @@ public class AugmentRecipe implements Recipe<RecipeInput> {
     
     @Override
     public ItemStack getResult(RegistryWrapper.WrapperLookup registriesLookup) {
-        throw new UnsupportedOperationException();
+        return ItemStack.EMPTY;
     }
     
     @Override
