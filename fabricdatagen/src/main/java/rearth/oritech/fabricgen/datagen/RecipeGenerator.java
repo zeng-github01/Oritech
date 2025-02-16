@@ -920,7 +920,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         addAugmentRecipe(exporter,
           List.of(
             new SizedIngredient(64, of(ItemContent.ENDERIC_LENS)),
-            new SizedIngredient(48, of(Items.ENDER_PEARL)),
+            new SizedIngredient(16, of(Items.ENDER_PEARL)),
             new SizedIngredient(16, of(Items.DIAMOND_BLOCK))),
           List.of(
             new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
@@ -1010,12 +1010,12 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         addAugmentRecipe(exporter,
           List.of(
-            new SizedIngredient(64, of(Items.ENDER_PEARL)),
+            new SizedIngredient(16, of(Items.ENDER_PEARL)),
             new SizedIngredient(48, of(Items.OBSIDIAN)),
             new SizedIngredient(1, of(ItemContent.UNHOLY_INTELLIGENCE)),
             new SizedIngredient(32, of(ItemContent.ADAMANT_INGOT))),
           List.of(
-            new SizedIngredient(64, of(Items.ENDER_PEARL)),
+            new SizedIngredient(8, of(Items.ENDER_PEARL)),
             new SizedIngredient(32, of(Items.CRYING_OBSIDIAN))),
           3000, 250_000_000, "portal");
         
