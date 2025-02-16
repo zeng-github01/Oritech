@@ -14,6 +14,11 @@
       }
     }
   ],
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [
+    "oritech:nightvision",
+    "oritech:magnet"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -28,7 +33,6 @@
       }
     },
     {
-      "count": 48,
       "ingredient": {
         "item": "oritech:overcharged_crystal"
       }
@@ -40,12 +44,14 @@
       }
     },
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "minecraft:sculk_sensor"
       }
     }
   ],
   "rfCost": 200000000,
-  "time": 3200
+  "time": 3200,
+  "uiX": 130,
+  "uiY": 10
 }

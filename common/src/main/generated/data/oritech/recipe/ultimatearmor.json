@@ -19,6 +19,10 @@
       }
     }
   ],
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:betterarmor"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -46,5 +50,7 @@
     }
   ],
   "rfCost": 500000000,
-  "time": 2400
+  "time": 2400,
+  "uiX": 155,
+  "uiY": 50
 }

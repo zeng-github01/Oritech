@@ -14,6 +14,10 @@
       }
     }
   ],
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:blockreach"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -22,7 +26,7 @@
       }
     },
     {
-      "count": 48,
+      "count": 16,
       "ingredient": {
         "item": "minecraft:ender_pearl"
       }
@@ -35,5 +39,7 @@
     }
   ],
   "rfCost": 200000000,
-  "time": 800
+  "time": 800,
+  "uiX": 140,
+  "uiY": 90
 }

@@ -14,6 +14,10 @@
       }
     }
   ],
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:superminingspeed"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -35,5 +39,7 @@
     }
   ],
   "rfCost": 400000000,
-  "time": 2400
+  "time": 2400,
+  "uiX": 105,
+  "uiY": 10
 }

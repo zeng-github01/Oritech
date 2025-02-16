@@ -14,6 +14,10 @@
       }
     }
   ],
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:ultimatearmor"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -34,5 +38,7 @@
     }
   ],
   "rfCost": 200000000,
-  "time": 1600
+  "time": 1600,
+  "uiX": 165,
+  "uiY": 70
 }

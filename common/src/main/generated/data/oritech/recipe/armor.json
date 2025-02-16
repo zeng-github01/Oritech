@@ -14,6 +14,8 @@
       }
     }
   ],
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [],
   "researchCost": [
     {
       "count": 64,
@@ -35,5 +37,7 @@
     }
   ],
   "rfCost": 80000000,
-  "time": 800
+  "time": 800,
+  "uiX": 30,
+  "uiY": 50
 }

@@ -14,6 +14,11 @@
       }
     }
   ],
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:dwarf",
+    "oritech:armor"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -24,7 +29,7 @@
     {
       "count": 32,
       "ingredient": {
-        "item": "oritech:small_plutonium_pellet"
+        "item": "oritech:small_uranium_dust"
       }
     },
     {
@@ -35,5 +40,7 @@
     }
   ],
   "rfCost": 300000000,
-  "time": 1600
+  "time": 1600,
+  "uiX": 55,
+  "uiY": 90
 }

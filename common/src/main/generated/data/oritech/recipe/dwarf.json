@@ -14,6 +14,10 @@
       }
     }
   ],
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:hpboost"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -35,5 +39,7 @@
     }
   ],
   "rfCost": 50000000,
-  "time": 400
+  "time": 400,
+  "uiX": 30,
+  "uiY": 90
 }

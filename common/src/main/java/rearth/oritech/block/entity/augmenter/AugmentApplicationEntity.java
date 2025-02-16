@@ -193,9 +193,8 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             if (station == null) continue;
             if (station.working) continue;
             
-            var augmentAssets = PlayerAugments.augmentAssets.get(augment);
             
-            if (!Registries.BLOCK.getId(station.type).equals(augmentAssets.requiredStation())) continue;
+            if (!Registries.BLOCK.getId(station.type).equals(recipe.getRequiredStation())) continue;
             
             station.selectedResearch = augment;
             station.working = true;

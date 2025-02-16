@@ -14,6 +14,10 @@
       }
     }
   ],
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [
+    "oritech:flight"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -35,5 +39,7 @@
     }
   ],
   "rfCost": 400000000,
-  "time": 2200
+  "time": 2200,
+  "uiX": 180,
+  "uiY": 10
 }

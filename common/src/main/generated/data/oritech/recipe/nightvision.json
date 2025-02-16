@@ -2,7 +2,7 @@
   "type": "oritech:augment",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:enderic_lens"
       }
@@ -20,11 +20,13 @@
       }
     }
   ],
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [],
   "researchCost": [
     {
       "count": 64,
       "ingredient": {
-        "item": "minecraft:gold_block"
+        "item": "minecraft:gold_ingot"
       }
     },
     {
@@ -41,5 +43,7 @@
     }
   ],
   "rfCost": 50000000,
-  "time": 2400
+  "time": 2400,
+  "uiX": 105,
+  "uiY": 30
 }

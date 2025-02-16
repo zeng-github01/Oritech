@@ -14,6 +14,11 @@
       }
     }
   ],
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [
+    "oritech:hpboostultra",
+    "oritech:ultimatearmor"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -35,5 +40,7 @@
     }
   ],
   "rfCost": 500000000,
-  "time": 2800
+  "time": 2800,
+  "uiX": 180,
+  "uiY": 50
 }

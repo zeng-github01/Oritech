@@ -19,6 +19,11 @@
       }
     }
   ],
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:speedboost",
+    "oritech:armor"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -40,5 +45,7 @@
     }
   ],
   "rfCost": 350000000,
-  "time": 1800
+  "time": 1800,
+  "uiX": 55,
+  "uiY": 50
 }

@@ -36,7 +36,6 @@ import java.util.*;
 
 public class PlayerAugments {
     public static final Map<Identifier, PlayerAugment> allAugments = new HashMap<>();
-    public static final Map<Identifier, AugmentExtraData> augmentAssets = new HashMap<>();
     
     private static final PlayerAugment hpBoost = new PlayerStatEnhancingAugment(Oritech.id("hpboost"), EntityAttributes.GENERIC_MAX_HEALTH, 6, EntityAttributeModifier.Operation.ADD_VALUE);
     private static final PlayerAugment hpBoostMore = new PlayerStatEnhancingAugment(Oritech.id("hpboostmore"), EntityAttributes.GENERIC_MAX_HEALTH, 4, EntityAttributeModifier.Operation.ADD_VALUE);
@@ -54,7 +53,7 @@ public class PlayerAugments {
     private static final PlayerAugment blockReach = new PlayerStatEnhancingAugment(Oritech.id("blockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 0.3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE);
     private static final PlayerAugment farBlockReach = new PlayerStatEnhancingAugment(Oritech.id("farblockreach"), EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE, 1f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
     private static final PlayerAugment miningSpeed = new PlayerStatEnhancingAugment(Oritech.id("miningspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, false);
-    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("fastminingspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
+    private static final PlayerAugment superMiningSpeed = new PlayerStatEnhancingAugment(Oritech.id("superminingspeed"), EntityAttributes.PLAYER_BLOCK_BREAK_SPEED, 3f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, true);
     private static final PlayerAugment luck = new PlayerStatEnhancingAugment(Oritech.id("luck"), EntityAttributes.GENERIC_LUCK, 500f, EntityAttributeModifier.Operation.ADD_VALUE, false);
     private static final PlayerAugment gravity = new PlayerStatEnhancingAugment(Oritech.id("gravity"), EntityAttributes.GENERIC_GRAVITY, -0.5f, EntityAttributeModifier.Operation.ADD_MULTIPLIED_BASE, false);
     private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, false, true);
@@ -344,40 +343,39 @@ public class PlayerAugments {
     
     public static void init() {
         
-        addAugmentAsset(hpBoost, 5, 70, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
-        addAugmentAsset(hpBoostMore, 80, 70, List.of(armor.id), BlockContent.SIMPLE_AUGMENT_STATION);
-        addAugmentAsset(hpBoostUltra, 165, 70, List.of(ultimateArmor.id), BlockContent.ADVANCED_AUGMENT_STATION);
-        addAugmentAsset(hpBoostUltimate, 205, 40, List.of(hpBoostUltra.id, gravity.id), BlockContent.ADVANCED_AUGMENT_STATION);
-        addAugmentAsset(speedBoost, 5, 30, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
-        addAugmentAsset(superSpeedBoost, 55, 50, List.of(speedBoost.id, armor.id), BlockContent.ADVANCED_AUGMENT_STATION);    //
-        addAugmentAsset(stepAssist, 80, 50, List.of(superSpeedBoost.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
-        addAugmentAsset(dwarf, 30, 90, List.of(hpBoost.id), BlockContent.SIMPLE_AUGMENT_STATION);    //
-        addAugmentAsset(giant, 55, 90, List.of(dwarf.id, armor.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
-        addAugmentAsset(autoFeeder, 90, 90, List.of(armor.id, hpBoostMore.id), BlockContent.SIMPLE_AUGMENT_STATION);
-        addAugmentAsset(armor, 30, 50, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
-        addAugmentAsset(betterArmor, 105, 50, List.of(autoFeeder.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
-        addAugmentAsset(ultimateArmor, 155, 50, List.of(betterArmor.id), BlockContent.ADVANCED_AUGMENT_STATION);
-        addAugmentAsset(flight, 155, 30, List.of(betterArmor.id, portal.id), BlockContent.ADVANCED_AUGMENT_STATION);   //
-        addAugmentAsset(cloak, 155, 10, List.of(oreFinder.id), BlockContent.ARCANE_AUGMENT_STATION);    //
-        addAugmentAsset(portal, 130, 30, List.of(), BlockContent.ARCANE_AUGMENT_STATION);    //
-        addAugmentAsset(nightVision, 105, 30, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);
-        addAugmentAsset(weaponReach, 140, 70, List.of(blockReach.id), BlockContent.ADVANCED_AUGMENT_STATION);
-        addAugmentAsset(blockReach, 115, 90, List.of(), BlockContent.ADVANCED_AUGMENT_STATION);   //
-        addAugmentAsset(farBlockReach, 140, 90, List.of(blockReach.id), BlockContent.ADVANCED_AUGMENT_STATION);    //
-        addAugmentAsset(miningSpeed, 30, 10, List.of(attackDamage.id, speedBoost.id), BlockContent.SIMPLE_AUGMENT_STATION);
-        addAugmentAsset(superMiningSpeed, 80, 10, List.of(miningSpeed.id, superSpeedBoost.id), BlockContent.ADVANCED_AUGMENT_STATION);
-        addAugmentAsset(attackDamage, 5, 10, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
-        addAugmentAsset(superAttackDamage, 180, 50, List.of(hpBoostUltra.id, ultimateArmor.id), BlockContent.ARCANE_AUGMENT_STATION);    //
-        addAugmentAsset(luck, 55, 30, List.of(), BlockContent.ARCANE_AUGMENT_STATION);     //
-        addAugmentAsset(gravity, 180, 10, List.of(flight.id), BlockContent.ARCANE_AUGMENT_STATION);
-        addAugmentAsset(waterBreathing, 5, 90, List.of(), BlockContent.SIMPLE_AUGMENT_STATION);
-        addAugmentAsset(magnet, 105, 10, List.of(superMiningSpeed.id), BlockContent.SIMPLE_AUGMENT_STATION);   //
-        addAugmentAsset(oreFinder, 130, 10, List.of(nightVision.id, magnet.id), BlockContent.ARCANE_AUGMENT_STATION);
+        addAugmentAsset(hpBoost);
+        addAugmentAsset(hpBoostMore);
+        addAugmentAsset(hpBoostUltra);
+        addAugmentAsset(hpBoostUltimate);
+        addAugmentAsset(speedBoost);
+        addAugmentAsset(superSpeedBoost);
+        addAugmentAsset(stepAssist);
+        addAugmentAsset(dwarf);
+        addAugmentAsset(giant);
+        addAugmentAsset(autoFeeder);
+        addAugmentAsset(armor);
+        addAugmentAsset(betterArmor);
+        addAugmentAsset(ultimateArmor);
+        addAugmentAsset(flight);
+        addAugmentAsset(cloak);
+        addAugmentAsset(portal);
+        addAugmentAsset(nightVision);
+        addAugmentAsset(weaponReach);
+        addAugmentAsset(blockReach);
+        addAugmentAsset(farBlockReach);
+        addAugmentAsset(miningSpeed);
+        addAugmentAsset(superMiningSpeed);
+        addAugmentAsset(attackDamage);
+        addAugmentAsset(superAttackDamage);
+        addAugmentAsset(luck);
+        addAugmentAsset(gravity);
+        addAugmentAsset(waterBreathing);
+        addAugmentAsset(magnet);
+        addAugmentAsset(oreFinder);
     }
     
-    private static void addAugmentAsset(PlayerAugment augment, int x, int y, List<Identifier> requirements, Block requiredStation) {
+    private static void addAugmentAsset(PlayerAugment augment) {
         allAugments.put(augment.id, augment);
-        augmentAssets.put(augment.id, new AugmentExtraData(augment.id, requirements, Registries.BLOCK.getId(requiredStation), new Vector2i(x, y)));
         augment.register();
     }
     
@@ -686,9 +684,5 @@ public class PlayerAugments {
             var newAmount = isActive ? 0 : amount;
             instance.overwritePersistentModifier(new EntityAttributeModifier(id, newAmount, operation));
         }
-    }
-    
-    public record AugmentExtraData(Identifier id, List<Identifier> requirements, Identifier requiredStation,
-                                   Vector2i position) {
     }
 }

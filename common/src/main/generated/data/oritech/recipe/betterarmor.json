@@ -19,6 +19,10 @@
       }
     }
   ],
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:autofeeder"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -40,5 +44,7 @@
     }
   ],
   "rfCost": 280000000,
-  "time": 1600
+  "time": 1600,
+  "uiX": 105,
+  "uiY": 50
 }

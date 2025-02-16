@@ -18,6 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
@@ -770,7 +771,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addAugmentRecipes(RecipeExporter exporter) {
-
+        
+        var SIMPLE_AUGMENT_STATION_ID = Registries.BLOCK.getId(BlockContent.SIMPLE_AUGMENT_STATION);
+        var ADVANCED_AUGMENT_STATION_ID = Registries.BLOCK.getId(BlockContent.ADVANCED_AUGMENT_STATION);
+        var ARCANE_AUGMENT_STATION_ID = Registries.BLOCK.getId(BlockContent.ARCANE_AUGMENT_STATION);
+        
         addAugmentRecipe(exporter,
           List.of(
             new SizedIngredient(64, of(TagContent.MACHINE_PLATING)),
@@ -779,7 +784,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(8, of(TagContent.STEEL_INGOTS)),
             new SizedIngredient(16, of(ConventionalItemTags.IRON_INGOTS))),
-          400, 10_000_000, "hpboost");
+          List.of(), SIMPLE_AUGMENT_STATION_ID, 5, 70, 400, 10_000_000, "hpboost");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -789,7 +794,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(8, of(ItemContent.CARBON_FIBRE_STRANDS)),
             new SizedIngredient(4, of(ItemContent.DURATIUM_INGOT))),
-          800, 50_000_000, "hpboostmore");
+          List.of("oritech:armor"), SIMPLE_AUGMENT_STATION_ID, 80, 70, 800, 50_000_000, "hpboostmore");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -799,7 +804,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(64, of(ItemContent.DURATIUM_DUST)),
             new SizedIngredient(64, of(Items.REDSTONE_BLOCK))),
-          1600, 200_000_000, "hpboostultra");
+          List.of("oritech:ultimatearmor"), ADVANCED_AUGMENT_STATION_ID, 165, 70, 1600, 200_000_000, "hpboostultra");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -811,7 +816,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             new SizedIngredient(32, of(ItemContent.ADAMANT_INGOT)),
             new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
             new SizedIngredient(64, of(ItemContent.FLUXITE))),
-          2400, 500_000_000, "hpboostultimate");
+          List.of("oritech:hpboostultra", "oritech:gravity"), ADVANCED_AUGMENT_STATION_ID, 205, 40, 2400, 500_000_000, "hpboostultimate");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -821,7 +826,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(16, of(ItemContent.MOTOR)),
             new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS))),
-          600, 30_000_000, "speedboost");
+          List.of(), SIMPLE_AUGMENT_STATION_ID, 5, 30, 600, 30_000_000, "speedboost");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -832,7 +837,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
             new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
             new SizedIngredient(64, of(TagContent.ELECTRUM_DUSTS))),
-          1800, 350_000_000, "superspeedboost");
+          List.of("oritech:speedboost", "oritech:armor"), ADVANCED_AUGMENT_STATION_ID, 55, 50, 1800, 350_000_000, "superspeedboost");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -842,7 +847,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(16, of(ItemContent.MOTOR)),
             new SizedIngredient(64, of(ConventionalItemTags.IRON_INGOTS))),
-          800, 75_000_000, "stepassist");
+          List.of("oritech:superspeedboost"), SIMPLE_AUGMENT_STATION_ID, 80, 50, 800, 75_000_000, "stepassist");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -852,17 +857,17 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(TagContent.SILICON)),
             new SizedIngredient(32, of(Items.REDSTONE_BLOCK))),
-          400, 50_000_000, "dwarf");
+          List.of("oritech:hpboost"), SIMPLE_AUGMENT_STATION_ID, 30, 90, 400, 50_000_000, "dwarf");
         
         addAugmentRecipe(exporter,
           List.of(
             new SizedIngredient(64, of(ItemContent.RAW_BIOPOLYMER)),
-            new SizedIngredient(32, of(ItemContent.SMALL_PLUTONIUM_PELLET)),
+            new SizedIngredient(32, of(ItemContent.SMALL_URANIUM_DUST)),
             new SizedIngredient(64, of(TagContent.BIOMASS))),
           List.of(
             new SizedIngredient(32, of(ItemContent.RAW_BIOPOLYMER)),
             new SizedIngredient(64, of(ConventionalItemTags.IRON_INGOTS))),
-          1600, 300_000_000, "giant");
+          List.of("oritech:dwarf", "oritech:armor"), SIMPLE_AUGMENT_STATION_ID, 55, 90, 1600, 300_000_000, "giant");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -872,7 +877,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(4, of(ItemContent.DURATIUM_INGOT)),
             new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS))),
-          800, 80_000_000, "armor");
+          List.of(), SIMPLE_AUGMENT_STATION_ID, 30, 50, 800, 80_000_000, "armor");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -883,7 +888,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             new SizedIngredient(16, of(ItemContent.MAGNETIC_COIL)),
             new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
             new SizedIngredient(8, of(ItemContent.DURATIUM_INGOT))),
-          1600, 280_000_000, "betterarmor");
+          List.of("oritech:autofeeder"), SIMPLE_AUGMENT_STATION_ID, 105, 50, 1600, 280_000_000, "betterarmor");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -895,7 +900,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             new SizedIngredient(32, of(BlockContent.FLUXITE_BLOCK)),
             new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
             new SizedIngredient(16, of(Items.OBSIDIAN))),
-          2400, 500_000_000, "ultimatearmor");
+          List.of("oritech:betterarmor"), ADVANCED_AUGMENT_STATION_ID, 155, 50, 2400, 500_000_000, "ultimatearmor");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -905,7 +910,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
             new SizedIngredient(64, of(Items.IRON_BLOCK))),
-          1600, 150_000_000, "weaponreach");
+          List.of("oritech:blockreach"), ADVANCED_AUGMENT_STATION_ID, 140, 70, 1600, 150_000_000, "weaponreach");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -915,7 +920,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.MOTOR)),
             new SizedIngredient(64, of(Items.COPPER_INGOT))),
-          900, 100_000_000, "blockreach");
+          List.of(), SIMPLE_AUGMENT_STATION_ID, 115, 90, 900, 100_000_000, "blockreach");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -925,7 +930,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
             new SizedIngredient(64, of(Items.OBSIDIAN))),
-          800, 200_000_000, "farblockreach");
+          List.of("oritech:blockreach"), ADVANCED_AUGMENT_STATION_ID, 140, 90, 800, 200_000_000, "farblockreach");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -935,7 +940,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(16, of(Items.QUARTZ_BLOCK)),
             new SizedIngredient(32, of(ConventionalItemTags.IRON_INGOTS))),
-          1200, 100_000_000, "miningspeed");
+          List.of("oritech:attackdamage", "oritech:speedboost"), SIMPLE_AUGMENT_STATION_ID, 30, 10, 1200, 100_000_000, "miningspeed");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -945,7 +950,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.ENERGITE_INGOT)),
             new SizedIngredient(64, of(Items.REDSTONE_BLOCK))),
-          2400, 450_000_000, "fastminingspeed");
+          List.of("oritech:miningspeed", "oritech:superspeedboost"), ADVANCED_AUGMENT_STATION_ID, 80, 10, 2400, 450_000_000, "superminingspeed");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -955,7 +960,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(16, of(TagContent.STEEL_INGOTS)),
             new SizedIngredient(4, of(ItemContent.DURATIUM_INGOT))),
-          1600, 150_000_000, "attackdamage");
+          List.of(), SIMPLE_AUGMENT_STATION_ID, 5, 10, 1600, 150_000_000, "attackdamage");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -965,7 +970,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.ENDERIC_COMPOUND)),
             new SizedIngredient(64, of(Items.GOLD_BLOCK))),
-          2800, 500_000_000, "superattackdamage");
+          List.of("oritech:hpboostultra", "oritech:ultimatearmor"), ARCANE_AUGMENT_STATION_ID, 180, 50, 2800, 500_000_000, "superattackdamage");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -975,7 +980,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(Items.LAPIS_BLOCK)),
             new SizedIngredient(64, of(Items.REDSTONE_BLOCK))),
-          1800, 200_000_000, "luck");
+          List.of(), ARCANE_AUGMENT_STATION_ID, 55, 30, 1800, 200_000_000, "luck");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -985,18 +990,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
             new SizedIngredient(16, of(Items.IRON_BLOCK))),
-          2200, 400_000_000, "gravity");
+          List.of("oritech:flight"), ARCANE_AUGMENT_STATION_ID, 180, 10, 2200, 400_000_000, "gravity");
         
         addAugmentRecipe(exporter,
           List.of(
             new SizedIngredient(64, of(ItemContent.FLUX_GATE)),
-            new SizedIngredient(32, of(Items.WIND_CHARGE)),
+            new SizedIngredient(16, of(Items.WIND_CHARGE)),
             new SizedIngredient(16, of(ItemContent.PROMETHEUM_INGOT)),
-            new SizedIngredient(64, of(ItemContent.PLUTONIUM_PELLET))),
+            new SizedIngredient(32, of(ItemContent.PLUTONIUM_PELLET))),
           List.of(
             new SizedIngredient(32, of(ItemContent.FLUX_GATE)),
             new SizedIngredient(8, of(ItemContent.PLUTONIUM_PELLET))),
-          3600, 500_000_000, "flight");
+          List.of("oritech:betterarmor", "oritech:portal"), ARCANE_AUGMENT_STATION_ID, 155, 30, 3600, 500_000_000, "flight");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -1006,7 +1011,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
             new SizedIngredient(64, of(Items.GLOWSTONE))),
-          3200, 100_000_000, "cloak");
+          List.of("oritech:orefinder"), ARCANE_AUGMENT_STATION_ID, 155, 10, 3200, 100_000_000, "cloak");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -1017,18 +1022,18 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(8, of(Items.ENDER_PEARL)),
             new SizedIngredient(32, of(Items.CRYING_OBSIDIAN))),
-          3000, 250_000_000, "portal");
+          List.of(), ARCANE_AUGMENT_STATION_ID, 130, 30, 3000, 250_000_000, "portal");
         
         addAugmentRecipe(exporter,
           List.of(
-            new SizedIngredient(64, of(Items.GOLD_BLOCK)),
+            new SizedIngredient(64, of(Items.GOLD_INGOT)),
             new SizedIngredient(48, of(ItemContent.ENDERIC_LENS)),
             new SizedIngredient(64, of(Items.GLOWSTONE))),
           List.of(
-            new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
+            new SizedIngredient(4, of(ItemContent.ENDERIC_LENS)),
             new SizedIngredient(8, of(Items.GLOWSTONE)),
             new SizedIngredient(8, of(Items.REDSTONE_LAMP))),
-          2400, 50_000_000, "nightvision");
+          List.of(), ADVANCED_AUGMENT_STATION_ID, 105, 30, 2400, 50_000_000, "nightvision");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -1038,7 +1043,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.BIOSTEEL_INGOT)),
             new SizedIngredient(1, of(Items.CONDUIT))),
-          800, 50_000_000, "waterbreath");
+          List.of(), SIMPLE_AUGMENT_STATION_ID, 5, 90, 800, 50_000_000, "waterbreath");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -1049,7 +1054,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
             new SizedIngredient(32, of(TagContent.BIOMASS)),
             new SizedIngredient(64, of(BlockContent.ITEM_PIPE)),
             new SizedIngredient(8, of(Items.HOPPER))),
-          500, 30_000_000, "autofeeder");
+          List.of("oritech:armor", "oritech:hpboostmore"), SIMPLE_AUGMENT_STATION_ID, 90, 90, 500, 30_000_000, "autofeeder");
         
         addAugmentRecipe(exporter,
           List.of(
@@ -1059,20 +1064,19 @@ public class RecipeGenerator extends FabricRecipeProvider {
           List.of(
             new SizedIngredient(32, of(ItemContent.MAGNETIC_COIL)),
             new SizedIngredient(64, of(ConventionalItemTags.COPPER_INGOTS))),
-          2400, 400_000_000, "magnet");
+          List.of("oritech:superminingspeed"), SIMPLE_AUGMENT_STATION_ID, 105, 10, 2400, 400_000_000, "magnet");
         
         addAugmentRecipe(exporter,
           List.of(
             new SizedIngredient(64, of(ItemContent.ENDERIC_LENS)),
             new SizedIngredient(48, of(Items.AMETHYST_BLOCK)),
-            new SizedIngredient(48, of(ItemContent.OVERCHARGED_CRYSTAL)),
+            new SizedIngredient(1, of(ItemContent.OVERCHARGED_CRYSTAL)),
             new SizedIngredient(8, of(ItemContent.PROMETHEUM_INGOT)),
-            new SizedIngredient(32, of(Items.SCULK_SENSOR))),
+            new SizedIngredient(4, of(Items.SCULK_SENSOR))),
           List.of(
             new SizedIngredient(32, of(ItemContent.ENDERIC_LENS)),
             new SizedIngredient(64, of(Items.REDSTONE_TORCH))),
-          3200, 200_000_000, "orefinder");
-        
+          List.of("oritech:nightvision", "oritech:magnet"), ARCANE_AUGMENT_STATION_ID, 130, 10, 3200, 200_000_000, "orefinder");
     }
     
     private void addReactorBlocks(RecipeExporter exporter) {
@@ -1310,8 +1314,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         exporter.accept(Oritech.id("laser/" + suffix), entry, null);
     }
     
-    private void addAugmentRecipe(RecipeExporter exporter, List<SizedIngredient> inputs, List<SizedIngredient> applyCost, int time, long rfCost, String id) {
-        var entry = new AugmentRecipe(RecipeContent.AUGMENT, inputs, applyCost, time, rfCost);
+    private void addAugmentRecipe(RecipeExporter exporter, List<SizedIngredient> inputs, List<SizedIngredient> applyCost, List<String> requirements, Identifier requiredStation, int uiX, int uiY, int time, long rfCost, String id) {
+        var entry = new AugmentRecipe(RecipeContent.AUGMENT, inputs, applyCost, requirements.stream().map(elem -> Identifier.of(elem)).toList(), requiredStation, uiX, uiY, time, rfCost);
         exporter.accept(Oritech.id(id), entry, null);
     }
     

@@ -20,6 +20,11 @@
       }
     }
   ],
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:armor",
+    "oritech:hpboostmore"
+  ],
   "researchCost": [
     {
       "count": 64,
@@ -41,5 +46,7 @@
     }
   ],
   "rfCost": 30000000,
-  "time": 500
+  "time": 500,
+  "uiX": 90,
+  "uiY": 90
 }
