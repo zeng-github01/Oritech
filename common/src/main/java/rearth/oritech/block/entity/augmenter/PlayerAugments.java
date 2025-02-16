@@ -59,7 +59,7 @@ public class PlayerAugments {
     private static final PlayerAugment attackDamage = new PlayerStatEnhancingAugment(Oritech.id("attackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 4f, EntityAttributeModifier.Operation.ADD_VALUE, false, true);
     private static final PlayerAugment superAttackDamage = new PlayerStatEnhancingAugment(Oritech.id("superattackdamage"), EntityAttributes.GENERIC_ATTACK_DAMAGE, 6f, EntityAttributeModifier.Operation.ADD_VALUE, false, true);
     
-    private static final PlayerAugment flight = new PlayerCustomAugment(Oritech.id("flight")) {
+    private static final PlayerAugment flight = new PlayerCustomAugment(Oritech.id("flight"), true) {
         @Override
         public void onInstalled(PlayerEntity player) {
             player.getAbilities().allowFlying = true;
