@@ -155,7 +155,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
         
     }
     
-    public void researchAugment(Identifier augment, boolean creative) {
+    public void researchAugment(Identifier augment, boolean creative, PlayerEntity player) {
         
         if (!PlayerAugments.allAugments.containsKey(augment)) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
@@ -177,6 +177,15 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             var missingCount = wantedInput.count();
             
             for (var stack : this.inventory.heldStacks) {
+                if (type.test(stack)) {
+                    var takeAmount = Math.min(stack.getCount(), missingCount);
+                    missingCount -= takeAmount;
+                    stack.decrement(takeAmount);
+                    
+                    if (missingCount <= 0) break;
+                }
+            }
+            for (var stack : player.getInventory().main) {
                 if (type.test(stack)) {
                     var takeAmount = Math.min(stack.getCount(), missingCount);
                     missingCount -= takeAmount;
@@ -227,6 +236,16 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
             var missingCount = wantedInput.count();
             
             for (var stack : this.inventory.heldStacks) {
+                if (type.test(stack)) {
+                    var takeAmount = Math.min(stack.getCount(), missingCount);
+                    missingCount -= takeAmount;
+                    stack.decrement(takeAmount);
+                    
+                    if (missingCount <= 0) break;
+                }
+            }
+            
+            for (var stack : player.getInventory().main) {
                 if (type.test(stack)) {
                     var takeAmount = Math.min(stack.getCount(), missingCount);
                     missingCount -= takeAmount;

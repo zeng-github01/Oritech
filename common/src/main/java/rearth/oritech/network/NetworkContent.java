@@ -654,7 +654,7 @@ public class NetworkContent {
                 var operation = PlayerAugments.AugmentOperation.values()[message.operationId];
                 switch (operation) {
                     case RESEARCH -> {
-                        modifierEntity.researchAugment(message.id, player.isCreative());
+                        modifierEntity.researchAugment(message.id, player.isCreative(), player);
                     }
                     case ADD -> {
                         modifierEntity.installAugmentToPlayer(message.id, player);

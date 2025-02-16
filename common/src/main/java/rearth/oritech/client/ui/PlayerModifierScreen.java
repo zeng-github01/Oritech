@@ -491,7 +491,8 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                 var type = wantedInput.ingredient();
                 var count = wantedInput.count();
                 var matchingIngredients = this.handler.blockEntity.inventory.heldStacks.stream().filter(type).mapToInt(ItemStack::getCount).sum();
-                if (matchingIngredients < count) {
+                var playerMatchingIngredients = this.handler.player.getInventory().main.stream().filter(type).mapToInt(ItemStack::getCount).sum();
+                if (playerMatchingIngredients + matchingIngredients < count) {
                     hasResources = false;
                     break;
                 }
