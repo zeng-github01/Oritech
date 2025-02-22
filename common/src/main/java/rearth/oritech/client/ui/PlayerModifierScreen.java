@@ -502,7 +502,18 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
                 var shownItem = Arrays.stream(input.ingredient().getMatchingStacks()).findFirst().get().getItem();
                 var shownStack = new ItemStack(shownItem, input.count());
                 
-                var shown = Components.item(shownStack).showOverlay(true).setTooltipFromStack(true);
+                var allMatchingItems = Arrays.stream(input.ingredient().getMatchingStacks()).map(ItemStack::getName).toList();
+                var combinedList = new ArrayList<Text>();
+                combinedList.add(Text.translatable("oritech.text.augment_ingredient_tip").formatted(Formatting.BOLD, Formatting.GRAY));
+                combinedList.addAll(allMatchingItems);
+                
+                var shown = Components.item(shownStack).showOverlay(true).setTooltipFromStack(false);
+                
+                if (allMatchingItems.size() > 1) {
+                    shown.tooltip(combinedList);
+                } else {
+                    shown.setTooltipFromStack(true);
+                }
                 itemContainer.child(shown.margins(Insets.of(2)));
             }
             descriptionPanel.child(itemContainer);
