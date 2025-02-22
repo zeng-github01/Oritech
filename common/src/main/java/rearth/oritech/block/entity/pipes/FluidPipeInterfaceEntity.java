@@ -31,7 +31,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.fluidPipeExtractIntervalDuration();
     
     private List<Storage<FluidVariant>> filteredFluidTargetsCached;
-
+    
     private final HashMap<BlockPos, BlockApiCache<Storage<FluidVariant>, Direction>> lookupCache = new HashMap<>();
     
     private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
@@ -71,14 +71,14 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
     @Override
     public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         if (world.isClient) return;
-
+        
         // boosted pipe works every tick, otherwise only every N tick
-		var block = (ExtractablePipeConnectionBlock) state.getBlock();
+        var block = (ExtractablePipeConnectionBlock) state.getBlock();
         if (world.getTime() % TRANSFER_PERIOD != 0 && !isBoostAvailable() || !block.isExtractable(state))
             return;
-
-		var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
-
+        
+        var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
+        
         // try to fill internal storage from inputs (if extract true)
         // one transaction for each side
         if (block.isExtractable(state) && fluidStorage.amount < fluidStorage.getCapacity()) {
@@ -161,7 +161,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
         var availableFluid = fluidStorage.getAmount();
         var ownType = fluidStorage.variant;
         var moved = 0L;
-
+        
         try (var tx = Transaction.openOuter()) {
             for (var targetStorage : filteredFluidTargetsCached) {
                 var transferred = targetStorage.insert(ownType, availableFluid, tx);
@@ -176,7 +176,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
         
         if (moved > 0)
             onBoostUsed();
-
+        
     }
     
     @Override
