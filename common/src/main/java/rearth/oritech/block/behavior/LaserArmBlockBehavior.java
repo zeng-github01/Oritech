@@ -37,7 +37,7 @@ public class LaserArmBlockBehavior {
             return transferPowerBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
         // an unregistered budding block, attempt to energize it
-        if (blockState.isIn(ConventionalBlockTags.BUDDING_BLOCKS))
+        if (blockState.isIn(TagContent.LASER_ACCELERATED))
             return energizeBuddingBehavior.fireAtBlock(world, laserEntity, block, blockPos, blockState, blockEntity);
         
         // passes through, stop targetting this block
@@ -101,35 +101,19 @@ public class LaserArmBlockBehavior {
         energizeBuddingBehavior = new LaserArmBlockBehavior() {
             @Override
             public boolean fireAtBlock(World world, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-                if (buddingAmethystCanGrow(world, blockState, blockPos)) {
-                    blockState.randomTick((ServerWorld) world, blockPos, world.random);
-                    ParticleContent.ACCELERATING.spawn(world, Vec3d.of(blockPos));
-                    return true;
+                
+                if (world.getTime() % 40 == 0) {    // periodically reset target
+                    return false;
                 }
-                return false;
+                if (blockState.isAir() || blockState.isLiquid()) return false;
+                
+                blockState.randomTick((ServerWorld) world, blockPos, world.random);
+                ParticleContent.ACCELERATING.spawn(world, Vec3d.of(blockPos));
+                
+                return true;
             }
         };
+        
         LaserArmBlock.registerBlockBehavior(Blocks.BUDDING_AMETHYST, energizeBuddingBehavior);
-    }
-    
-    private static boolean buddingAmethystCanGrow(World world, BlockState blockState, BlockPos pos) {
-        if (!blockState.isIn(ConventionalBlockTags.BUDDING_BLOCKS))
-            return true;
-        
-        // returning true means the laser will keep firing at the budding amethyst block
-        // this means that a laser arm will fire at a budding amethyst block for up to 20 ticks even if the clusters are already fully grown
-        // it also means that it will only check the blockstates of the surrounding 6 blocks every 20 ticks instead of every tick
-        if (world.getTime() % 20 != 0) {
-            return true;
-        }
-        
-        for (var direction : Direction.values()) {
-            var growingPos = pos.offset(direction);
-            var growingState = world.getBlockState(growingPos);
-            if (BuddingAmethystBlock.canGrowIn(growingState) || blockState.isIn(ConventionalBlockTags.BUDS))
-                return true;
-        }
-        
-        return false;
     }
 }

@@ -822,7 +822,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     public boolean isTargetingBuddingAmethyst() {
-        return world.getBlockState(currentTarget).getBlock() instanceof BuddingAmethystBlock;
+        return world.getBlockState(currentTarget).isIn(TagContent.LASER_ACCELERATED);
     }
     
     @Override

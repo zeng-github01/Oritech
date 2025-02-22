@@ -25,7 +25,6 @@ public class OritechEmiLaserRecipe extends BasicEmiRecipe {
     @Override
     public void addWidgets(WidgetHolder widgets) {
         
-
         widgets.addSlot(this.inputs.get(0), 80, 15).drawBack(false);
         widgets.addFillingArrow(105, 15, 3000);
         widgets.addSlot(this.outputs.get(0), 135, 15).recipeContext(this).drawBack(true);
