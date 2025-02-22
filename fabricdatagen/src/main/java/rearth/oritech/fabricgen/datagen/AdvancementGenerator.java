@@ -270,6 +270,22 @@ public class AdvancementGenerator extends FabricAdvancementProvider {
                                 .build(consumer, Oritech.MOD_ID + "/plastic");
         
         
+        var augmenterAdvancement = Advancement.Builder.create().parent(centrifugeAdvancement)
+                                .display(
+                                  BlockContent.AUGMENT_APPLICATION_BLOCK, // The display icon
+                                  Text.translatable("advancements.oritech.augmenter"), // The title
+                                  Text.translatable("advancements.oritech.augmenter.description"), // The description
+                                  background, // Background image used
+                                  AdvancementFrame.GOAL, // Options: TASK, CHALLENGE, GOAL
+                                  true, // Show toast top right
+                                  true, // Announce to chat
+                                  false // Hidden in the advancement tab
+                                )
+                                // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
+                                .criterion("got_augmenter", InventoryChangedCriterion.Conditions.items(BlockContent.AUGMENT_APPLICATION_BLOCK))
+                                .build(consumer, Oritech.MOD_ID + "/augmenter");
+        
+        
         var arcaneAdvancement = Advancement.Builder.create().parent(plasticAdvancement)
                                 .display(
                                   BlockContent.ENCHANTMENT_CATALYST_BLOCK, // The display icon
@@ -315,6 +331,21 @@ public class AdvancementGenerator extends FabricAdvancementProvider {
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
                                 .criterion("got_laser", InventoryChangedCriterion.Conditions.items(BlockContent.LASER_ARM_BLOCK))
                                 .build(consumer, Oritech.MOD_ID + "/laser");
+        
+        var reactorAdvancement = Advancement.Builder.create().parent(laserAdvancement)
+                                .display(
+                                  BlockContent.REACTOR_CONTROLLER, // The display icon
+                                  Text.translatable("advancements.oritech.reactor"), // The title
+                                  Text.translatable("advancements.oritech.reactor.description"), // The description
+                                  background, // Background image used
+                                  AdvancementFrame.TASK, // Options: TASK, CHALLENGE, GOAL
+                                  true, // Show toast top right
+                                  true, // Announce to chat
+                                  false // Hidden in the advancement tab
+                                )
+                                // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
+                                .criterion("got_reactor", InventoryChangedCriterion.Conditions.items(BlockContent.REACTOR_CONTROLLER))
+                                .build(consumer, Oritech.MOD_ID + "/reactor");
         
         
         var fluxiteAdvancement = Advancement.Builder.create().parent(laserAdvancement)
