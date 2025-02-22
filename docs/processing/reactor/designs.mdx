@@ -12,8 +12,8 @@ may absorb up to 16 * 4 = 64 Heat per Tick, but does require ice to work. You ca
 A single heat vent can vent heat based on the hottest neighboring block. At 1000 Degrees, it will vent 14 Heat, and at 0 Degrees just 4. Depending on your
 goals you probably want to either spread the heat with heat spreaders to many vents, or surround a few absorbers with heat pipes.
 
+<div onlineOnly="true" >
 Based on the provided formulas, here's a small table that did some of the math for you:
-
 | Rod Type   | Rod Count | Internal Pulses | External Pulses | Total Pulses | Heat Generated | RF Generated | Vents needed at 0 C | Vents Needed at 1000 C | Absorber Contacts needed |
 | ---------- | --------- | --------------- | --------------- | ------------ | -------------- | ------------ | ------------------- | ---------------------- | ------------------------ |
 | single rod | 1         | 1               | 0               | 1            | 4              | 32           | 1                   | 1                      | 1                        |
@@ -31,6 +31,7 @@ Based on the provided formulas, here's a small table that did some of the math f
 |            | 4         | 12              | 4               | 16           | 132            | 512          | 33                  | 10                     | 9                        |
 |            | 4         | 12              | 8               | 20           | 204            | 640          | 51                  | 15                     | 13                       |
 |            | 4         | 12              | 16              | 28           | 396            | 896          | 99                  | 29                     | 25                       |
+</div>
 
 Reactor design can vary. A small reactor may be good enough for early-midgame power generation, while massive reactors may be needed in the lategame.
 When testing designs, it is often advisable to use small pellets to allow faster shutdown should the reactor begin overheating.
