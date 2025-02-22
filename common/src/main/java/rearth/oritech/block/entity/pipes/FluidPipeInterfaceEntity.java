@@ -138,7 +138,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
         
         var netHash = targets.hashCode();
         
-        if (netHash != filteredTargetsNetHash) {
+        if (netHash != filteredTargetsNetHash || filteredFluidTargetsCached == null) {
             filteredFluidTargetsCached = targets.stream()
                                            .filter(target -> {
                                                var direction = target.getRight();

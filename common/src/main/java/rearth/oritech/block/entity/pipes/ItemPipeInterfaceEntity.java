@@ -84,7 +84,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         var netHash = targets.hashCode();
         
-        if (netHash != filteredTargetsNetHash) {
+        if (netHash != filteredTargetsNetHash || filteredTargetItemStorages == null) {
             filteredTargetItemStorages = targets.stream()
                                            .filter(target -> {
                                                var direction = target.getRight();
