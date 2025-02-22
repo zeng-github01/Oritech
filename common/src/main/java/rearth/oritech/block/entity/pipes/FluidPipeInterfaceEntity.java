@@ -132,7 +132,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
         var targets = findNetworkTargets(pos, data);
         
         if (targets == null) {
-            System.err.println("Yeah your pipe network likely is too long");
+            System.err.println("Yeah your pipe network likely is too long. At: " + this.getPos());
             return;
         }
         

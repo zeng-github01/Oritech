@@ -22,132 +22,135 @@ import rearth.oritech.init.BlockEntitiesContent;
 import java.util.*;
 
 public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
-    
-    private static final int TRANSFER_AMOUNT = Oritech.CONFIG.itemPipeTransferAmount();
-    private static final int TRANSFER_PERIOD = Oritech.CONFIG.itemPipeIntervalDuration();
-    
-    private final HashMap<BlockPos, BlockApiCache<Storage<ItemVariant>, Direction>> lookupCache = new HashMap<>();
-    private List<Pair<Storage<ItemVariant>, BlockPos>> filteredTargetItemStorages;
-
-    public ItemPipeInterfaceEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ITEM_PIPE_ENTITY, pos, state);
-    }
-    
-    @Override
-    public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
-        var block = (ExtractablePipeConnectionBlock) state.getBlock();
-        if (world.isClient || !block.isExtractable(state))
+		
+		private static final int TRANSFER_AMOUNT = Oritech.CONFIG.itemPipeTransferAmount();
+		private static final int TRANSFER_PERIOD = Oritech.CONFIG.itemPipeIntervalDuration();
+		
+		private final HashMap<BlockPos, BlockApiCache<Storage<ItemVariant>, Direction>> lookupCache = new HashMap<>();
+		private List<Pair<Storage<ItemVariant>, BlockPos>> filteredTargetItemStorages;
+		
+		public ItemPipeInterfaceEntity(BlockPos pos, BlockState state) {
+				super(BlockEntitiesContent.ITEM_PIPE_ENTITY, pos, state);
+		}
+		
+		@Override
+		public void tick(World world, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
+				var block = (ExtractablePipeConnectionBlock) state.getBlock();
+				if (world.isClient || !block.isExtractable(state))
+						return;
+				
+				// boosted pipe works every tick, otherwise only every N tick
+				if (world.getTime() % TRANSFER_PERIOD != 0 && !isBoostAvailable())
+						return;
+				
+				// find first itemstack from connected invs (that can be extracted)
+				// try to move it to one of the destinations
+				
+				var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
+				
+				var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
+				var stackToMove = ItemStack.EMPTY;
+				Storage<ItemVariant> moveFromInventory = null;
+				var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
+				
+				try (var mainTx = Transaction.openOuter()) {
+						for (var sourcePos : sources) {
+								var offset = pos.subtract(sourcePos);
+								var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+								if (!block.isSideExtractable(state, direction.getOpposite())) continue;
+								var inventory = findFromCache(world, sourcePos, direction);
+								if (inventory == null || !inventory.supportsExtraction()) continue;
+								
+								var firstStack = getFromStorage(inventory, moveCapacity, mainTx);
+								
+								if (!firstStack.isEmpty()) {
+										stackToMove = firstStack;
+										moveFromInventory = inventory;
+										break;
+								}
+								
+						}
+						
+						mainTx.abort();
+				}
+				
+				if (stackToMove.isEmpty()) return;
+				
+				var targets = findNetworkTargets(pos, data);
+				if (targets == null) {
+            System.err.println("Yeah your pipe network likely is too long. At: " + this.getPos());
             return;
-
-		// boosted pipe works every tick, otherwise only every N tick
-		if (world.getTime() % TRANSFER_PERIOD != 0 && !isBoostAvailable())
-			return;
-        
-        // find first itemstack from connected invs (that can be extracted)
-        // try to move it to one of the destinations
-        
-        var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(world.getRegistryKey().getValue(), new PipeNetworkData());
-        
-        var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
-        var stackToMove = ItemStack.EMPTY;
-        Storage<ItemVariant> moveFromInventory = null;
-        var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
-
-        try (var mainTx = Transaction.openOuter()) {
-            for (var sourcePos : sources) {
-                var offset = pos.subtract(sourcePos);
-                var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
-                if (!block.isSideExtractable(state, direction.getOpposite())) continue;
-                var inventory = findFromCache(world, sourcePos, direction);
-                if (inventory == null || !inventory.supportsExtraction()) continue;
-                
-                var firstStack = getFromStorage(inventory, moveCapacity, mainTx);
-                
-                if (!firstStack.isEmpty()) {
-                    stackToMove = firstStack;
-                    moveFromInventory = inventory;
-                    break;
-                }
-                
-            }
-            
-            mainTx.abort();
         }
-        
-        if (stackToMove.isEmpty()) return;
-        
-        var targets = findNetworkTargets(pos, data);
-        if (targets == null) return;
-        
-        var netHash = targets.hashCode();
-        
-        if (netHash != filteredTargetsNetHash) {
-            filteredTargetItemStorages = targets.stream()
-                                           .filter(target -> {
-                                               var direction = target.getRight();
-                                               var pipePos = target.getLeft().add(direction.getVector());
-                                               var pipeState = world.getBlockState(pipePos);
-                                               if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
-                                                   return true;   // edge case, this should never happen
-                                               var extracting = itemBlock.isSideExtractable(pipeState, direction.getOpposite());
-                                               return !extracting;
-                                           })
-                                           .map(target -> new Pair<>(findFromCache(world, target.getLeft(), target.getRight()), target.getLeft()))
-                    .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion()) //&& obj.getRight().getManhattanDistance(pos) > 1)
-                                           .sorted(Comparator.comparingInt(a -> a.getRight().getManhattanDistance(pos)))
-                                           .toList();
-            
-            filteredTargetsNetHash = netHash;
-        }
-        
-        var moveCount = stackToMove.getCount();
-        var moved = 0L;
-        
-        try (var tx = Transaction.openOuter()) {
-            for (var targetStorage : filteredTargetItemStorages) {
-                var inserted = targetStorage.getLeft().insert(ItemVariant.of(stackToMove), moveCount, tx);
-                moveCount -= (int) inserted;
-                moved += inserted;
-                
-                if (moveCount <= 0) break;
-            }
-            
-            var extracted = moveFromInventory.extract(ItemVariant.of(stackToMove), moved, tx);
-            
-            if (extracted != moved) {
-                Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position " + pos);
-                tx.abort();
-            } else {
-                tx.commit();
-            }
-            
-        }
-        
-        if (moved > 0 && moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
-
-    }
-    
-    @Override
-    public void markDirty() {
-        if (this.world != null)
-            world.markDirty(pos);
-    }
-    
-    private Storage<ItemVariant> findFromCache(World world, BlockPos pos, Direction direction) {
-        var cacheRes = lookupCache.computeIfAbsent(pos, elem -> BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos));
-        return cacheRes.find(direction);
-    }
-    
-    private static ItemStack getFromStorage(Storage<ItemVariant> inventory, int maxTransferAmount, Transaction mainTx) {
-        for (Iterator<StorageView<ItemVariant>> it = inventory.nonEmptyIterator(); it.hasNext(); ) {
-            var stack = it.next();
-            var type = stack.getResource();
-            var extractedAmount = inventory.extract(type, maxTransferAmount, mainTx);
-            if (extractedAmount > 0) {
-                return type.toStack((int) extractedAmount);
-            }
-        }
-        
-        return ItemStack.EMPTY;
-    }
+				
+				var netHash = targets.hashCode();
+				
+				if (netHash != filteredTargetsNetHash) {
+						filteredTargetItemStorages = targets.stream()
+							                             .filter(target -> {
+									                             var direction = target.getRight();
+									                             var pipePos = target.getLeft().add(direction.getVector());
+									                             var pipeState = world.getBlockState(pipePos);
+									                             if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
+											                             return true;   // edge case, this should never happen
+									                             var extracting = itemBlock.isSideExtractable(pipeState, direction.getOpposite());
+									                             return !extracting;
+							                             })
+							                             .map(target -> new Pair<>(findFromCache(world, target.getLeft(), target.getRight()), target.getLeft()))
+							                             .filter(obj -> Objects.nonNull(obj.getLeft()) && obj.getLeft().supportsInsertion()) //&& obj.getRight().getManhattanDistance(pos) > 1)
+							                             .sorted(Comparator.comparingInt(a -> a.getRight().getManhattanDistance(pos)))
+							                             .toList();
+						
+						filteredTargetsNetHash = netHash;
+				}
+				
+				var moveCount = stackToMove.getCount();
+				var moved = 0L;
+				
+				try (var tx = Transaction.openOuter()) {
+						for (var targetStorage : filteredTargetItemStorages) {
+								var inserted = targetStorage.getLeft().insert(ItemVariant.of(stackToMove), moveCount, tx);
+								moveCount -= (int) inserted;
+								moved += inserted;
+								
+								if (moveCount <= 0) break;
+						}
+						
+						var extracted = moveFromInventory.extract(ItemVariant.of(stackToMove), moved, tx);
+						
+						if (extracted != moved) {
+								Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position " + pos);
+								tx.abort();
+						} else {
+								tx.commit();
+						}
+						
+				}
+				
+				if (moved > 0 && moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
+				
+		}
+		
+		@Override
+		public void markDirty() {
+				if (this.world != null)
+						world.markDirty(pos);
+		}
+		
+		private Storage<ItemVariant> findFromCache(World world, BlockPos pos, Direction direction) {
+				var cacheRes = lookupCache.computeIfAbsent(pos, elem -> BlockApiCache.create(ItemStorage.SIDED, (ServerWorld) world, pos));
+				return cacheRes.find(direction);
+		}
+		
+		private static ItemStack getFromStorage(Storage<ItemVariant> inventory, int maxTransferAmount, Transaction mainTx) {
+				for (Iterator<StorageView<ItemVariant>> it = inventory.nonEmptyIterator(); it.hasNext(); ) {
+						var stack = it.next();
+						var type = stack.getResource();
+						var extractedAmount = inventory.extract(type, maxTransferAmount, mainTx);
+						if (extractedAmount > 0) {
+								return type.toStack((int) extractedAmount);
+						}
+				}
+				
+				return ItemStack.EMPTY;
+		}
 }
