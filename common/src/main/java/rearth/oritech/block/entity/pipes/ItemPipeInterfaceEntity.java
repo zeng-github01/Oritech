@@ -108,6 +108,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         try (var tx = Transaction.openOuter()) {
             for (var targetStorage : filteredTargetItemStorages) {
+                if (targetStorage.getLeft().equals(moveFromInventory)) continue;    // skip when targeting same machine
                 var inserted = targetStorage.getLeft().insert(ItemVariant.of(stackToMove), moveCount, tx);
                 moveCount -= (int) inserted;
                 moved += inserted;
