@@ -165,6 +165,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity imp
         try (var tx = Transaction.openOuter()) {
             for (var targetStorage : filteredFluidTargetsCached) {
                 var transferred = targetStorage.insert(ownType, availableFluid, tx);
+                transferred = Math.max(0, transferred); // no idea how this could be negative, but here we are: https://mclo.gs/ZDq7S0r
                 moved += fluidStorage.extract(ownType, transferred, tx);
                 availableFluid -= transferred;
                 
