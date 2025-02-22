@@ -263,6 +263,12 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
     
     @Override
+    public boolean showEnergy() {
+        if (this.energyStorage.maxExtract <= 0 && !isProducingSteam) return false;
+        return super.showEnergy();
+    }
+    
+    @Override
     protected float getAnimationSpeed() {
         
         if (currentMaxBurnTime <= 0) return 1;
