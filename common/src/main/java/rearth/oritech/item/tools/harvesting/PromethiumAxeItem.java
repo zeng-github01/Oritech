@@ -44,7 +44,7 @@ import java.util.function.Consumer;
 
 public class PromethiumAxeItem extends AxeItem implements GeoItem {
     
-    private static final Deque<Pair<World, BlockPos>> pendingBlocks = new ArrayDeque<>();
+    public static final Deque<Pair<World, BlockPos>> pendingBlocks = new ArrayDeque<>();
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     

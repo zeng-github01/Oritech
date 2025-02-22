@@ -60,6 +60,7 @@ public class Config {
     public ToolData basicDrill = new ToolData(10_000, 10, 512);
     @Nest
     public ToolData chainSaw = new ToolData(10_000, 10, 512);
+    public boolean chainsawTreeCutting = true;
     
     @SectionHeader("worldGeneration")
     public boolean generateOres = true;

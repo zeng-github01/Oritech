@@ -15,9 +15,11 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 
 import java.util.List;
@@ -49,13 +51,30 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
         var amount = state.getBlock().getHardness() * energyUsageMultiplier;
         amount = Math.min(amount, this.getStoredEnergy(stack));
         
-        return this.tryUseEnergy(stack, (long) amount, player);
+        var energySuccess = this.tryUseEnergy(stack, (long) amount, player);
+        
+        if (!world.isClient && miner.isSneaking() && energySuccess && Oritech.CONFIG.chainsawTreeCutting()) {
+            var startPos = pos.up();
+            var startState = world.getBlockState(startPos);
+            if (startState.isIn(BlockTags.LOGS)) {
+                var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, world);
+                PromethiumAxeItem.pendingBlocks.addAll(treeBlocks.stream().map(elem -> new Pair<>(world, elem)).toList());
+                
+                var extraEnergyUsed = treeBlocks.size() * energyUsageMultiplier / 2;
+                this.tryUseEnergy(stack, (long) extraEnergyUsed, player);
+            }
+        }
+        
+        return energySuccess;
     }
     
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
         var text = Text.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(stack), this.getEnergyCapacity(stack));
         tooltip.add(text.formatted(Formatting.GOLD));
+        
+        if (Oritech.CONFIG.chainsawTreeCutting())
+            tooltip.add(Text.translatable("tooltip.oritech.promethium_axe").formatted(Formatting.DARK_GRAY));
     }
     
     @Override
