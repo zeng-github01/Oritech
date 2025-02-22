@@ -163,7 +163,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidProvider, 
     private void processBuckets() {
         var inStack = inventory.getStack(0);
 
-        if (!inStack.isEmpty() && inStack.isOf(Items.BUCKET) && fluidStorage.amount >= FluidConstants.BUCKET) {
+        if (!inStack.isEmpty() && inStack.isOf(Items.BUCKET) && fluidStorage.amount >= FluidConstants.BUCKET && fluidStorage.variant != FluidVariant.blank()) {
             // try fill bucket
             var filledBucket = ItemVariant.of(fluidStorage.variant.getFluid().getBucketItem(), inStack.getComponentChanges()).toStack();
             if (!outputCanAcceptBucket(filledBucket)) return;
