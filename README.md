@@ -44,7 +44,7 @@
 
 An upcoming tech mod for minecraft fabric. Features advanced ore processing, powered tools and armor, and much much more.
 
-Wiki is available online (https://moddedmc.org/en/mod/oritech/docs)
+Wiki is available online (https://moddedmc.org/en/mod/oritech/docs) or via the [Oracle Index](https://www.curseforge.com/minecraft/mc-mods/oracle-index) mod.
 
 Currently in very early access, numerous bugs and issues are to be expected.
 
