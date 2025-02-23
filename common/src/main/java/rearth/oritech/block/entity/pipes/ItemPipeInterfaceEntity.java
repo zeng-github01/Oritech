@@ -116,7 +116,10 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 if (moveCount <= 0) break;
             }
             
-            moved = Math.max(moved, 0); // no idea how this could ever be negative, but there was this crash: https://github.com/Rearth/Oritech/issues/277
+            if(moved <= 0) { // no idea how this could ever be negative, but there was this crash: https://github.com/Rearth/Oritech/issues/277
+                tx.abort();
+                return;
+            }
             
             var extracted = moveFromInventory.extract(ItemVariant.of(stackToMove), moved, tx);
             

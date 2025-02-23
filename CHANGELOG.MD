@@ -1,0 +1,5 @@
+- Add support for the Oracle Index mod, allowing the wiki/documentation be viewed ingame (see https://www.curseforge.com/minecraft/mc-mods/oracle-index)
+- Add the ability to toggle the flight augment
+- Add/rewrite some wiki entries
+- Improve error logging for fluid/item pipes
+- Fix solar panels not outputting stored energy during the day
