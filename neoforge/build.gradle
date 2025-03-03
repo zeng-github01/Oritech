@@ -33,8 +33,12 @@ repositories {
         name = 'NeoForged'
         url = 'https://maven.neoforged.net/releases'
     }
-    flatDir {
-        dir './libs'
+
+    maven {
+        url "https://modmaven.dev/"
+        content {
+            includeGroup "dev.technici4n"
+        }
     }
 }
 
@@ -49,6 +53,8 @@ dependencies {
 
     // forgified fabric api
     modImplementation "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.104.0+2.0.15+1.21.1"
+
+    include modApi("dev.technici4n:GrandPower:3.0.2")
 
     // owo lib
     modImplementation "io.wispforest:owo-lib-neoforge:0.12.15-beta.9+1.21"

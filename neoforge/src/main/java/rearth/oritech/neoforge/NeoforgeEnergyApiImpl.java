@@ -1,5 +1,6 @@
 package rearth.oritech.neoforge;
 
+import dev.technici4n.grandpower.api.ILongEnergyStorage;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -11,7 +12,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.energy.BlockEnergyApi;
@@ -54,7 +54,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public EnergyApi.EnergyContainer find(ItemStack stack, ContainerItemContext context) {
-        var candidate = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+        var candidate = stack.getCapability(ILongEnergyStorage.ITEM);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
         return new NeoforgeStorageWrapper(candidate);
@@ -62,7 +62,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        var candidate = world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, state, entity, direction);
+        var candidate = world.getCapability(ILongEnergyStorage.BLOCK, pos, state, entity, direction);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
         return new NeoforgeStorageWrapper(candidate);
@@ -76,30 +76,30 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     // this is used to interact with energy storages from other mods
     public static class NeoforgeStorageWrapper extends EnergyApi.EnergyContainer {
         
-        public final IEnergyStorage storage;
+        public final ILongEnergyStorage storage;
         
-        public NeoforgeStorageWrapper(IEnergyStorage storage) {
+        public NeoforgeStorageWrapper(ILongEnergyStorage storage) {
             this.storage = storage;
         }
         
         @Override
         public long insert(long maxAmount, boolean simulate) {
-            return storage.receiveEnergy((int) maxAmount, simulate);
+            return storage.receive(maxAmount, simulate);
         }
         
         @Override
         public long extract(long maxAmount, boolean simulate) {
-            return storage.extractEnergy((int) maxAmount, simulate);
+            return storage.extract(maxAmount, simulate);
         }
         
         @Override
         public long getAmount() {
-            return storage.getEnergyStored();
+            return storage.getAmount();
         }
         
         @Override
         public long getCapacity() {
-            return storage.getMaxEnergyStored();
+            return storage.getCapacity();
         }
         
         @Override
@@ -112,7 +112,7 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     // this is used by other mods to interact with the oritech energy containers (machines/items)
-    public static class ContainerStorageWrapper implements IEnergyStorage {
+    public static class ContainerStorageWrapper implements ILongEnergyStorage {
         
         public final EnergyApi.EnergyContainer container;
         
@@ -126,27 +126,27 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
         }
         
         @Override
-        public int receiveEnergy(int i, boolean bl) {
-            long inserted = container.insert(i, bl);
-            if (!bl) container.update();
-            return (int) inserted;
+        public long receive(long amount, boolean simulate) {
+            long inserted = container.insert(amount, simulate);
+            if (!simulate) container.update();
+            return inserted;
         }
         
         @Override
-        public int extractEnergy(int i, boolean bl) {
-            long extracted = container.extract(i, bl);
-            if (!bl) container.update();
-            return (int) extracted;
+        public long extract(long amount, boolean simulate) {
+            long inserted = container.extract(amount, simulate);
+            if (!simulate) container.update();
+            return inserted;
         }
         
         @Override
-        public int getEnergyStored() {
-            return (int) container.getAmount();
+        public long getAmount() {
+            return container.getAmount();
         }
         
         @Override
-        public int getMaxEnergyStored() {
-            return (int) container.getCapacity();
+        public long getCapacity() {
+            return container.getCapacity();
         }
         
         @Override
