@@ -1,13 +1,22 @@
 package rearth.oritech.init.compat.jei;
 
+import dev.emi.emi.api.widget.Bounds;
+import io.wispforest.owo.mixin.ui.access.BaseOwoHandledScreenAccessor;
+import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
+import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.core.*;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.block.Block;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.Rect2i;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +27,9 @@ import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
 import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.*;
+import rearth.oritech.client.ui.BasicMachineScreen;
+import rearth.oritech.client.ui.PlayerModifierScreen;
+import rearth.oritech.client.ui.ReactorScreen;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -25,6 +37,7 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @JeiPlugin
@@ -36,7 +49,7 @@ public class OritechJeiPlugin implements IModPlugin {
     }
     
     @Override
-    public void registerCategories(IRecipeCategoryRegistration registration) {
+    public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
         
         registerOritechCategory(registration, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, PulverizerBlockEntity.class);
         registerOritechCategory(registration, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK, FragmentForgeBlockEntity.class);
@@ -103,7 +116,7 @@ public class OritechJeiPlugin implements IModPlugin {
     }
     
     @Override
-    public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+    public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
         
         registerCatalyst(registration, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
         registerCatalyst(registration, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK);
@@ -127,5 +140,49 @@ public class OritechJeiPlugin implements IModPlugin {
     
     private void registerCatalyst(IRecipeCatalystRegistration registration, OritechRecipeType type, Block block) {
         registration.addRecipeCatalyst(block, RecipeType.create(type.getIdentifier().getNamespace(), type.getIdentifier().getPath(), OritechRecipe.class));
+    }
+    
+    @Override
+    public void registerGuiHandlers(@NotNull IGuiHandlerRegistration registration) {
+        IModPlugin.super.registerGuiHandlers(registration);
+        
+        registration.addGenericGuiContainerHandler(BasicMachineScreen.class, new JeiExclusionZoneHandler());
+        registration.addGenericGuiContainerHandler(ReactorScreen.class, new JeiExclusionZoneHandler());
+        registration.addGenericGuiContainerHandler(PlayerModifierScreen.class, new JeiExclusionZoneHandler());
+        
+    }
+    
+    private static class JeiExclusionZoneHandler implements IGuiContainerHandler<BaseOwoHandledScreen<FlowLayout, ?>> {
+        @Override
+        public @NotNull List<Rect2i> getGuiExtraAreas(@NotNull BaseOwoHandledScreen<FlowLayout, ?> containerScreen) {
+            return getScreenExclusionZones(containerScreen);
+        }
+    }
+    
+    private static @NotNull ArrayList<Rect2i> getScreenExclusionZones(@NotNull BaseOwoHandledScreen<FlowLayout, ?> containerScreen) {
+        var result = new ArrayList<Rect2i>();
+        
+        // basically a copy of the owo emi adapter
+        if (!containerScreen.children().isEmpty() && containerScreen instanceof BaseOwoHandledScreenAccessor accessor) {
+            OwoUIAdapter<?> adapter = accessor.owo$getUIAdapter();
+            if (adapter != null) {
+                ParentComponent rootComponent = adapter.rootComponent;
+                ArrayList<Component> children = new ArrayList<>();
+                rootComponent.collectDescendants(children);
+                children.remove(rootComponent);
+                children.forEach((component) -> {
+                    if (component instanceof ParentComponent parent) {
+                        if (parent.surface() == Surface.BLANK) {
+                            return;
+                        }
+                    }
+                    
+                    Size size = component.fullSize();
+                    result.add(new Rect2i(component.x(), component.y(), size.width(), size.height()));
+                });
+            }
+        }
+        
+        return result;
     }
 }
