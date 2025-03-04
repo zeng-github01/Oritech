@@ -216,7 +216,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             updateFluidDisplay(genericDisplay);
         
         if (steamProductionLabel != null) {
-            var productionRate = handler.screenData.getDisplayedEnergyUsage() * Oritech.CONFIG.generators.rfToSteamRation();
+            var productionRate = handler.screenData.getDisplayedEnergyUsage() * Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
             productionRate = Math.min(this.waterDisplay.storage.amount, productionRate);
             steamProductionLabel.text(Text.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
         }

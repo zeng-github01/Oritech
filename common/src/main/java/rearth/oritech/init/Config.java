@@ -146,7 +146,6 @@ public class Config {
     public static class Generators {
         
         public float animationSpeedMultiplier = 10;
-        public float rfToSteamRation = 2;
         
         @Nest
         public BasicEnergyMachineData basicGeneratorData = new BasicEnergyMachineData(50_000, 0, 32 * 8, 32);
@@ -157,7 +156,7 @@ public class Config {
         @Nest
         public BasicEnergyMachineData fuelGeneratorData = new BasicEnergyMachineData(250_000, 0, 256 * 8, 256);
         @Nest
-        public BasicEnergyMachineData steamEngineData = new BasicEnergyMachineData(100_000, 0, 10_000, 1);
+        public SteamEngineData steamEngineData = new SteamEngineData(100_000, 50_000, 2, 1, false, true);
         @Nest
         public BasicEnergyMachineData solarGeneratorData = new BasicEnergyMachineData(100_000, 0, 32 * 8, 32);
     }
@@ -210,6 +209,24 @@ public class Config {
             this.maxEnergyInsertion = maxEnergyInsertion;
             this.maxEnergyExtraction = maxEnergyExtraction;
             this.energyPerTick = energyPerTick;
+        }
+    }
+    
+    public static class SteamEngineData {
+        public long energyCapacity;
+        public long maxEnergyExtraction;
+        public float rfToSteamRatio;    // used for generators
+        public int steamToRfRatio;  // used for steam engines
+        public boolean stopOnEnergyFull;
+        public boolean stopOnWaterFull;
+        
+        public SteamEngineData(long energyCapacity, long maxEnergyExtraction, float rfToSteamRatio, int steamToRfRatio, boolean stopOnEnergyFull, boolean stopOnWaterFull) {
+            this.energyCapacity = energyCapacity;
+            this.maxEnergyExtraction = maxEnergyExtraction;
+            this.steamToRfRatio = steamToRfRatio;
+            this.rfToSteamRatio = rfToSteamRatio;
+            this.stopOnEnergyFull = stopOnEnergyFull;
+            this.stopOnWaterFull = stopOnWaterFull;
         }
     }
     

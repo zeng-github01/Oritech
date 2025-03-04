@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -51,7 +52,7 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     public int energyProducedTick = 0;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.energyPerTick());
+        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.steamToRfRatio());
     }
     
     @Override
@@ -70,6 +71,7 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
         
         if (world.isClient || !isActive(state)) return;
+        outputEnergy();
         
         progress = 0;
         var usedTankEntity = cachedTargetTank;
@@ -86,7 +88,10 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         var usedWaterTank = usedTankEntity.waterStorage;
         var usedEnergyStorage = usedTankEntity.energyStorage;
         
-        if (usedSteamTank.amount == 0 || usedWaterTank.amount == usedWaterTank.getCapacity()) return;
+        if (usedEnergyStorage.getAmount() >= usedEnergyStorage.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnEnergyFull()) return;
+        
+        if (usedSteamTank.amount == 0) return;
+        if (usedWaterTank.amount >= usedWaterTank.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnWaterFull()) return;
         
         if (currentRecipe == OritechRecipe.DUMMY) {
             var candidate = getRecipe(usedSteamTank);
@@ -101,7 +106,7 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         var consumed = Math.max(1, currentRecipe.getFluidInput().getAmount() * speed);
         usedSteamTank.amount -= consumed;
         usedWaterTank.amount += consumed * 0.9f;
-        usedWaterTank.amount = Math.min(usedWaterTank.amount, usedWaterTank.getCapacity());
+        usedWaterTank.amount = (long) Math.min(usedWaterTank.amount + consumed * 0.9f, usedWaterTank.getCapacity());
         progress = (int) (speed * 100);
         
         var energyEfficiency = getSteamEnergyEfficiency(speed);
@@ -115,8 +120,6 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         lastWorkedAt = world.getTime();
         
         markDirty();
-        markNetDirty();
-        outputEnergy();
         
         if (networkDirty) {
             updateNetwork();

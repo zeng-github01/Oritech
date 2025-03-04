@@ -108,7 +108,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             }
             pendingOutputs = activeRecipe.getResults();
             
-            markNetDirty();
             markDirty();
             
         }
@@ -168,7 +167,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         if (isProducingSteam) {
             // yes this will void excess steam. Generators will only stop producing when the RF storage is full, not the steam storage
             // this is by design and supposed to be one of the negatives of steam production
-            produced *= Oritech.CONFIG.generators.rfToSteamRation();
+            produced *= Oritech.CONFIG.generators.steamEngineData.rfToSteamRatio();
             produced = Math.min(waterStorage.amount, produced);
             steamStorage.amount += produced;
             steamStorage.amount = Math.min(steamStorage.amount, steamStorage.getCapacity());
@@ -231,12 +230,18 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected void outputEnergy() {
         if (energyStorage.getAmount() <= 0) return;
         
+        var moved = 0L;
+        
         // todo caching for targets? Used to be BlockApiCache.create()
         for (var target : getOutputTargets(pos, world)) {
             var candidate = EnergyApi.BLOCK.find(world, target.getLeft(), target.getRight());
             if (candidate != null)
-                EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
+                moved += EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
         }
+        
+        if (moved > 0)
+            this.markDirty();
+        
     }
     
     @Override
