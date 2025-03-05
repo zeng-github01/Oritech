@@ -2,6 +2,8 @@ package rearth.oritech;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import dev.architectury.event.events.common.PlayerEvent;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -54,6 +56,7 @@ public final class Oritech {
         
         // for player augment modifiers
         ServerPlayConnectionEvents.JOIN.register(((handler, sender, server) -> PlayerAugments.refreshPlayerAugments(handler.player)));
+        PlayerEvent.PLAYER_RESPAWN.register((player, inEnd, removalReason) -> PlayerAugments.refreshPlayerAugments(player));
         
         // for player augment ticks
         ServerTickEvents.START_WORLD_TICK.register(event -> event.getPlayers().forEach(PlayerAugments::serverTickAugments));
