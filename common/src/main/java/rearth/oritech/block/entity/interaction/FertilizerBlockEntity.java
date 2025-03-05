@@ -87,7 +87,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     }
     
     private long getWaterUsagePerTick() {
-        return FLUID_USAGE / getWorkTime();
+        return (long) (FLUID_USAGE / getWorkTime());
     }
     
     private boolean hasEnoughWater() {
@@ -188,8 +188,8 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     }
     
     @Override
-    public void updateNetwork() {
-        super.updateNetwork();
+    public void sendMovementNetworkPacket(BlockPos from) {
+        super.sendMovementNetworkPacket(from);
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacket(pos, Registries.FLUID.getId(fluidStorage.variant.getFluid()).toString(), fluidStorage.amount));
     }
     
@@ -199,12 +199,12 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     }
     
     @Override
-    public int getMoveTime() {
+    public float getMoveTime() {
         return Oritech.CONFIG.fertilizerConfig.moveDuration();
     }
     
     @Override
-    public int getWorkTime() {
+    public float getWorkTime() {
         return Oritech.CONFIG.fertilizerConfig.workDuration();
     }
     

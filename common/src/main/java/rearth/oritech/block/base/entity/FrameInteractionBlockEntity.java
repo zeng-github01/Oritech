@@ -35,11 +35,12 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     private BlockPos areaMax;
     private BlockPos currentTarget; // rendering is based just on this (and move time)
     private BlockPos lastTarget;
-    private int currentProgress;    // not synced
+    private float currentProgress;    // not synced
     private boolean moving;    // not synced
     private Vec3i currentDirection = new Vec3i(1, 0, 0);    // not synced
     public long lastWorkedAt;   // not synced
     public boolean disabledViaRedstone;
+    public boolean networkDirty;
     
     // client only
     private long moveStartedAt;
@@ -119,8 +120,6 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
             currentTarget = areaMin;
             lastTarget = areaMin;
         }
-        
-        updateNetwork();
         this.markDirty();
         
         return true;
@@ -203,30 +202,33 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, FrameInteractionBlockEntity blockEntity) {
-        if (world.isClient || !isActive(state) || !state.get(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null) return;
+        if (world.isClient || !isActive(state) || !state.get(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null)
+            return;
         
         if (!canProgress()) return;
         
-        // yes this is inaccurate, but when the machine is this fast the move duration can just be skipped
-        var skipMoveTime = getMoveTime() <= 1;
-        if (skipMoveTime && moving && hasWorkAvailable(currentTarget))
-            moving = false;
+        var posAtTickBegin = currentTarget.mutableCopy();
         
-        if (!moving && currentProgress >= getWorkTime() && moveBlock()) {
-            // if another machine occupies this position in the frame, we wait for it to move (with a timeout to avoid fully blocking everything)
-            currentProgress = 0;
-            finishBlockWork(lastTarget);
-            updateToolPosInFrame();
-            moving = true;
-            updateNetwork();
-            this.markDirty();
-        } else if (moving && currentProgress >= getMoveTime()) {
-            moving = false;
-            currentProgress = 0;
-            
-            // basically skip work if not op is available
-            if (!hasWorkAvailable(currentTarget)) currentProgress = getWorkTime();
+        while (currentProgress > 0.01 && canProgress()) {
+            if (!moving && currentProgress >= getWorkTime()) {
+                currentProgress -= getWorkTime();
+                finishBlockWork(currentTarget);
+                moving = true;
+                this.markDirty();
+            } else if (moving && currentProgress >= getMoveTime() && finishBlockMove()) {
+                updateToolPosInFrame();
+                currentProgress -= getMoveTime();
+                this.networkDirty = true;
+                
+                if (hasWorkAvailable(currentTarget)) moving = false;
+                
+            } else {
+                break;
+            }
         }
+        
+        if (this.networkDirty)
+            sendMovementNetworkPacket(posAtTickBegin);
         
         doProgress(moving);
         currentProgress++;
@@ -271,7 +273,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
             nbt.putLong("areaMax", areaMax.asLong());
             nbt.putLong("currentTarget", currentTarget.asLong());
             nbt.putLong("currentDirection", new BlockPos(currentDirection).asLong());
-            nbt.putInt("progress", currentProgress);
+            nbt.putInt("progress", (int) currentProgress);
             nbt.putBoolean("moving", moving);
         }
     }
@@ -290,7 +292,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         }
     }
     
-    private boolean moveBlock() {
+    private boolean finishBlockMove() {
         
         var nextPos = currentTarget.add(currentDirection);
         var nextDir = currentDirection;
@@ -328,8 +330,9 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         ParticleContent.HIGHLIGHT_BLOCK.spawn(world, Vec3d.of(block), null);
     }
     
-    public void updateNetwork() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineFrameMovementPacket(pos, currentTarget, lastTarget, areaMin, areaMax, disabledViaRedstone));
+    public void sendMovementNetworkPacket(BlockPos from) {
+        networkDirty = false;
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.MachineFrameMovementPacket(pos, currentTarget, from, areaMin, areaMax, disabledViaRedstone));
     }
     
     @Override
@@ -344,7 +347,9 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         return 1;
     }
     
-    public float getSpeedMultiplier() { return 1f; }
+    public float getSpeedMultiplier() {
+        return 1f;
+    }
     
     public BlockPos getAreaMin() {
         return areaMin;
@@ -379,7 +384,7 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
     }
     
     public int getCurrentProgress() {
-        return currentProgress;
+        return (int) currentProgress;
     }
     
     public void setCurrentProgress(int currentProgress) {
@@ -406,9 +411,9 @@ public abstract class FrameInteractionBlockEntity extends BlockEntity implements
         this.currentDirection = currentDirection;
     }
     
-    public abstract int getMoveTime();
+    public abstract float getMoveTime();
     
-    public abstract int getWorkTime();
+    public abstract float getWorkTime();
     
     public ItemStack getToolheadAdditionalRender() {
         return null;

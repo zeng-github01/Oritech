@@ -10,8 +10,7 @@
     "ElytraFeatureRendererMixin"
   ],
   "mixins": [
-    "ServerPlayerEntityMixin",
-    "PlayerEntityMixin"
+    "ServerPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

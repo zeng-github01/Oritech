@@ -145,7 +145,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             var targetState = world.getBlockState(checkPos);
             if (!targetState.isAir() && !targetState.isLiquid()) {  // pass through both air and liquid
                 quarryTarget = checkPos;
-                targetHardness = targetState.getHardness(world, checkPos);
+                targetHardness = Math.clamp(targetState.getHardness(world, checkPos), 0, 100);
                 syncQuarryNetworkData();
                 return new Pair<>(checkPos, targetState);
             }
@@ -162,10 +162,15 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         var targetState = Objects.requireNonNull(world).getBlockState(targetPosition);
         
         if (range > 1) {
-            var data = getQuarryDownwardState(processed);
-            if (data == null) return;
-            targetPosition = data.getLeft();
-            targetState = data.getRight();
+            if (quarryTarget != BlockPos.ORIGIN) {
+                targetPosition = quarryTarget;
+                targetState = world.getBlockState(targetPosition);
+            } else {
+                var data = getQuarryDownwardState(processed);
+                if (data == null) return;
+                targetPosition = data.getLeft();
+                targetState = data.getRight();
+            }
         }
         
         // remove fluids
@@ -205,7 +210,6 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 this.inventory.addStack(stack);
             }
             
-            // world.addBlockBreakParticles(targetPosition, world.getBlockState(targetPosition));
             targetState.getBlock().onBreak(world, targetPosition, targetState, getDestroyerPlayerEntity());
             world.playSound(null, targetPosition, targetState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 1f, 1f);
             world.breakBlock(targetPosition, false);
@@ -281,13 +285,13 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
     
     @Override
-    public int getMoveTime() {
-        return Math.max((int) (Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier()), 1);
+    public float getMoveTime() {
+        return Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier();
     }
     
     @Override
-    public int getWorkTime() {
-        return (int) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness,  0.3f));
+    public float getWorkTime() {
+        return (float) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness,  0.5f));
     }
     
     @Override
@@ -297,7 +301,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public int getOperationEnergyUsage() {
-        return Oritech.CONFIG.destroyerConfig.workEnergyUsage();
+        return (int) (Oritech.CONFIG.destroyerConfig.workEnergyUsage() * Math.max(1, targetHardness));
     }
     
     @Override
@@ -314,8 +318,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
     
     @Override
-    public void updateNetwork() {
-        super.updateNetwork();
+    public void sendMovementNetworkPacket(BlockPos from) {
+        super.sendMovementNetworkPacket(from);
         syncQuarryNetworkData();
     }
     

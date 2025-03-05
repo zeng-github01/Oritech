@@ -79,7 +79,7 @@ public class NetworkContent {
     public record ParticleAcceleratorAnimationPacket(BlockPos position) {
     }
     
-    public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastTarget,
+    public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastPosition,
                                              BlockPos areaMin, BlockPos areaMax, boolean redstoneDisable) {
     }   // times are in ticks
     
@@ -439,7 +439,7 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             if (entity instanceof FrameInteractionBlockEntity machine) {
                 machine.setCurrentTarget(message.currentTarget);
-                machine.setLastTarget(message.lastTarget);
+                machine.setLastTarget(message.lastPosition);
                 machine.setMoveStartedAt(access.player().getWorld().getTime());
                 machine.setAreaMin(message.areaMin);
                 machine.setAreaMax(message.areaMax);

@@ -66,8 +66,8 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
     
     // send inventory updates to client to correctly render the current item
     @Override
-    public void updateNetwork() {
-        super.updateNetwork();
+    public void sendMovementNetworkPacket(BlockPos from) {
+        super.sendMovementNetworkPacket(from);
         
         if (!isActivelyViewed())
             NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.InventorySyncPacket(pos, inventory.heldStacks));
@@ -102,12 +102,12 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity {
     }
     
     @Override
-    public int getMoveTime() {
+    public float getMoveTime() {
         return Oritech.CONFIG.placerConfig.moveDuration();
     }
     
     @Override
-    public int getWorkTime() {
+    public float getWorkTime() {
         return Oritech.CONFIG.placerConfig.workDuration();
     }
     

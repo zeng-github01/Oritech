@@ -66,7 +66,6 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Override
     protected void doProgress(boolean moving) {
         energyStorage.amount -= (long) (getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
-        this.markDirty();
     }
     
     @Override
@@ -117,7 +116,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public Object getScreenOpeningData(ServerPlayerEntity player) {
-        updateNetwork();
+        sendMovementNetworkPacket(getCurrentTarget());
         return new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
     }
     
@@ -172,12 +171,12 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public long getDefaultCapacity() {
-        return 10000;
+        return 100_000;
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return 512;
+        return 5000;
     }
     
     @Override
