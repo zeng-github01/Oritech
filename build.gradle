@@ -77,6 +77,10 @@ subprojects {
             url "https://maven.teamresourceful.com/repository/maven-public/"
         }
 
+        // create:
+        maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
+        maven { url = "https://maven.createmod.net" }
+
     }
 
     dependencies {

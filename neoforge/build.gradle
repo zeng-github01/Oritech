@@ -88,6 +88,11 @@ dependencies {
     modRuntimeOnly "curse.maven:mekanism-268560:5680395"
     modRuntimeOnly "curse.maven:applied-energistics-2-223794:6087880"
     modRuntimeOnly "curse.maven:spark-361579:5759671"
+
+    // create
+    // modImplementation "net.createmod.ponder:Ponder-NeoForge-${minecraft_version}:1.0.43"
+//    modApi "dev.engine-room.flywheel:flywheel-neoforge-api-${minecraft_version}:1.0.0-10"
+//    modImplementation "dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:1.0.0-10"
 }
 
 processResources {
