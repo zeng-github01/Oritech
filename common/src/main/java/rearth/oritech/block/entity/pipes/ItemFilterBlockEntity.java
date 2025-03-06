@@ -45,7 +45,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     
     public final FilterBlockInventory inventory = new FilterBlockInventory(1);
     
-    protected FilterData filterSettings = new FilterData(false, true, new HashMap<>());
+    protected FilterData filterSettings = new FilterData(false, true, false, new HashMap<>());
     protected BlockApiCache<Storage<ItemVariant>, Direction> lookupCache;
     
     @Override
@@ -54,6 +54,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
         Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putBoolean("whitelist", filterSettings.useWhitelist);
         nbt.putBoolean("useNbt", filterSettings.useNbt);
+        nbt.putBoolean("useComponents", filterSettings.useComponents);
         
         var filterItems = filterSettings.items.values();
         var itemsNbtList = new NbtList();
@@ -73,6 +74,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
         
         var whiteList = nbt.getBoolean("whitelist");
         var useNbt = nbt.getBoolean("useNbt");
+        var useComponents = nbt.getBoolean("useComponents");
         
         var list = nbt.getList("filterItems", NbtElement.COMPOUND_TYPE);
         var itemsList = new HashMap<Integer, ItemStack>();
@@ -83,7 +85,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
             itemsList.put(i, stack);
         }
         
-        var data = new FilterData(useNbt, whiteList, itemsList);
+        var data = new FilterData(useNbt, whiteList, useComponents, itemsList);
         this.setFilterSettings(data);
         
     }
@@ -157,7 +159,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
     }
     
     // items is a map of position index (in the filter GUI) to filtered item stack
-    public record FilterData(boolean useNbt, boolean useWhitelist, Map<Integer, ItemStack> items) {
+    public record FilterData(boolean useNbt, boolean useWhitelist, boolean useComponents, Map<Integer, ItemStack> items) {
     }
     
     public class FilterBlockInventory extends SimpleInventory implements SidedInventory {
@@ -184,13 +186,20 @@ public class ItemFilterBlockEntity extends BlockEntity implements InventoryProvi
             if (side.equals(outputSide)) return false;
             
             // then check filter settings
-            // todo add option to compare components and/or nbt (possibly third button?)
             var checkNbt = filterSettings.useNbt;
             var matchesFilterItems = false; // check if at least 1 item matches
+            var checkComponents = true;
             
             for (var filterItem : filterSettings.items.values()) {
                 var matchesType = stack.getItem().equals(filterItem.getItem());
                 if (!matchesType) continue;
+                
+                if (checkComponents) {
+                    var componentsMatch = stack.getComponentChanges().equals(filterItem.getComponentChanges());
+                    if (!componentsMatch) {
+                        break;
+                    }
+                }
                 
                 if (checkNbt) {
                     // check if both have nbt, if so compare them

@@ -30,6 +30,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     
     private ButtonComponent whiteListButton;
     private ButtonComponent nbtButton;
+    private ButtonComponent componentButton;
     private final FlowLayout[] gridContainers = new FlowLayout[8];
     private Map<Integer, ItemStack> cachedItems;
     
@@ -80,8 +81,13 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
                                      Text.translatable("tooltip.oritech.item_filter.nbt")
                                      : Text.translatable("tooltip.oritech.item_filter.no_nbt");
         
+        var textNbtComponent = data.useComponents() ?
+                                     Text.translatable("tooltip.oritech.item_filter.component")
+                                     : Text.translatable("tooltip.oritech.item_filter.no_component");
+        
         whiteListButton.tooltip(textWhitelistTooltip);
         nbtButton.tooltip(textNbtTooltip);
+        componentButton.tooltip(textNbtComponent);
         
     }
     
@@ -117,20 +123,26 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         
         overlay.child(gridContainer.positioning(Positioning.absolute(5, 20)));
         
-        var buttonWidth = 50;
+        var buttonWidth = 60;
         
         // sorry to whoever is reading this for this cursed section
-        whiteListButton = Components.button(Text.literal("               ").append(Text.translatable("title.oritech.item_filter.whitelist").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleWhitelist());
+        whiteListButton = Components.button(Text.literal("            ").append(Text.translatable("title.oritech.item_filter.whitelist").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleWhitelist());
         whiteListButton.horizontalSizing(Sizing.fixed(buttonWidth));
         whiteListButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.handler.blockEntity.getFilterSettings().useWhitelist()));
         whiteListButton.textShadow(false);
-        overlay.child(whiteListButton.positioning(Positioning.absolute(90, 20)));
+        overlay.child(whiteListButton.positioning(Positioning.absolute(83, 18)));
         
-        nbtButton = Components.button(Text.literal("               ").append(Text.translatable("title.oritech.item_filter.nbt").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleNbt());
+        nbtButton = Components.button(Text.literal("      ").append(Text.translatable("title.oritech.item_filter.nbt").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleNbt());
         nbtButton.horizontalSizing(Sizing.fixed(buttonWidth));
         nbtButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.handler.blockEntity.getFilterSettings().useNbt()));
         nbtButton.textShadow(false);
-        overlay.child(nbtButton.positioning(Positioning.absolute(90, 46)));
+        overlay.child(nbtButton.positioning(Positioning.absolute(83, 38)));
+        
+        componentButton = Components.button(Text.literal("                ").append(Text.translatable("title.oritech.item_filter.component").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleComponent());
+        componentButton.horizontalSizing(Sizing.fixed(buttonWidth));
+        componentButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.handler.blockEntity.getFilterSettings().useComponents()));
+        componentButton.textShadow(false);
+        overlay.child(componentButton.positioning(Positioning.absolute(83, 58)));
         
         addTitle(overlay);
         
@@ -174,7 +186,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var data = handler.blockEntity.getFilterSettings();
         var whitelist = data.useWhitelist();
         var newWhitelist = !whitelist;
-        var newData = new ItemFilterBlockEntity.FilterData(data.useNbt(), newWhitelist, data.items());
+        var newData = new ItemFilterBlockEntity.FilterData(data.useNbt(), newWhitelist, data.useComponents(), data.items());
         updateFilterSettings(newData); // this is only on client
         
         updateButtons();
@@ -186,7 +198,22 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var data = handler.blockEntity.getFilterSettings();
         var nbt = data.useNbt();
         var newNbt = !nbt;
-        var newData = new ItemFilterBlockEntity.FilterData(newNbt, data.useWhitelist(), data.items());
+        var newData = new ItemFilterBlockEntity.FilterData(newNbt, data.useWhitelist(), data.useComponents(), data.items());
+        updateFilterSettings(newData); // this is only on client
+        
+        updateButtons();
+        sendUpdateToServer();
+    }
+    
+    private void toggleComponent() {
+        
+        var data = handler.blockEntity.getFilterSettings();
+        var component = data.useComponents();
+        var nbt = data.useNbt();
+        var newComponent = !component;
+        if (newComponent)
+            nbt = true;
+        var newData = new ItemFilterBlockEntity.FilterData(nbt, data.useWhitelist(), newComponent, data.items());
         updateFilterSettings(newData); // this is only on client
         
         updateButtons();
@@ -206,7 +233,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
             var oldData = handler.blockEntity.getFilterSettings();
             var itemFilters = new HashMap<>(oldData.items());
             itemFilters.remove(idIndex);
-            var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), itemFilters);
+            var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), oldData.useComponents(), itemFilters);
             updateFilterSettings(newData); // this is only on client
             sendUpdateToServer();
             
@@ -228,7 +255,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         var oldData = handler.blockEntity.getFilterSettings();
         var itemFilters = new HashMap<>(oldData.items());
         itemFilters.put(idIndex, displayStack);
-        var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), itemFilters);
+        var newData = new ItemFilterBlockEntity.FilterData(oldData.useNbt(), oldData.useWhitelist(), oldData.useComponents(), itemFilters);
         updateFilterSettings(newData); // this is only on client
         
         Oritech.LOGGER.debug("stored map: " + itemFilters);

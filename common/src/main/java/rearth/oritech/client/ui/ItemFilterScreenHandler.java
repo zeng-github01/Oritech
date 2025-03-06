@@ -54,7 +54,7 @@ public class ItemFilterScreenHandler extends ScreenHandler {
             }
         }
         
-        var newData = new ItemFilterBlockEntity.FilterData(data.useNbt(), data.useWhitelist(), newItems);
+        var newData = new ItemFilterBlockEntity.FilterData(data.useNbt(), data.useWhitelist(), data.useComponents(), newItems);
         blockEntity.setFilterSettings(newData);
         if (Objects.requireNonNull(blockEntity.getWorld()).isClient) {
             if (player instanceof ClientPlayerEntity clientPlayer && clientPlayer.client.currentScreen instanceof ItemFilterScreen filterScreen) {
