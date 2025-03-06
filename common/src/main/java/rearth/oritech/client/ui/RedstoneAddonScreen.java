@@ -17,6 +17,7 @@ import rearth.oritech.util.ScreenProvider;
 import java.util.ArrayList;
 import java.util.List;
 
+import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_PANEL;
 import static rearth.oritech.client.ui.BasicMachineScreen.getItemFrame;
 
 public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, RedstoneAddonScreenHandler> {
@@ -47,7 +48,7 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
         overlay.padding(Insets.of(3)).margins(Insets.of(3));
         var spacer = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(166 - 100 + 5));
         
-        rootComponent.child(overlay.surface(Surface.PANEL));
+        rootComponent.child(overlay.surface(ORITECH_PANEL));
         rootComponent.child(spacer);
         
         var modes = RedstoneAddonBlockEntity.RedstoneMode.values();

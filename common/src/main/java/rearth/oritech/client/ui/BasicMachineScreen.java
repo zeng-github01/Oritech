@@ -6,6 +6,7 @@ import io.wispforest.owo.ui.component.*;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
+import io.wispforest.owo.ui.util.NinePatchTexture;
 import io.wispforest.owo.ui.util.SpriteUtilInvoker;
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
@@ -14,12 +15,17 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneTorchBlock;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Mouse;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.Sprite;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -38,6 +44,20 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public static final Identifier BACKGROUND = Oritech.id("textures/gui/modular/gui_base.png");
     public static final Identifier ITEM_SLOT = Oritech.id("textures/gui/modular/itemslot.png");
     public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
+    public static final int GRAY_TEXT_COLOR = new Color(0.2f, 0.2f, 0.3f).rgb();
+    public static Surface ORITECH_PANEL = (context, component) -> NinePatchTexture.draw(Identifier.of(Oritech.MOD_ID, "bedrock_panel"), context, component);
+
+    public static ButtonComponent.Renderer ORITECH_BUTTON = (matrices, button, delta) -> {
+        RenderSystem.enableDepthTest();
+        var texture = button.active ? (button.isHovered() ? MinecraftClient.getInstance().mouse.wasLeftButtonClicked() ? Identifier.of(Oritech.MOD_ID, "bedrock_panel_pressed") : Identifier.of(Oritech.MOD_ID, "bedrock_panel_hover") : Identifier.of(Oritech.MOD_ID, "bedrock_panel")) : ButtonComponent.DISABLED_TEXTURE;
+        NinePatchTexture.draw(texture, matrices, button.getX(), button.getY(), button.width(), button.height());
+    };
+    public static ButtonComponent.Renderer ORITECH_BUTTON_DARK = (matrices, button, delta) -> {
+        RenderSystem.enableDepthTest();
+        var texture = button.active ? (button.isHovered() ? MinecraftClient.getInstance().mouse.wasLeftButtonClicked() ? Identifier.of(Oritech.MOD_ID, "bedrock_panel_pressed") : Identifier.of(Oritech.MOD_ID, "bedrock_panel_dark_hover") : Identifier.of(Oritech.MOD_ID, "bedrock_panel_dark")) : ButtonComponent.DISABLED_TEXTURE;
+        NinePatchTexture.draw(texture, matrices, button.getX(), button.getY(), button.width(), button.height());
+    };
+    
     public FlowLayout root;
     protected TextureComponent progress_indicator;
     protected TextureComponent energyIndicator;
@@ -162,7 +182,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
               Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))
                 .child(Containers.horizontalFlow(Sizing.content(), Sizing.content())
                          .child(buildExtensionPanel())
-                         .surface(Surface.PANEL)
+                         .surface(ORITECH_PANEL)
                          .positioning(Positioning.absolute(176 + 117, 30)))
                 .positioning(Positioning.relative(50, 50))
                 .zIndex(-1)
@@ -175,7 +195,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
               Containers.horizontalFlow(Sizing.fixed(176 + 250), Sizing.fixed(166 + 40))
                 .child(Containers.horizontalFlow(Sizing.content(), Sizing.content())
                          .child(buildEquipmentPanel())
-                         .surface(Surface.PANEL)
+                         .surface(ORITECH_PANEL)
                          .positioning(Positioning.absolute(176 - 80, 30)))
                 .positioning(Positioning.relative(50, 50))
                 .zIndex(-1)
@@ -279,7 +299,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var activeMode = handler.screenData.getInventoryInputMode();
         var modeName = activeMode.name().toLowerCase();
         
-        cycleInputButton.setMessage(Text.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)));
+        cycleInputButton.setMessage(Text.translatable("button.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)).withColor(GRAY_TEXT_COLOR));
         cycleInputButton.tooltip(Text.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName)));
     }
     
@@ -342,12 +362,14 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     
     public void addExtensionComponents(FlowLayout container) {
         
-        cycleInputButton = Components.button(Text.translatable("button.oritech.input_mode_fill_matching_recipe"),
+        cycleInputButton = Components.button(Text.translatable("button.oritech.input_mode_fill_matching_recipe").withColor(GRAY_TEXT_COLOR),
           button -> {
               NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.InventoryInputModeSelectorPacket(handler.blockPos));
           });
         cycleInputButton.horizontalSizing(Sizing.fixed(73));
         cycleInputButton.margins(Insets.of(3));
+        cycleInputButton.renderer(ORITECH_BUTTON);
+        cycleInputButton.textShadow(false);
         
         container.child(Components.label(Text.translatable("title.oritech.details")).margins(Insets.of(3, 1, 1, 1)));
         

@@ -34,8 +34,7 @@ import rearth.oritech.util.TooltipHelper;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
-import static rearth.oritech.client.ui.BasicMachineScreen.getEnergyTooltip;
+import static rearth.oritech.client.ui.BasicMachineScreen.*;
 
 public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, PlayerModifierScreenHandler> {
     
@@ -73,7 +72,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         shownAugments.clear();
         
         var outerContainer = Containers.horizontalFlow(Sizing.fill(60), Sizing.fill((int) (panelHeight * 100)));
-        outerContainer.surface(Surface.PANEL);
+        outerContainer.surface(ORITECH_PANEL);
         
         var movedPanel = Containers.horizontalFlow(Sizing.fixed(900), Sizing.fill());
         movedPanel.surface(Surface.tiled(Oritech.id("textures/block/machine_plating_block/empty.png"), 16, 16));
@@ -97,16 +96,18 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         addResearchPanels(researchContainer, researchWidth);
         
         var energyPanel = Containers.verticalFlow(Sizing.content(3), Sizing.content(3));
-        energyPanel.surface(Surface.PANEL);
+        energyPanel.surface(ORITECH_PANEL);
         energyPanel.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         
         var loadResearchedAugments = Components.button(Text.translatable("\uD83D\uDD2C"), elem -> onLoadAugmentsClick());
         loadResearchedAugments.tooltip(Text.translatable("text.oritech.load_augments.tooltip"));
         loadResearchedAugments.margins(Insets.of(2));
+        loadResearchedAugments.renderer(ORITECH_BUTTON);
         
         var openInvScreen = Components.button(Text.translatable("\uD83E\uDDF0"), elem -> onOpenInvClicked());
         openInvScreen.tooltip(Text.translatable("text.oritech.open_inv.tooltip"));
         openInvScreen.margins(Insets.of(2));
+        openInvScreen.renderer(ORITECH_BUTTON);
         
         var energyPanelX = this.width * 0.2 - 22;
         var energyPanelY = this.height * 0.3;
@@ -329,7 +330,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             
             researchLabels.add(status);
             
-            parent.child(panel.surface(Surface.PANEL).padding(Insets.of(6)).margins(Insets.of(0, 10, 0, 0)).zIndex(-1));
+            parent.child(panel.surface(ORITECH_PANEL).padding(Insets.of(6)).margins(Insets.of(0, 10, 0, 0)).zIndex(-1));
         }
         
     }
@@ -431,7 +432,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         var panel = Containers.verticalFlow(Sizing.fixed(310), Sizing.content(1));
         panel.padding(Insets.of(5));
-        panel.surface(Surface.PANEL);
+        panel.surface(ORITECH_PANEL);
         panel.horizontalAlignment(HorizontalAlignment.CENTER);
         
         var descriptionPanel = Containers.verticalFlow(Sizing.fill(100), Sizing.content(3));
@@ -532,11 +533,17 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
             confirmKey = "text.oritech.noop";
         }
         
-        var cancelButton = Components.button(Text.translatable("text.oritech.cancel"), component -> overlay.remove());
-        var confirmButton = Components.button(Text.translatable(confirmKey), component -> {
+        var cancelButton = Components.button(Text.translatable("text.oritech.cancel").withColor(GRAY_TEXT_COLOR), component -> overlay.remove());
+        cancelButton.textShadow(false);
+        
+        var confirmButton = Components.button(Text.translatable(confirmKey).withColor(GRAY_TEXT_COLOR), component -> {
             onAugmentClick(id, operation, true);
             overlay.remove();
         });
+        confirmButton.textShadow(false);
+        
+        cancelButton.renderer(ORITECH_BUTTON);
+        confirmButton.renderer(ORITECH_BUTTON);
         
         if ((!hasResources || !hasEnergy) && isCreative) {
             hasResources = true;

@@ -41,6 +41,7 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         openEnchantmentSelection = Components.button(Text.translatable("button.oritech.enchanter.bane_of_long_names"), this::onOpenClicked);
         openEnchantmentSelection.positioning(Positioning.relative(54, 13));
         openEnchantmentSelection.active(false);
+        openEnchantmentSelection.renderer(ORITECH_BUTTON_DARK);
         overlay.child(openEnchantmentSelection);
         
         detailsScrollPane = Containers.verticalFlow(Sizing.content(2), Sizing.content(2));
@@ -102,6 +103,13 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
     }
     
     private void openSelectionPanel() {
+        
+        var slotCount = this.handler.slots.size();
+        
+        for (int i = 0; i < slotCount; i++) {
+            this.disableSlot(i);
+        }
+        
         // find enchantments
         var registry = handler.enchanter.getWorld().getRegistryManager().get(RegistryKeys.ENCHANTMENT);
         var all = registry.stream().map(registry::getEntry).filter(entry -> entry.value().isAcceptableItem(currentItem)).toList();
@@ -115,14 +123,24 @@ public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> 
         
         var scrollPane = Containers.verticalScroll(Sizing.fixed(184), Sizing.fixed(200), detailsScrollPane);
         scrollPane.padding(Insets.of(2));
-        var floatingPanel = Containers.overlay(scrollPane);
+        var floatingPanel = new OverlayContainer<>(scrollPane) {
+            @Override
+            public void remove() {
+                super.remove();
+                for (int i = 0; i < slotCount; i++) {
+                    EnchanterScreen.this.enableSlot(i);
+                }
+            }
+        };
         
         // refresh gui
         for (var entry : all) {
             var candidate = entry.value();
-            var button = Components.button(candidate.description(), data -> onEnchantmentSelected(entry, floatingPanel));
+            var button = Components.button(candidate.description().copy().withColor(BasicMachineScreen.GRAY_TEXT_COLOR), data -> onEnchantmentSelected(entry, floatingPanel));
             button.sizing(Sizing.fill(), Sizing.fixed(25));
             button.margins(Insets.of(1, 1, 0, 8));
+            button.renderer(ORITECH_BUTTON);
+            button.textShadow(false);
             detailsScrollPane.child(button);
         }
         

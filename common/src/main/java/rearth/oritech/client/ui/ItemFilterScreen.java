@@ -1,14 +1,19 @@
 package rearth.oritech.client.ui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
+import io.wispforest.owo.ui.util.NinePatchTexture;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -16,8 +21,10 @@ import rearth.oritech.network.NetworkContent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.ITEM_SLOT;
+import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_BUTTON;
 
 public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilterScreenHandler> {
     
@@ -65,20 +72,15 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     private void updateButtons() {
         var data = handler.blockEntity.getFilterSettings();
         
-        var textWhitelist = data.useWhitelist() ? Text.translatable("title.oritech.item_filter.whitelist") : Text.translatable("title.oritech.item_filter.blacklist");
         var textWhitelistTooltip = data.useWhitelist() ?
                                      Text.translatable("tooltip.oritech.item_filter.whitelist")
                                      : Text.translatable("tooltip.oritech.item_filter.blacklist");
         
-        var textNbt = data.useNbt() ? Text.translatable("title.oritech.item_filter.nbt") : Text.translatable("title.oritech.item_filter.no_nbt");
         var textNbtTooltip = data.useNbt() ?
                                      Text.translatable("tooltip.oritech.item_filter.nbt")
                                      : Text.translatable("tooltip.oritech.item_filter.no_nbt");
         
-        whiteListButton.setMessage(textWhitelist);
         whiteListButton.tooltip(textWhitelistTooltip);
-        
-        nbtButton.setMessage(textNbt);
         nbtButton.tooltip(textNbtTooltip);
         
     }
@@ -113,16 +115,22 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
             }
         }
         
-        overlay.child(gridContainer.positioning(Positioning.absolute(25, 20)));
+        overlay.child(gridContainer.positioning(Positioning.absolute(5, 20)));
         
         var buttonWidth = 50;
-        whiteListButton = Components.button(Text.translatable("button.oritech.item_filter.whitelist"), buttonComponent -> toggleWhitelist());
-        whiteListButton.horizontalSizing(Sizing.fixed(buttonWidth));
-        overlay.child(whiteListButton.positioning(Positioning.absolute(110, 20)));
         
-        nbtButton = Components.button(Text.translatable("button.oritech.item_filter.nbt_on"), buttonComponent -> toggleNbt());
+        // sorry to whoever is reading this for this cursed section
+        whiteListButton = Components.button(Text.literal("               ").append(Text.translatable("title.oritech.item_filter.whitelist").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleWhitelist());
+        whiteListButton.horizontalSizing(Sizing.fixed(buttonWidth));
+        whiteListButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.handler.blockEntity.getFilterSettings().useWhitelist()));
+        whiteListButton.textShadow(false);
+        overlay.child(whiteListButton.positioning(Positioning.absolute(90, 20)));
+        
+        nbtButton = Components.button(Text.literal("               ").append(Text.translatable("title.oritech.item_filter.nbt").withColor(BasicMachineScreen.GRAY_TEXT_COLOR)), buttonComponent -> toggleNbt());
         nbtButton.horizontalSizing(Sizing.fixed(buttonWidth));
-        overlay.child(nbtButton.positioning(Positioning.absolute(110, 46)));
+        nbtButton.renderer(createToggleRenderer(ignored -> ItemFilterScreen.this.handler.blockEntity.getFilterSettings().useNbt()));
+        nbtButton.textShadow(false);
+        overlay.child(nbtButton.positioning(Positioning.absolute(90, 46)));
         
         addTitle(overlay);
         
@@ -134,6 +142,16 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         
         updateButtons();
         updateItemFilters();
+    }
+    
+    public static ButtonComponent.Renderer createToggleRenderer(Predicate<ButtonComponent> activeSupplier) {
+        return (owoUIDrawContext, button, v) -> {
+            RenderSystem.enableDepthTest();
+            var isOn = activeSupplier.test(button);
+            var normalTexture = isOn ? Oritech.id("textures/gui/modular/toggle_on.png") : Oritech.id("textures/gui/modular/toggle_off.png");
+            var hoverTexture = isOn ? Oritech.id("textures/gui/modular/toggle_on_hover.png") : Oritech.id("textures/gui/modular/toggle_off_hover.png");
+            owoUIDrawContext.drawTexture(button.isHovered() ? hoverTexture : normalTexture, button.x(), button.y(), 30, 16, 0, 0, 30, 16, 30, 16);
+        };
     }
     
     

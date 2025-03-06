@@ -37,7 +37,7 @@ public class DroneScreen extends UpgradableMachineScreen<DroneScreenHandler> {
             var container = Containers.verticalFlow(Sizing.content(10), Sizing.content(10));
             container.child(label);
             container.sizing(Sizing.content(10));
-            container.surface(Surface.PANEL);
+            container.surface(ORITECH_PANEL);
             container.positioning(Positioning.relative(50, 30));
             container.zIndex(7000);
             

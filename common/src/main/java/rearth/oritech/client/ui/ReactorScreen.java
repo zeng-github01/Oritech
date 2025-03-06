@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 
+import static rearth.oritech.client.ui.BasicMachineScreen.ORITECH_PANEL;
+
 public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScreenHandler> {
     
     private ArrayList<Pair<Integer, ReactorBlockRenderComponent>> activeComponents;
@@ -69,7 +71,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
         tooltipTitle.zIndex(3001);
         
         var overlay = Containers.horizontalFlow(Sizing.fixed(329), Sizing.fixed(200));
-        rootComponent.child(overlay.surface(Surface.PANEL));
+        rootComponent.child(overlay.surface(ORITECH_PANEL));
         
         if (handler.reactorEntity.uiData != null) {
             addReactorComponentPreview(overlay);

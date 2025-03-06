@@ -8,6 +8,7 @@ import io.wispforest.owo.ui.container.OverlayContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
 import rearth.oritech.Oritech;
@@ -125,24 +126,27 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         var floatingContent = Containers.verticalFlow(Sizing.content(), Sizing.content());
         
         var holoPreviewContainer = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(96));
-        holoPreviewContainer.surface(Surface.PANEL);
+        holoPreviewContainer.surface(ORITECH_PANEL);
         holoPreviewContainer.margins(Insets.of(2));
         
         var detailsScrollPane = Containers.verticalFlow(Sizing.content(2), Sizing.content(2));
         detailsScrollPane.padding(Insets.of(2));
         var detailsContainer = Containers.verticalScroll(Sizing.fixed(176), Sizing.fixed(110), detailsScrollPane);
-        detailsContainer.surface(Surface.PANEL);
+        detailsContainer.surface(ORITECH_PANEL);
         detailsContainer.margins(Insets.of(2));
         detailsContainer.padding(Insets.of(4));
         
         floatingContent.child(holoPreviewContainer);
         floatingContent.child(detailsContainer);
         
+        var slotCount = this.handler.slots.size();
         var floatingPanel = new OverlayContainer<>(floatingContent) {
             @Override
             public void remove() {
                 super.remove();
-                //handler.showSlots();
+                for (int i = 0; i < slotCount; i++) {
+                    UpgradableMachineScreen.this.enableSlot(i);
+                }
             }
         };
         
@@ -171,13 +175,17 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             
             addonBlock = addonBlock.getBlock().getDefaultState();
             
+            if (addonBlock.contains(MachineAddonBlock.ADDON_USED)) {
+                addonBlock = addonBlock.with(MachineAddonBlock.ADDON_USED, true);
+            }
+            
             // detailed list element
             var addonBlockType = (MachineAddonBlock) addonBlock.getBlock();
             var addonSettings = addonBlockType.getAddonSettings();
             var speed = (1 - addonSettings.speedMultiplier()) * 100;
             var efficiency = (1 - addonSettings.efficiencyMultiplier()) * 100;
             
-            var blockSize = addonSettings.extender() ? 15 : 23;
+            var blockSize = 23;
             
             var detailPane = Containers.horizontalFlow(Sizing.fill(100), Sizing.content(2))
                                .child(Components.block(addonBlock).sizing(Sizing.fixed(blockSize)).margins(Insets.of(4)))
@@ -228,10 +236,14 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             .positioning(Positioning.absolute(previewX, previewY))
         );
         
-        var openAddonsButton = Components.button(Text.translatable("button.oritech.machine.addons"), button -> {
+        var openAddonsButton = Components.button(Text.translatable("button.oritech.machine.addons").withColor(BasicMachineScreen.GRAY_TEXT_COLOR), button -> {
             root.child(floatingPanel);
-            // handler.hideSlots();
+            for (int i = 0; i < this.handler.slots.size(); i++) {
+                this.disableSlot(i);
+            }
         });
+        openAddonsButton.renderer(ORITECH_BUTTON);
+        openAddonsButton.textShadow(false);
         
         sidePanel.child(openAddonsButton);
     }

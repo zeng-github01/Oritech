@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static rearth.oritech.client.ui.BasicMachineScreen.getItemFrame;
+import static rearth.oritech.client.ui.BasicMachineScreen.*;
 
 public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, InventoryProxyScreenHandler> {
     
@@ -40,16 +40,17 @@ public class InventoryProxyScreen extends BaseOwoHandledScreen<FlowLayout, Inven
         var overlay = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(100));
         var spacer = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(166 - 100 + 5));
         
-        rootComponent.child(overlay.surface(Surface.PANEL));
+        rootComponent.child(overlay.surface(ORITECH_PANEL));
         rootComponent.child(spacer);
         
         for (var slot : Objects.requireNonNull(handler.controllerScreen).getGuiSlots()) {
             var button = Components.button(Text.literal(""), elem -> {
                 setActiveSlot(slot.index());
             });
+            button.renderer(ORITECH_BUTTON);
             buttons.add(button);
             overlay.child(getItemFrame(slot.x(), slot.y()));
-            overlay.child(button.sizing(Sizing.fixed(10)).positioning(Positioning.absolute(slot.x() + 2, slot.y() + 2)));
+            overlay.child(button.sizing(Sizing.fixed(10)).positioning(Positioning.absolute(slot.x() + 3, slot.y() + 3)));
         }
         
         for (int i = 0; i < buttons.size(); i++) {

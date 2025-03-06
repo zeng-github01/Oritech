@@ -49,8 +49,7 @@ public class BlockPreviewComponent extends BaseComponent {
             final var vertexConsumers = client.getBufferBuilders().getEntityVertexConsumers();
             if (this.state.getRenderType() != BlockRenderType.ENTITYBLOCK_ANIMATED) {
                 this.client.getBlockRenderManager().renderBlockAsEntity(
-                  this.state, context.getMatrices(), vertexConsumers,
-                  LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV
+                  this.state, context.getMatrices(), vertexConsumers, LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV
                 );
             }
             
