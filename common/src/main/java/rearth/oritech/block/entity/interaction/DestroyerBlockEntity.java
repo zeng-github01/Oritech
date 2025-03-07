@@ -266,12 +266,13 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         return List.of(
           new GuiSlot(0, 117, 20, true),
           new GuiSlot(1, 117, 38, true),
-          new GuiSlot(2, 117, 56, true));
+          new GuiSlot(2, 135, 20, true),
+          new GuiSlot(3, 135, 38, true));
     }
     
     @Override
     public int getInventorySize() {
-        return 3;
+        return 4;
     }
     
     @Override
