@@ -24,6 +24,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -46,6 +47,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public static final Identifier GUI_COMPONENTS = Oritech.id("textures/gui/modular/machine_gui_components.png");
     public static final int GRAY_TEXT_COLOR = new Color(0.2f, 0.2f, 0.3f).rgb();
     public static Surface ORITECH_PANEL = (context, component) -> NinePatchTexture.draw(Identifier.of(Oritech.MOD_ID, "bedrock_panel"), context, component);
+    public static Surface ORITECH_PANEL_DARK = (context, component) -> NinePatchTexture.draw(Identifier.of(Oritech.MOD_ID, "bedrock_panel_dark"), context, component);
+    public static Surface ORITECH_PANEL_ORANGE = (context, component) -> NinePatchTexture.draw(Identifier.of(Oritech.MOD_ID, "bedrock_panel_orange"), context, component);
 
     public static ButtonComponent.Renderer ORITECH_BUTTON = (matrices, button, delta) -> {
         RenderSystem.enableDepthTest();
@@ -450,10 +453,32 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var blockTitle = handler.machineBlock.getBlock().getName();
         var label = Components.label(blockTitle);
         label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
-        label.sizing(Sizing.fixed(176), Sizing.content(2));
-        label.horizontalTextAlignment(HorizontalAlignment.CENTER);
         label.zIndex(1);
-        overlay.child(label.positioning(Positioning.relative(54, 2)));
+        
+        var blockIcon = Components.item(new ItemStack(this.handler.blockEntity.getCachedState().getBlock()));
+        blockIcon.sizing(Sizing.fixed(24));
+        
+        var iconPanel = Containers.horizontalFlow(Sizing.content(0), Sizing.content(0));
+        iconPanel.padding(Insets.of(2, 5, 3, 3));
+        iconPanel.child(blockIcon);
+        iconPanel.surface(ORITECH_PANEL);
+        iconPanel.zIndex(50);
+        
+        var textPanel = Containers.horizontalFlow(Sizing.content(0), Sizing.content(0));
+        textPanel.padding(Insets.of(5, 6, 6, 5));
+        textPanel.child(label);
+        textPanel.surface(ORITECH_PANEL);
+        
+        var combinedPanel = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+        combinedPanel.child(iconPanel);
+        combinedPanel.child(textPanel.margins(Insets.of(4, 0, -1, 0)));
+        
+        var horizontalPos = blockTitle.getString().length() > 15 ? 90 : 65;
+        var verticalPos = blockTitle.getString().length() > 20 ? - 25 : - 15;
+        
+        overlay.child(combinedPanel.positioning(Positioning.relative(horizontalPos, verticalPos)));
+        overlay.allowOverflow(true);
+        
     }
     
     private void addProgressArrow(FlowLayout panel) {
