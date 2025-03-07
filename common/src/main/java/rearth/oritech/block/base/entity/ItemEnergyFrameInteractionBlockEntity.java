@@ -65,12 +65,13 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     protected void doProgress(boolean moving) {
-        energyStorage.amount -= (long) (getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
+        var usedCost = moving ? getMoveEnergyUsage() : getOperationEnergyUsage();
+        energyStorage.amount -= (long) (usedCost * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
     }
     
     @Override
     public void finishBlockWork(BlockPos processed) {
-        energyStorage.amount -= getOperationEnergyUsage();
+        energyStorage.amount -= (long) (getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
     }
     
     @Override

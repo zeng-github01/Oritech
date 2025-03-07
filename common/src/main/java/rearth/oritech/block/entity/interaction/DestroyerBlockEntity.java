@@ -301,7 +301,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public int getOperationEnergyUsage() {
-        return (int) (Oritech.CONFIG.destroyerConfig.workEnergyUsage() * Math.max(1, targetHardness));
+        return Oritech.CONFIG.destroyerConfig.workEnergyUsage();
     }
     
     @Override
