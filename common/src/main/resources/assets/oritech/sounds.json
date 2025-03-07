@@ -48,7 +48,7 @@
     "sounds": [
       {
         "name": "oritech:grinder_working",
-        "volume": 0.7
+        "volume": 0.3
       }
     ]
   },

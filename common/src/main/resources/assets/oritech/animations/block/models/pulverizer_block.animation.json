@@ -27,6 +27,11 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.1667": {
+					"effect": "oritech:grinder_working"
+				}
 			}
 		},
 		"idle": {
