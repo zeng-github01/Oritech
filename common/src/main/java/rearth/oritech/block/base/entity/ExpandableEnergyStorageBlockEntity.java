@@ -38,6 +38,7 @@ import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.containers.DynamicStatisticEnergyContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,9 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     private boolean networkDirty = false;
     private boolean redstonePowered;
     
+    // client only
+    public DynamicStatisticEnergyContainer.EnergyStatistics currentStats;
+    
     public final SimpleInventory inventory = new SimpleInventory(1) {
         @Override
         public void markDirty() {
@@ -62,7 +66,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     //own storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
+    protected final DynamicStatisticEnergyContainer energyStorage = new DynamicStatisticEnergyContainer(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
     private final EnergyApi.EnergyContainer outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
@@ -85,6 +89,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     @Override
     public void tick(World world, BlockPos pos, BlockState state, ExpandableEnergyStorageBlockEntity blockEntity) {
         if (world.isClient) return;
+        
+        energyStorage.tick((int) world.getTime());
         
         if (!redstonePowered)
             outputEnergy();
@@ -259,7 +265,10 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         
         if (world.getTime() % 15 != 0 && !isActivelyViewed()) return;
         
+        var statistics = energyStorage.getCurrentStatistics(world.getTime());
+        
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnergyStatisticsPacket(pos, statistics));
         networkDirty = false;
     }
     
@@ -278,7 +287,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     @Override
     public List<GuiSlot> getGuiSlots() {
-        return List.of(new GuiSlot(0, 80, 35));
+        return List.of(new GuiSlot(0, 30, 42));
     }
     
     @Override

@@ -10,10 +10,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
-import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.base.entity.*;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
 import rearth.oritech.block.entity.accelerator.ParticleCollectorBlockEntity;
@@ -38,6 +35,7 @@ import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.energy.containers.DynamicStatisticEnergyContainer;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 
 import java.util.List;
@@ -99,6 +97,7 @@ public class NetworkContent {
     // for use with addon providers to sync energy state
     public record GenericEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy) {}
     public record FullEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy, long maxInsert, long maxExtract) {}
+    public record EnergyStatisticsPacket(BlockPos position, DynamicStatisticEnergyContainer.EnergyStatistics data) {}
     
     public record GenericRedstoneSyncPacket(BlockPos position, boolean isPowered) {}
     
@@ -269,6 +268,16 @@ public class NetworkContent {
                 storage.amount = message.currentEnergy;
             } else if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof SimpleEnergyStorage storage) {
                 storage.setAmount(message.currentEnergy);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(EnergyStatisticsPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof ExpandableEnergyStorageBlockEntity storageBlock) {
+                storageBlock.currentStats = message.data;
             }
             
         }));

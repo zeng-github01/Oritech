@@ -473,8 +473,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         combinedPanel.child(iconPanel);
         combinedPanel.child(textPanel.margins(Insets.of(4, 0, -1, 0)));
         
-        var horizontalPos = blockTitle.getString().length() > 15 ? 90 : 65;
-        var verticalPos = blockTitle.getString().length() > 20 ? - 25 : - 15;
+        var horizontalPos = blockTitle.getString().length() > 15 ? 100 : 65;
+        var verticalPos = blockTitle.getString().length() > 18 ? - 25 : - 15;
         
         overlay.child(combinedPanel.positioning(Positioning.relative(horizontalPos, verticalPos)));
         overlay.allowOverflow(true);

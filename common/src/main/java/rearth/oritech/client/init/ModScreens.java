@@ -84,7 +84,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
         HandledScreens.register(LAVA_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(FUEL_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(BASIC_GENERATOR_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
-        HandledScreens.register(STORAGE_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
+        HandledScreens.register(STORAGE_SCREEN, EnergyStorageScreen::new);
         HandledScreens.register(DESTROYER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(PLACER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         HandledScreens.register(FERTILIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
