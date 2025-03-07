@@ -71,7 +71,6 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public void finishBlockWork(BlockPos processed) {
-        energyStorage.amount -= (long) (getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
     }
     
     @Override
