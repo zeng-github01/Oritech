@@ -1,15 +1,17 @@
 package rearth.oritech.block.behavior;
 
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.CropBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
@@ -68,6 +70,9 @@ public class LaserArmBlockBehavior {
                 
                 if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider energyProvider)
                     storageCandidate = energyProvider.getStorage(null);
+                
+                if (blockEntity instanceof UnstableContainerBlockEntity unstableContainerBlockEntity)
+                    storageCandidate = unstableContainerBlockEntity.laserInputStorage;
                 
                 var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();
                 if (insertAmount < 10)

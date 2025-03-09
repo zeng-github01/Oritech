@@ -39,7 +39,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         if (laserEntity.getCurrentTarget() == null) return;
         var target = laserEntity.getVisualTarget();
         
-        if (laserEntity.isTargetingDeepdrill()) {
+        if (laserEntity.isTargetingDeepdrill(laserEntity.getWorld().getBlockState(laserEntity.getCurrentTarget()).getBlock())) {
             var drillId = laserEntity.getCurrentTarget().asLong();
             var offset = getOffsetByDrillId(drillId, laserEntity);
             target = target.add(offset);

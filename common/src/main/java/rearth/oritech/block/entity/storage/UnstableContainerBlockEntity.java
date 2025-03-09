@@ -19,9 +19,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
@@ -31,6 +33,7 @@ import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.containers.DynamicStatisticEnergyContainer;
+import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -47,14 +50,17 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("setup").thenPlay("idle");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
+    public static final Long BASE_CAPACITY = 20_000_000L;
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
     public BlockState capturedBlock = Blocks.AIR.getDefaultState();
     private boolean networkDirty = false;
     
+    public final SimpleEnergyStorage laserInputStorage = new SimpleEnergyStorage(100_000_000, 0, 100_000_000);
+    
     //own storage
-    protected final DynamicStatisticEnergyContainer energyStorage = new DynamicStatisticEnergyContainer(10_000_000_000L, 100_000_000, 100_000_000, this::markDirty);
+    protected final DynamicStatisticEnergyContainer energyStorage = new DynamicStatisticEnergyContainer(20_000_000L, 20_000_000L, 20_000_000L, this::markDirty);
     
     private final EnergyApi.EnergyContainer outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
@@ -78,12 +84,34 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
         
         energyStorage.tick((int) world.getTime());
         
+        adjustEnergyStorageSize();
+        
         if (energyStorage.amount > 0)
             outputEnergy();
         
         if (networkDirty) {
             updateNetwork();
         }
+    }
+    
+    private void adjustEnergyStorageSize() {
+        
+        var targetMultiplier = 1 + Math.pow((double) laserInputStorage.getAmount() / Oritech.CONFIG.laserArmConfig.energyPerTick(), 2);
+        targetMultiplier = Math.min(targetMultiplier, 5_000);
+        laserInputStorage.setAmount(0);
+        var targetAmount = BASE_CAPACITY * targetMultiplier;
+        var currentAmount = energyStorage.getCapacity();
+        energyStorage.capacity = (long) MathHelper.lerp(0.005d, currentAmount, targetAmount);
+        energyStorage.setMaxInsert((long) targetAmount);
+        energyStorage.setMaxExtract((long) targetAmount);
+        
+        if (energyStorage.amount > energyStorage.capacity) {
+            energyStorage.amount = energyStorage.capacity;
+        }
+        
+        if (energyStorage.capacity != BASE_CAPACITY)
+            energyStorage.update();
+        
     }
     
     private void outputEnergy() {

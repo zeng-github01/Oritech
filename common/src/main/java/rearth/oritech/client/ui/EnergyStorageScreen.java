@@ -4,17 +4,19 @@ import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.Positioning;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.Surface;
+import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.TooltipHelper;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+
+import java.util.Collection;
+import java.util.List;
 
 public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachineScreenHandler> {
     
@@ -35,10 +37,12 @@ public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachi
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        var insertionContainer = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        var panelXPos = 74;
+        
+        var insertionContainer = Containers.verticalFlow(Sizing.fixed(90), Sizing.content());
         insertionContainer.surface(Surface.PANEL_INSET);
         insertionContainer.padding(Insets.of(2, 2, 4, 8));
-        insertionContainer.positioning(Positioning.absolute(60, 23));
+        insertionContainer.positioning(Positioning.absolute(panelXPos, 23));
         
         inAvgSecond = Components.label(Text.literal("X RF/t"));
         inAvgSecond.tooltip(Text.translatable("title.oritech.energy.inAvgSecond.tooltip"));
@@ -57,7 +61,7 @@ public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachi
         var extractionContainer = Containers.verticalFlow(Sizing.content(), Sizing.content());
         extractionContainer.surface(Surface.PANEL_INSET);
         extractionContainer.padding(Insets.of(2, 2, 4, 8));
-        extractionContainer.positioning(Positioning.absolute(60, 23));
+        extractionContainer.positioning(Positioning.absolute(panelXPos, 23));
         
         outAvgSecond = Components.label(Text.literal("X RF/t"));
         outAvgSecond.tooltip(Text.translatable("title.oritech.energy.outAvgSecond.tooltip"));
@@ -85,7 +89,28 @@ public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachi
         toggleButton.horizontalSizing(Sizing.fixed(60));
         toggleButton.renderer(ItemFilterScreen.createToggleRenderer(ignored -> showingOutput));
         toggleButton.textShadow(false);
-        overlay.child(toggleButton.positioning(Positioning.absolute(60, 5)));
+        overlay.child(toggleButton.positioning(Positioning.absolute(panelXPos, 5)));
+        
+        if (this.handler.blockEntity instanceof UnstableContainerBlockEntity unstableContainer) {
+            var container = (DynamicEnergyStorage) unstableContainer.getEnergyStorageForLink(null);
+            var capacity = container.maxInsert;
+            var capacityMultiplier = capacity / UnstableContainerBlockEntity.BASE_CAPACITY;   // in percent, exponential
+            var laserIcon = Components.item(new ItemStack(BlockContent.LASER_ARM_BLOCK.asItem()));
+            var laserLabel = Components.label(Text.literal("x" + capacityMultiplier));
+            
+            Collection<Text> tooltipText = List.of(Text.translatable("tooltip.oritech.unstable_laser_tooltip"), Text.translatable("tooltip.oritech.unstable_laser_tooltip.2"));
+            
+            laserIcon.tooltip(tooltipText);
+            laserLabel.tooltip(tooltipText);
+            
+            var laserContainer = Containers.verticalFlow(Sizing.fixed(45), Sizing.content());
+            laserContainer.surface(Surface.PANEL_INSET);
+            laserContainer.child(laserIcon);
+            laserContainer.child(laserLabel.margins(Insets.of(4, 4, 4, 4)));
+            laserContainer.horizontalAlignment(HorizontalAlignment.CENTER);
+            
+            overlay.child(laserContainer.positioning(Positioning.absolute(26, 23)));
+        }
         
     }
     

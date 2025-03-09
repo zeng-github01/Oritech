@@ -29,8 +29,10 @@ public class TooltipHelper {
             return getFormatted(amount / 1_000.0) + I18n.translate("tooltip.oritech.thousand_abbrev");
         } else if (amount < 1_000_000_000) {
             return getFormatted(amount / 1_000_000.0) + I18n.translate("tooltip.oritech.million_abbrev");
-        } else {
+        } else if (amount < 1_000_000_000_000L)  {
             return getFormatted(amount / 1_000_000_000.0) + I18n.translate("tooltip.oritech.billion_abbrev");
+        } else {
+            return getFormatted(amount / 1_000_000_000_000.0) + I18n.translate("tooltip.oritech.trillion_abbrev");
         }
     }
     

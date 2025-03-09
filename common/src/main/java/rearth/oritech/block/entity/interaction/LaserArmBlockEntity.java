@@ -5,9 +5,9 @@ import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.BuddingAmethystBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.DataComponentTypes;
@@ -45,8 +45,8 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
-import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.MachineCoreEntity;
+import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
@@ -804,21 +804,26 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         return idleTime < 3;
     }
     
-    public boolean isTargetingAtomicForge() {
-        return world.getBlockState(currentTarget).getBlock().equals(BlockContent.ATOMIC_FORGE_BLOCK);
+    public boolean isTargetingAtomicForge(Block block) {
+        return block.equals(BlockContent.ATOMIC_FORGE_BLOCK);
     }
     
-    public boolean isTargetingDeepdrill() {
-        return world.getBlockState(currentTarget).getBlock().equals(BlockContent.DEEP_DRILL_BLOCK);
+    public boolean isTargetingDeepdrill(Block block) {
+        return block.equals(BlockContent.DEEP_DRILL_BLOCK);
     }
     
-    public boolean isTargetingCatalyst() {
-        return world.getBlockState(currentTarget).getBlock().equals(BlockContent.ENCHANTMENT_CATALYST_BLOCK);
+    public boolean isTargetingCatalyst(Block block) {
+        return block.equals(BlockContent.ENCHANTMENT_CATALYST_BLOCK);
+    }
+    
+    public boolean isTargetingUnstableContainer(Block block) {
+        return block.equals(BlockContent.UNSTABLE_CONTAINER);
     }
     
     public boolean isTargetingEnergyContainer() {
         var storageCandidate = EnergyApi.BLOCK.find(world, currentTarget, null);
-        return storageCandidate != null || isTargetingAtomicForge() || isTargetingDeepdrill() || isTargetingCatalyst();
+        var block = world.getBlockState(currentTarget).getBlock();
+        return storageCandidate != null || isTargetingAtomicForge(block) || isTargetingDeepdrill(block) || isTargetingCatalyst(block) || isTargetingUnstableContainer(block);
     }
     
     public boolean isTargetingBuddingAmethyst() {

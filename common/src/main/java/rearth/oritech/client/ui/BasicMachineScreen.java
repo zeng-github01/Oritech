@@ -279,13 +279,13 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var amount = handler.energyStorage.getAmount();
         
         var fillAmount = (float) amount / capacity;
-        var tooltipText = getEnergyTooltip(amount, capacity, (int) handler.screenData.getDisplayedEnergyUsage(), (int) handler.screenData.getDisplayedEnergyTransfer());
+        var tooltipText = getEnergyTooltip(amount, capacity, (long) handler.screenData.getDisplayedEnergyUsage(), (long) handler.screenData.getDisplayedEnergyTransfer());
         
         energyIndicator.tooltip(tooltipText);
         energyIndicator.visibleArea(PositionedRectangle.of(0, 96 - ((int) (96 * (fillAmount))), 24, (int) (96 * fillAmount)));
     }
     
-    public static Text getEnergyTooltip(long amount, long max, int showedUsage, int showedTransfer) {
+    public static Text getEnergyTooltip(long amount, long max, long showedUsage, long showedTransfer) {
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
         var storedAmount = TooltipHelper.getEnergyText(amount);

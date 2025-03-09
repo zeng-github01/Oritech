@@ -53,13 +53,14 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         var startPos = Vec3d.of(laserEntity.getPos()).add(0.5, 1.55, 0.5);
         
         var targetPos = laserEntity.getVisualTarget();
-        if (laserEntity.isTargetingAtomicForge()) { // adjust so the beam end faces one of the corner pillars
+        var targetBlock = laserEntity.getWorld().getBlockState(laserEntity.getCurrentTarget()).getBlock();
+        if (laserEntity.isTargetingAtomicForge(targetBlock)) { // adjust so the beam end faces one of the corner pillars
             var moveX = 0.5;
             var moveZ = 0.5;
             if (startPos.x < targetPos.x) moveX = -0.5;
             if (startPos.z < targetPos.z) moveZ = -0.5;
             targetPos = targetPos.add(moveX, 0.5, moveZ);
-        } else if (laserEntity.isTargetingDeepdrill()) {
+        } else if (laserEntity.isTargetingDeepdrill(targetBlock)) {
             var offset = cachedOffsets.computeIfAbsent(laserEntity, id -> idToOffset(id.getPos(), 0.5f, laserEntity.getWorld(), laserEntity.getCurrentTarget()));
             targetPos = targetPos.add(offset);
         }
