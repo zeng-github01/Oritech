@@ -623,7 +623,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
         return energyStorage;
     }
     

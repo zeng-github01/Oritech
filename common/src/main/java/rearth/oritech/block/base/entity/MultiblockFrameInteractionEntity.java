@@ -61,7 +61,7 @@ public abstract class MultiblockFrameInteractionEntity extends ItemEnergyFrameIn
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
         return energyStorage;
     }
     

@@ -31,14 +31,22 @@ import java.util.Objects;
 public interface MultiblockMachineController {
     
     List<Vec3i> getCorePositions();
+    
     Direction getFacingForMultiblock();
+    
     BlockPos getMachinePos();
+    
     World getMachineWorld();
+    
     ArrayList<BlockPos> getConnectedCores();
+    
     void setCoreQuality(float quality);
+    
     float getCoreQuality();
+    
     InventoryProvider getInventoryForLink();
-    EnergyApi.EnergyContainer getEnergyStorageForLink();
+    
+    EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction);
     
     default void addMultiblockToNbt(NbtCompound nbt) {
         
@@ -212,6 +220,7 @@ public interface MultiblockMachineController {
     
     void playSetupAnimation();
     
-    record MultiBlockElement(BlockState state, MachineCoreBlock coreBlock, BlockPos pos) {}
+    record MultiBlockElement(BlockState state, MachineCoreBlock coreBlock, BlockPos pos) {
+    }
     
 }

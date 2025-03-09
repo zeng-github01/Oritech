@@ -16,17 +16,13 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneTorchBlock;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.Mouse;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.*;
 import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -294,7 +290,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var energyFill = String.format("%.1f", percentage * 100);
         var storedAmount = TooltipHelper.getEnergyText(amount);
         var maxAmount = TooltipHelper.getEnergyText(max);
-        return Text.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, showedUsage, showedTransfer);
+        var transfer = TooltipHelper.getEnergyText(showedTransfer);
+        return Text.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, showedUsage, transfer);
     }
     
     public void updateSettingsButtons() {
@@ -455,7 +452,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         label.color(new Color(64 / 255f, 64 / 255f, 64 / 255f));
         label.zIndex(1);
         
-        var blockIcon = Components.item(new ItemStack(this.handler.blockEntity.getCachedState().getBlock()));
+        var blockIcon = Components.item(getTitleIcon());
         blockIcon.sizing(Sizing.fixed(24));
         
         var iconPanel = Containers.horizontalFlow(Sizing.content(0), Sizing.content(0));
@@ -479,6 +476,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         overlay.child(combinedPanel.positioning(Positioning.relative(horizontalPos, verticalPos)));
         overlay.allowOverflow(true);
         
+    }
+    
+    public ItemStack getTitleIcon() {
+        return new ItemStack(this.handler.blockEntity.getCachedState().getBlock());
     }
     
     private void addProgressArrow(FlowLayout panel) {

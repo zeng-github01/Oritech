@@ -60,7 +60,7 @@ public abstract class ExpandableMultiblockEnergyStorageBlockEntity extends Expan
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
         return energyStorage;
     }
     

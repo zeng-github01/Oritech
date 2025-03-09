@@ -47,7 +47,7 @@ public class LaserArmEntityBehavior {
                 var chestItem = player.getEquippedStack(EquipmentSlot.CHEST);
                 var candidate = EnergyApi.ITEM.find(chestItem, ContainerItemContext.ofSingleSlot(new SingleSlotHandler(chestItem)));
                 if (candidate != null) {
-                    var amount = EnergyApi.transfer(laserEntity.getEnergyStorageForLink(), candidate, laserEntity.energyRequiredToFire(), false);
+                    var amount = EnergyApi.transfer(laserEntity.getEnergyStorageForLink(null), candidate, laserEntity.energyRequiredToFire(), false);
                     return amount > 0;
                 }
                 

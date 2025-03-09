@@ -475,7 +475,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
         return energyStorage;
     }
 

@@ -443,7 +443,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
         return energyStorage;
     }
     

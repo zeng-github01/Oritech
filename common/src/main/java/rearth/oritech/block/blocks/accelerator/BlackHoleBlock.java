@@ -35,7 +35,7 @@ public class BlackHoleBlock extends Block implements BlockEntityProvider {
     
     @Override
     protected VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return Block.createCuboidShape(7, 7, 7, 10, 10, 10);
+        return Block.createCuboidShape(3, 3, 3, 13, 13, 13);
     }
     
     @Override

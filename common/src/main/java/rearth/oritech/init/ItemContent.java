@@ -15,6 +15,7 @@ import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.item.tools.WeedKiller;
 import rearth.oritech.item.tools.Wrench;
 import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.item.UnstableContainerItem;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -121,6 +122,7 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     @Compostable(1.0F)
     public static final Item PACKED_WHEAT = new Item(new Item.Settings());
     public static final Item QUARTZ_DUST = new Item(new Item.Settings());
+    public static final Item UNSTABLE_CONTAINER = new UnstableContainerItem(new Item.Settings().maxCount(1), 0.23f, "unstable_container");
     
     // bio
     @Compostable(0.3F)

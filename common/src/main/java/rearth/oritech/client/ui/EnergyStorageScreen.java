@@ -9,8 +9,11 @@ import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.Surface;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
+import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.TooltipHelper;
 
 public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachineScreenHandler> {
@@ -90,7 +93,8 @@ public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachi
     protected void handledScreenTick() {
         super.handledScreenTick();
         
-        var statistics = ((ExpandableEnergyStorageBlockEntity) this.handler.blockEntity).currentStats;
+        var entity = this.handler.blockEntity;
+        var statistics = (entity instanceof ExpandableEnergyStorageBlockEntity) ? ((ExpandableEnergyStorageBlockEntity) entity).currentStats : ((UnstableContainerBlockEntity) entity).currentStats;
         if (statistics == null) return;
         
         var updateAll = this.handler.worldAccess.getTime() % 4 == 0;
@@ -107,5 +111,13 @@ public class EnergyStorageScreen extends UpgradableMachineScreen<UpgradableMachi
         outLastTick.text(Text.translatable("title.oritech.energy.outLastTick", TooltipHelper.getEnergyText(statistics.extractedLastTickTotal())));
         
         
+    }
+    
+    @Override
+    public ItemStack getTitleIcon() {
+        if (this.handler.blockEntity instanceof UnstableContainerBlockEntity) {
+            return new ItemStack(ItemContent.UNSTABLE_CONTAINER);
+        }
+        return super.getTitleIcon();
     }
 }

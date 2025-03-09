@@ -62,7 +62,7 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
         return energyStorage;
     }
     

@@ -191,6 +191,9 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoAutoDrop
     public static final Block WITHER_CROP_BLOCK = new WitheredCropBlock(AbstractBlock.Settings.copy(Blocks.WHEAT));
     
+    @NoBlockItem
+    public static final Block UNSTABLE_CONTAINER = new UnstableContainerBlock(AbstractBlock.Settings.copy(Blocks.OBSIDIAN).strength(80, 1900f).nonOpaque());
+    
     public static final Block ACCELERATOR_RING = new AcceleratorRingBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     public static final Block ACCELERATOR_MOTOR = new AcceleratorMotorBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().luminance(item -> 5));
     public static final Block ACCELERATOR_CONTROLLER = new AcceleratorControllerBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
@@ -211,6 +214,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block MACHINE_CORE_5 = new MachineCoreBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), 5);
     public static final Block MACHINE_CORE_6 = new MachineCoreBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), 6);
     public static final Block MACHINE_CORE_7 = new MachineCoreBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), 7);
+    @NoBlockItem
+    public static final Block MACHINE_CORE_HIDDEN = new MachineCoreBlock(AbstractBlock.Settings.copy(Blocks.OBSIDIAN).strength(80, 1900f).nonOpaque(), 1);
     
     public static final Block MACHINE_SPEED_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withSpeedMultiplier(0.9f).withEfficiencyMultiplier(1.05f).withBoundingShape(MachineAddonBlock.MACHINE_SPEED_ADDON_SHAPE));
     public static final Block MACHINE_PROCESSING_ADDON = new MachineAddonBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), AddonSettings.getDefaultSettings().withEfficiencyMultiplier(1.5f).withChambers(1).withBoundingShape(MachineAddonBlock.MACHINE_PROCESSING_ADDON_SHAPE));

@@ -23,6 +23,8 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
 import rearth.oritech.block.blocks.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.util.Geometry;
@@ -44,28 +46,34 @@ public class BlockOutlineRenderer {
         
         if (Oritech.CONFIG.showMachinePreview())
             renderBlockPlacementPreviewOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
+        
         renderPromethiumPickaxeOutline(world, camera, matrixStack, consumer, itemStack, player, blockPos);
     }
     
     private static void renderBlockPlacementPreviewOutline(ClientWorld world, Camera camera, MatrixStack matrixStack, VertexConsumerProvider consumer, ItemStack itemStack, ClientPlayerEntity player, BlockPos blockPos) {
         
-        if (!(itemStack.getItem() instanceof BlockItem blockItem)) return;
-        if (!(blockItem.getBlock() instanceof BlockEntityProvider entityProvider) || !blockItem.getBlock().getDefaultState().contains(MultiblockMachine.ASSEMBLED))
+        var hasBlockItem = itemStack.getItem() instanceof BlockItem || itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER);
+        
+        if (!hasBlockItem) return;
+        
+        var block = itemStack.getItem() instanceof BlockItem ? ((BlockItem) itemStack.getItem()).getBlock() : BlockContent.UNSTABLE_CONTAINER;
+        
+        if (!(block instanceof BlockEntityProvider entityProvider) || !block.getDefaultState().contains(MultiblockMachine.ASSEMBLED))
             return;
         
         var machinePos = blockPos.add(((BlockHitResult) player.client.crosshairTarget).getSide().getVector());
-        var placementState = blockItem.getBlock().getPlacementState(new ItemPlacementContext(player, player.preferredHand, itemStack, (BlockHitResult) player.client.crosshairTarget));
+        var placementState = block.getPlacementState(new ItemPlacementContext(player, player.preferredHand, itemStack, (BlockHitResult) player.client.crosshairTarget));
         var entity = entityProvider.createBlockEntity(machinePos, placementState);
         if (!(entity instanceof MultiblockMachineController multiblockController)) return;
         
         var coreOffsets = multiblockController.getCorePositions();
         var machineFacing = getFacingFromState(placementState);
         
-        if (blockItem.getBlock() instanceof LargeStorageBlock) {    // the large block is weird
+        if (block instanceof LargeStorageBlock) {    // the large block is weird
             machineFacing = player.getHorizontalFacing().getOpposite();
-        } else if (blockItem.getBlock() instanceof AugmentResearchStationBlock) {
+        } else if (block instanceof AugmentResearchStationBlock) {
             machineFacing = player.getFacing();
-        } else if (!(blockItem.getBlock() instanceof MultiblockMachine)) {
+        } else if (!(block instanceof MultiblockMachine)) {
             machineFacing = machineFacing.getOpposite();
         }
         

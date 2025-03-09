@@ -52,6 +52,22 @@ public class DelegatingEnergyStorage extends EnergyApi.EnergyContainer {
     }
     
     @Override
+    public boolean supportsInsertion() {
+        if (validPredicate.getAsBoolean()) {
+            return backingStorage.get().supportsInsertion();
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean supportsExtraction() {
+        if (validPredicate.getAsBoolean()) {
+            return backingStorage.get().supportsExtraction();
+        }
+        return false;
+    }
+    
+    @Override
     public void setAmount(long amount) {
         if (validPredicate.getAsBoolean()) {
             backingStorage.get().setAmount(amount);

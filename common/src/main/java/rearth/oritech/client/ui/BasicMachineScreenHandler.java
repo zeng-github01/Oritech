@@ -17,9 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +62,8 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         this.screenData = (ScreenProvider) blockEntity;
         this.blockPos = blockEntity.getPos();
         this.inventory = screenData.getDisplayedInventory();
-        inventory.onOpen(playerInventory.player);
+        if (inventory != null)
+            inventory.onOpen(playerInventory.player);
         this.playerInventory = playerInventory;
         
         if (blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
@@ -139,7 +140,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         var newStack = ItemStack.EMPTY;
         
         var slot = this.slots.get(invSlot);
-
+        
         if (slot.hasStack()) {
             var originalStack = slot.getStack();
             newStack = originalStack.copy();
@@ -150,14 +151,14 @@ public class BasicMachineScreenHandler extends ScreenHandler {
             } else if (!this.insertItem(originalStack, getMachineInvStartSlot(newStack), getMachineInvEndSlot(newStack), false)) {
                 return ItemStack.EMPTY;
             }
-
+            
             if (originalStack.isEmpty()) {
                 slot.setStack(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
             }
         }
-
+        
         return newStack;
     }
     

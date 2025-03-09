@@ -28,6 +28,7 @@ import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
+import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -99,7 +100,7 @@ public class NetworkContent {
     public record FullEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy, long maxInsert, long maxExtract) {}
     public record EnergyStatisticsPacket(BlockPos position, DynamicStatisticEnergyContainer.EnergyStatistics data) {}
     
-    public record GenericRedstoneSyncPacket(BlockPos position, boolean isPowered) {}
+    public record UnstableContainerContentPacket(BlockPos position, Identifier captured) {}
     
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
@@ -278,6 +279,18 @@ public class NetworkContent {
             
             if (entity instanceof ExpandableEnergyStorageBlockEntity storageBlock) {
                 storageBlock.currentStats = message.data;
+            } else if (entity instanceof UnstableContainerBlockEntity storageBlock) {
+                storageBlock.currentStats = message.data;
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(UnstableContainerContentPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof UnstableContainerBlockEntity storageBlock) {
+                storageBlock.capturedBlock = Registries.BLOCK.get(message.captured).getDefaultState();
             }
             
         }));

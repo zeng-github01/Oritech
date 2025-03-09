@@ -270,7 +270,7 @@ public class DeepDrillEntity extends BlockEntity implements BlockEntityTicker<De
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
         return null;
     }
     

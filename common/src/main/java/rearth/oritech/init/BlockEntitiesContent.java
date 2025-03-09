@@ -25,10 +25,7 @@ import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
-import rearth.oritech.block.entity.storage.CreativeStorageBlockEntity;
-import rearth.oritech.block.entity.storage.LargeStorageBlockEntity;
-import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
-import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
+import rearth.oritech.block.entity.storage.*;
 import rearth.oritech.util.ArchitecturyRegistryContainer;
 import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryProvider;
@@ -40,6 +37,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 
+@SuppressWarnings("deprecation")
 public class BlockEntitiesContent implements ArchitecturyRegistryContainer<BlockEntityType<?>> {
     
     @AssignSidedInventory
@@ -150,6 +148,9 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedInventory
     public static final BlockEntityType<EnchantmentCatalystBlockEntity> ENCHANTMENT_CATALYST_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(EnchantmentCatalystBlockEntity::new, BlockContent.ENCHANTMENT_CATALYST_BLOCK).build();
     
+    @AssignSidedEnergy
+    public static final BlockEntityType<UnstableContainerBlockEntity> UNSTABLE_CONTAINER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(UnstableContainerBlockEntity::new, BlockContent.UNSTABLE_CONTAINER).build();
+    
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<EnchanterBlockEntity> ENCHANTER_BLOCK_ENTITY = FabricBlockEntityTypeBuilder.create(EnchanterBlockEntity::new, BlockContent.ENCHANTER_BLOCK).build();
@@ -236,7 +237,8 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
       BlockContent.MACHINE_CORE_4,
       BlockContent.MACHINE_CORE_5,
       BlockContent.MACHINE_CORE_6,
-      BlockContent.MACHINE_CORE_7
+      BlockContent.MACHINE_CORE_7,
+      BlockContent.MACHINE_CORE_HIDDEN
     ).build();
     
     public static final BlockEntityType<TechDoorBlockEntity> TECH_DOOR_ENTITY = FabricBlockEntityTypeBuilder.create(TechDoorBlockEntity::new, BlockContent.TECH_DOOR).build();

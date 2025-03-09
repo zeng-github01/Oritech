@@ -9,6 +9,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.*;
@@ -24,7 +25,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;
-    private final DelegatingEnergyStorage delegatedEnergy = new DelegatingEnergyStorage(this::getMainEnergyStorage, this::isEnabled);
+    private final Map<Direction, DelegatingEnergyStorage> delegatedEnergy = new HashMap<>(6);
     private final Map<Direction, DelegatingFluidStorage> delegatedFluid = new HashMap<>(6);
     private final Map<Direction, DelegatingItemStorage> delegatedItem = new HashMap<>(6);
     
@@ -65,14 +66,15 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         return controllerEntity;
     }
     
-    private EnergyApi.EnergyContainer getMainEnergyStorage() {
+    @Nullable
+    private EnergyApi.EnergyContainer getMainEnergyStorage(Direction direction) {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        if (controllerEntity == null) return new SimpleEnergyStorage(100, 0, 0);    // this should never happen
-        return controllerEntity.getEnergyStorageForLink();
+        if (controllerEntity == null) return new SimpleEnergyStorage(0, 0, 0);    // this should never happen
+        return controllerEntity.getEnergyStorageForLink(direction);
     }
     
     private Storage<FluidVariant> getMainFluidStorage(Direction direction) {
@@ -95,6 +97,14 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         return itemProvider.getInventory(direction);
     }
     
+    @Nullable
+    private EnergyApi.EnergyContainer getEnergyStorageDelegated(Direction direction) {
+        return delegatedEnergy.computeIfAbsent(direction, dir -> {
+            if (getMainEnergyStorage(dir) == null) return null;
+            return new DelegatingEnergyStorage(() -> getMainEnergyStorage(dir), this::isEnabled);
+        });
+    }
+    
     private Storage<FluidVariant> getFluidStorageDelegated(Direction direction) {
         return delegatedFluid.computeIfAbsent(direction, dir -> new DelegatingFluidStorage(() -> getMainFluidStorage(dir), this::isEnabled));
     }
@@ -109,11 +119,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     
     @Override
     public EnergyApi.EnergyContainer getStorage(Direction direction) {
-        if (getCachedController() == null || getCachedController().getEnergyStorageForLink() == null) {
-            return null;
-        } else {
-            return delegatedEnergy;
-        }
+        return getEnergyStorageDelegated(direction);
     }
     
     @Override

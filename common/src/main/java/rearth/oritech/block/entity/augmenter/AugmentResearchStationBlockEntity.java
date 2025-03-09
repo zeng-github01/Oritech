@@ -85,7 +85,7 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink() {
+    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
         return null;
     }
     
