@@ -102,6 +102,7 @@ public class Config {
     public int pullRange = 16;
     public int idleWaitTicks = 200;
     public int blackHoleTachyonEnergy = 50_000;
+    public long unstableContainerBaseCapacity = 20_000_000;
     
     @SectionHeader("augments")
     public long augmenterMaxEnergy = 500_000_000L;

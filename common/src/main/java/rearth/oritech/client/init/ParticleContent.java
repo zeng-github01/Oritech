@@ -59,6 +59,11 @@ public class ParticleContent {
         ClientParticles.spawn(ParticleTypes.SOUL_FIRE_FLAME, world, pos, 0.4);
     }));
     
+    public static final ParticleSystem<Integer> UNSTABLE_CONTAINER_GROWING = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
+        ClientParticles.setParticleCount(data);
+        ClientParticles.spawn(ParticleTypes.TRIAL_SPAWNER_DETECTION, world, pos, 4);
+    }));
+    
     public static final ParticleSystem<Integer> WATERING_EFFECT = PARTICLE_CONTROLLER.register(Integer.class, ((world, pos, data) -> {
         ClientParticles.setParticleCount(data);
         ClientParticles.spawnCenteredOnBlock(ParticleTypes.FALLING_WATER, world, new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), 0.6);

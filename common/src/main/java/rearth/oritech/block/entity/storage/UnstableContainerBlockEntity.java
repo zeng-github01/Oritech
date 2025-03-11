@@ -5,10 +5,12 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
@@ -24,10 +26,13 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.storage.UnstableContainerBlock;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
@@ -50,12 +55,14 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("setup").thenPlay("idle");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
-    public static final Long BASE_CAPACITY = 20_000_000L;
+    public static final Long BASE_CAPACITY = Oritech.CONFIG.unstableContainerBaseCapacity();
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
     public BlockState capturedBlock = Blocks.AIR.getDefaultState();
     private boolean networkDirty = false;
+    private long age = 0;
+    public float qualityMultiplier = 1f;
     
     public final SimpleEnergyStorage laserInputStorage = new SimpleEnergyStorage(100_000_000, 0, 100_000_000);
     
@@ -68,7 +75,7 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
             return false;
         }
     };
-
+    
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     // client only
@@ -82,6 +89,11 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     public void tick(World world, BlockPos pos, BlockState state, UnstableContainerBlockEntity blockEntity) {
         if (world.isClient) return;
         
+        age++;
+        if (age > 10 && !state.get(UnstableContainerBlock.SETUP_DONE)) {
+            world.setBlockState(pos, state.with(UnstableContainerBlock.SETUP_DONE, true));
+        }
+        
         energyStorage.tick((int) world.getTime());
         
         adjustEnergyStorageSize();
@@ -89,9 +101,7 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
         if (energyStorage.amount > 0)
             outputEnergy();
         
-        if (networkDirty) {
-            updateNetwork();
-        }
+        updateNetwork();
     }
     
     private void adjustEnergyStorageSize() {
@@ -99,17 +109,22 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
         var targetMultiplier = 1 + Math.pow((double) laserInputStorage.getAmount() / Oritech.CONFIG.laserArmConfig.energyPerTick(), 2);
         targetMultiplier = Math.min(targetMultiplier, 5_000);
         laserInputStorage.setAmount(0);
-        var targetAmount = BASE_CAPACITY * targetMultiplier;
+        var targetAmount = BASE_CAPACITY * qualityMultiplier * targetMultiplier;
         var currentAmount = energyStorage.getCapacity();
         energyStorage.capacity = (long) MathHelper.lerp(0.005d, currentAmount, targetAmount);
         energyStorage.setMaxInsert((long) targetAmount);
         energyStorage.setMaxExtract((long) targetAmount);
         
+        if (energyStorage.capacity < energyStorage.maxInsert * 0.9999) {
+            // growing, spawn particles
+            ParticleContent.UNSTABLE_CONTAINER_GROWING.spawn(world, pos.toCenterPos(), 2);
+        }
+        
         if (energyStorage.amount > energyStorage.capacity) {
             energyStorage.amount = energyStorage.capacity;
         }
         
-        if (energyStorage.capacity != BASE_CAPACITY)
+        if (energyStorage.capacity != BASE_CAPACITY * qualityMultiplier)
             energyStorage.update();
         
     }
@@ -132,6 +147,8 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
         var blockId = Registries.BLOCK.getId(capturedBlock.getBlock());
         nbt.putString("captured", blockId.toString());
         nbt.putLong("energy_stored", energyStorage.amount);
+        nbt.putLong("energy_capacity", energyStorage.capacity);
+        nbt.putFloat("quality", qualityMultiplier);
     }
     
     @Override
@@ -139,6 +156,9 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
         super.readNbt(nbt, registryLookup);
         loadMultiblockNbtData(nbt);
         energyStorage.amount = nbt.getLong("energy_stored");
+        energyStorage.capacity = nbt.getLong("energy_capacity");
+        energyStorage.capacity = nbt.getLong("energy_capacity");
+        qualityMultiplier = nbt.getFloat("quality");
         
         var blockId = nbt.getString("captured");
         if (!blockId.isBlank() && Registries.BLOCK.containsId(Identifier.of(blockId)))
@@ -153,6 +173,11 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     private void updateNetwork() {
         
+        // sync contained block
+        if (world.getTime() % 80 == 0 || (networkDirty && world.getTime() % 15 == 0))
+            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.UnstableContainerContentPacket(pos, Registries.BLOCK.getId(capturedBlock.getBlock()), qualityMultiplier));
+        
+        if (!networkDirty) return;
         if (world.getTime() % 15 != 0 && !isActivelyViewed()) return;
         
         var statistics = energyStorage.getCurrentStatistics(world.getTime());
@@ -161,10 +186,14 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
         
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnergyStatisticsPacket(pos, statistics));
-        
-        // sync contained block
-        if (world.getTime() % 45 == 0)
-            NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.UnstableContainerContentPacket(pos, Registries.BLOCK.getId(capturedBlock.getBlock())));
+    }
+    
+    private void sendFullNetworkEntry() {
+        var statistics = energyStorage.getCurrentStatistics(world.getTime());
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.UnstableContainerContentPacket(pos, Registries.BLOCK.getId(capturedBlock.getBlock()), qualityMultiplier));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.EnergyStatisticsPacket(pos, statistics));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.FullEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract));
     }
     
     @Override
@@ -176,8 +205,13 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "machine", 0, state -> {
-            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED))
-                return state.setAndContinue(SETUP);
+            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
+                if (this.getCachedState().get(UnstableContainerBlock.SETUP_DONE)) {
+                    return state.setAndContinue(IDLE);
+                } else {
+                    return state.setAndContinue(SETUP);
+                }
+            }
             return PlayState.CONTINUE;
         }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
     }
@@ -282,13 +316,17 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     private void onBroken(BlockPos eventSource) {
         
-        if (eventSource != pos)
-            world.breakBlock(pos, true);
         
         for (var corePos : coreBlocksConnected) {
             if (corePos.equals(eventSource)) continue;
             world.setBlockState(corePos, Blocks.AIR.getDefaultState());
         }
+        
+        // todo drop item of self
+        world.setBlockState(pos, capturedBlock);
+        
+        var spawnAt = this.pos.toCenterPos().add(0, 1, 0);
+        world.spawnEntity(new ItemEntity(world, spawnAt.x, spawnAt.y, spawnAt.z, new ItemStack(ItemContent.UNSTABLE_CONTAINER)));
         
     }
     
@@ -371,8 +409,7 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     
     @Override
     public @Nullable ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.FullEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity, energyStorage.maxInsert, energyStorage.maxExtract));
-        
+        sendFullNetworkEntry();
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this, new MachineAddonController.AddonUiData(List.of(), List.of(), 1f, 1f, pos, 0), getCoreQuality());
     }
 }

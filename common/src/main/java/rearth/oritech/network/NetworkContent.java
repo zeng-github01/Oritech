@@ -100,7 +100,7 @@ public class NetworkContent {
     public record FullEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy, long maxInsert, long maxExtract) {}
     public record EnergyStatisticsPacket(BlockPos position, DynamicStatisticEnergyContainer.EnergyStatistics data) {}
     
-    public record UnstableContainerContentPacket(BlockPos position, Identifier captured) {}
+    public record UnstableContainerContentPacket(BlockPos position, Identifier captured, float quality) {}
     
     public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
     }   // this goes both ways
@@ -291,6 +291,7 @@ public class NetworkContent {
             
             if (entity instanceof UnstableContainerBlockEntity storageBlock) {
                 storageBlock.capturedBlock = Registries.BLOCK.get(message.captured).getDefaultState();
+                storageBlock.qualityMultiplier = message.quality == 0 ? 1 : message.quality;
             }
             
         }));

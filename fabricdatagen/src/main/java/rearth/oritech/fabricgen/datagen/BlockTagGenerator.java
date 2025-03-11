@@ -36,6 +36,7 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         pickaxeBuilder.add(BlockContent.SMALL_TANK_BLOCK);
         pickaxeBuilder.add(BlockContent.SMALL_STORAGE_BLOCK);
         pickaxeBuilder.add(BlockContent.PUMP_TRUNK_BLOCK);
+        pickaxeBuilder.add(BlockContent.MACHINE_CORE_HIDDEN);
         
         pickaxeBuilder
           .add(BlockContent.NICKEL_ORE)
@@ -118,5 +119,18 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .add(BlockContent.REACTOR_FUEL_PORT)
           .add(BlockContent.REACTOR_REDSTONE_PORT)
           .add(BlockContent.REACTOR_CONTROLLER);
+        
+        getOrCreateTagBuilder(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW)
+          .add(Blocks.REDSTONE_BLOCK)
+          .add(Blocks.TNT)
+          .add(BlockContent.FLUXITE_BLOCK);
+        
+        getOrCreateTagBuilder(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM)
+          .add(Blocks.DRAGON_EGG)
+          .add(BlockContent.LOW_YIELD_NUKE)
+          .add(BlockContent.NUKE);
+        
+        getOrCreateTagBuilder(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH)
+          .add(BlockContent.BLACK_HOLE_BLOCK);
     }
 }

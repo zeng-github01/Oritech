@@ -91,4 +91,9 @@ public class TagContent {
     
     // spawner blacklist
     public static final TagKey<EntityType<?>> SPAWNER_BLACKLIST = TagKey.of(RegistryKeys.ENTITY_TYPE, Oritech.id("spawner_blacklist"));
+    
+    // unstable container contents
+    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_LOW = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/low"));
+    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_MEDIUM = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/medium"));
+    public static final TagKey<Block> UNSTABLE_CONTAINER_SOURCES_HIGH = TagKey.of(RegistryKeys.BLOCK, Oritech.id("unstable_container/high"));
 }

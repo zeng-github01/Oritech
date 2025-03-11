@@ -446,6 +446,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         }
     }
     
+    public boolean useHighTitle() {
+        return handler.machineBlock.getBlock().getName().toString().length() > 18;
+    }
+    
     private void addTitle(FlowLayout overlay) {
         var blockTitle = handler.machineBlock.getBlock().getName();
         var label = Components.label(blockTitle);
@@ -471,7 +475,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         combinedPanel.child(textPanel.margins(Insets.of(4, 0, -1, 0)));
         
         var horizontalPos = blockTitle.getString().length() > 15 ? 100 : 65;
-        var verticalPos = blockTitle.getString().length() > 18 ? - 25 : - 15;
+        var verticalPos = useHighTitle()? - 25 : - 15;
         
         overlay.child(combinedPanel.positioning(Positioning.relative(horizontalPos, verticalPos)));
         overlay.allowOverflow(true);

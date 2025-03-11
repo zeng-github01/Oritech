@@ -293,6 +293,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         offerAtomicForgeRecipe(exporter, BlockContent.SMALL_STORAGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.BASIC_BATTERY), Ingredient.fromTag(TagContent.SILICON), Ingredient.ofItems(ItemContent.MAGNETIC_COIL), Ingredient.fromTag(TagContent.NICKEL_INGOTS), Ingredient.fromTag(TagContent.WIRES), "smallstorage");
         // large storage
         offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE_BLOCK.asItem(), Ingredient.ofItems(ItemContent.ADVANCED_BATTERY), Ingredient.fromTag(TagContent.STEEL_INGOTS), Ingredient.ofItems(ItemContent.DUBIOS_CONTAINER), Ingredient.ofItems(ItemContent.FLUX_GATE), Ingredient.fromTag(TagContent.WIRES), "bigstorage");
+        // unstable container
+        offerAtomicForgeRecipe(exporter, ItemContent.UNSTABLE_CONTAINER, Ingredient.ofItems(ItemContent.FLUXITE), of(ItemContent.DURATIUM_INGOT), Ingredient.ofItems(BlockContent.LARGE_STORAGE_BLOCK), Ingredient.ofItems(ItemContent.FLUX_GATE), of(ItemContent.SUPER_AI_CHIP), "unstablecontainer");
         
         // fluid tank
         offerTankRecipe(exporter, BlockContent.SMALL_TANK_BLOCK.asItem(), Ingredient.ofItems(Items.COPPER_INGOT), Ingredient.fromTag(ConventionalItemTags.GLASS_BLOCKS), Ingredient.ofItems(BlockContent.FLUID_PIPE.asItem()), "stank");

@@ -12,6 +12,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -25,15 +26,18 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public class UnstableContainerBlock extends Block implements BlockEntityProvider {
     
+    public static final BooleanProperty SETUP_DONE = BooleanProperty.of("setup");
+    
     public UnstableContainerBlock(Settings settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false));
+        setDefaultState(getDefaultState().with(ASSEMBLED, false).with(SETUP_DONE, false));
     }
     
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         super.appendProperties(builder);
         builder.add(ASSEMBLED);
+        builder.add(SETUP_DONE);
     }
     
     @Override
@@ -54,8 +58,6 @@ public class UnstableContainerBlock extends Block implements BlockEntityProvider
         if (world.isClient) {
             return;
         }
-        
-        System.out.println("placed container");
         
         var machineCandidate = world.getBlockEntity(pos, BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY);
         if (machineCandidate.isEmpty()) return;

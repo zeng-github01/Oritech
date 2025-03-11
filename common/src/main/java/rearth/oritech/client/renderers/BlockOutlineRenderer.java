@@ -25,6 +25,7 @@ import rearth.oritech.block.blocks.storage.LargeStorageBlock;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.util.Geometry;
@@ -62,9 +63,17 @@ public class BlockOutlineRenderer {
             return;
         
         var machinePos = blockPos.add(((BlockHitResult) player.client.crosshairTarget).getSide().getVector());
+        if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER))
+            machinePos = blockPos;
         var placementState = block.getPlacementState(new ItemPlacementContext(player, player.preferredHand, itemStack, (BlockHitResult) player.client.crosshairTarget));
         var entity = entityProvider.createBlockEntity(machinePos, placementState);
         if (!(entity instanceof MultiblockMachineController multiblockController)) return;
+        
+        if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER)) {
+            var blockState = world.getBlockState(machinePos);
+            var isValid = blockState.isIn(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW) || blockState.isIn(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM) || blockState.isIn(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH);
+            if (!isValid) return;
+        }
         
         var coreOffsets = multiblockController.getCorePositions();
         var machineFacing = getFacingFromState(placementState);
