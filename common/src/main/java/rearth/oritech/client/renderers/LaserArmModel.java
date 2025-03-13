@@ -1,6 +1,8 @@
 package rearth.oritech.client.renderers;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector2f;
 import rearth.oritech.Oritech;
@@ -17,6 +19,8 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
     
     private static final HashMap<Long, ModelRenderData> additionalData = new HashMap<>();
     private static final HashMap<Long, Vec3d> drillOffsets = new HashMap<>();
+    
+    private Vec3d lastActivePlayerPos = Vec3d.ZERO;
     
     public LaserArmModel(String subpath) {
         super(Oritech.id(subpath));
@@ -36,10 +40,18 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
     @Override
     public void setCustomAnimations(T laserEntity, long instanceId, AnimationState<T> animationState) {
         
-        if (laserEntity.getCurrentTarget() == null) return;
-        var target = laserEntity.getVisualTarget();
+        Vec3d target;
+        var isIdle = false;
+        if (laserEntity.getCurrentTarget() == null || laserEntity.getCurrentTarget() == BlockPos.ORIGIN)  {
+            target = getIdleTarget(laserEntity);
+            isIdle = true;
+        } else {
+            target = laserEntity.getVisualTarget();
+        }
         
-        if (laserEntity.isTargetingDeepdrill(laserEntity.getWorld().getBlockState(laserEntity.getCurrentTarget()).getBlock())) {
+        if (target == null || target == Vec3d.ZERO) return;
+        
+        if (!isIdle && laserEntity.isTargetingDeepdrill(laserEntity.getWorld().getBlockState(laserEntity.getCurrentTarget()).getBlock())) {
             var drillId = laserEntity.getCurrentTarget().asLong();
             var offset = getOffsetByDrillId(drillId, laserEntity);
             target = target.add(offset);
@@ -79,6 +91,26 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
             data.angleX = newRotX;
         }
         
+    }
+    
+    private Vec3d getIdleTarget(T entity) {
+        var intervalA = (entity.getWorld().getTime() / 20) % 2 == 0;
+        var intervalB = (entity.getWorld().getTime() / 60) % 2 == 0;
+        var intervalC = (entity.getWorld().getTime() / 50) % 3 == 0;
+        var intervalD = (entity.getWorld().getTime() / 80) % 2 == 0;
+        
+        var offsetB = new Vec3d(0, intervalA ? 0.4f : -1.8f, 0);
+        var offsetC = new Vec3d(intervalB ? 0.4 : -0.4, 0, intervalC ? -0.7 : 0.4);
+        var offsetD = new Vec3d(0, intervalD ? 0.2f : -3f, intervalB ? 0.3 : -0.3);
+        
+        if (entity.getWorld().getRandom().nextFloat() > 0.9f) {
+             lastActivePlayerPos = MinecraftClient.getInstance().player.getEyePos();
+        }
+        
+        if (lastActivePlayerPos.equals(Vec3d.ZERO))
+            return Vec3d.ZERO;
+        
+        return lastActivePlayerPos.add(offsetB).add(offsetC).add(offsetD);
     }
     
     public static float lerp(float a, float b, float f) {
