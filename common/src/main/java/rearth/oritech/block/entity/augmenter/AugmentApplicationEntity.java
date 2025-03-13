@@ -80,7 +80,7 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     };
     private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
-    private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, 0, maxEnergyStored, this::markDirty);
+    private final EnergyApi.EnergyContainer energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::markDirty);
     private AnimationController<AugmentApplicationEntity> animationController;
     
     
