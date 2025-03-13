@@ -9,15 +9,19 @@ import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
@@ -35,6 +39,8 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
@@ -68,6 +74,13 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
         }
         
         @Override
+        protected boolean canInsert(FluidVariant variant) {
+            var jetpackItem = (BaseJetpackItem) ToolsContent.JETPACK.asItem();
+            
+            return jetpackItem.isValidFuel(variant.getFluid()) && super.canInsert(variant);
+        }
+        
+        @Override
         protected void onFinalCommit() {
             super.onFinalCommit();
             ChargerBlockEntity.this.markDirty();
@@ -90,6 +103,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
         
         // stop if no input is given, or it's a stackable item
         if (inventory.getStack(0).isEmpty() || inventory.getStack(0).getCount() > 1) return;
+        processBuckets();
         
         var isFull = true;
         var startEnergy = energyStorage.amount;
@@ -114,6 +128,40 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
             ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.toCenterPos().add(0.1, 0.1, 0), 1);
         }
         
+    }
+    
+    private void processBuckets() {
+        var inStack = inventory.getStack(0);
+        
+        if (inStack != ItemStack.EMPTY && inStack.getItem() instanceof BucketItem bucketItem) {
+            // empty input bucket
+            var emptyBucket = ItemVariant.of(Items.BUCKET, inStack.getComponentChanges()).toStack();
+            if (!outputCanAcceptBucket(emptyBucket)) return;
+            var bucketFluid = bucketItem.arch$getFluid();
+            if (bucketFluid == Fluids.EMPTY) return;
+            
+            try (var tx = Transaction.openOuter()) {
+                long inserted = fluidStorage.insert(FluidVariant.of(bucketFluid), FluidConstants.BUCKET, tx);
+                if (inserted != FluidConstants.BUCKET) return;
+                
+                inStack.decrement(1);
+                if (inventory.getStack(1).isEmpty()) {
+                    inventory.heldStacks.set(1, emptyBucket);
+                } else {
+                    inventory.getStack(1).increment(1);
+                }
+                inventory.heldStacks.set(0, inStack);
+                tx.commit();
+            }
+            
+            // shouldn't be necessary, since tx.commit should already be marking this dirty
+            this.markDirty();
+        }
+    }
+    
+    private boolean outputCanAcceptBucket(ItemStack bucket) {
+        var slot = inventory.getStack(1);
+        return (slot.isEmpty() || (slot.isStackable() && ItemStack.areItemsAndComponentsEqual(slot, bucket) && slot.getCount() < slot.getMaxCount()));
     }
     
     @Override
