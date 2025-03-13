@@ -23,7 +23,7 @@ public class DynamicStatisticEnergyContainer extends DynamicEnergyStorage {
     public long insert(long amount, boolean simulate) {
         
         var inserted = super.insert(amount, simulate);
-        if (!simulate) {
+        if (!simulate && inserted > 0) {
             this.inserted.add(inserted);
         }
         
@@ -34,7 +34,7 @@ public class DynamicStatisticEnergyContainer extends DynamicEnergyStorage {
     public long extract(long amount, boolean simulate) {
         
         var extracted = super.extract(amount, simulate);
-        if (!simulate) {
+        if (!simulate && extracted > 0) {
             this.extracted.add(extracted);
         }
         
