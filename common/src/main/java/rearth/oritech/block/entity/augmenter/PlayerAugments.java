@@ -31,6 +31,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.EntitiesContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
 
 import java.util.*;
@@ -205,7 +206,7 @@ public class PlayerAugments {
                 player.getHungerManager().add(usedFood, 1f);
                 player.setAttached(getOwnType(), storedFood - usedFood);
             } else {
-                var foodCandidate = player.getInventory().main.stream().filter(item -> item.contains(DataComponentTypes.FOOD)).findFirst();
+                var foodCandidate = player.getInventory().main.stream().filter(item -> item.contains(DataComponentTypes.FOOD) && !item.isIn(TagContent.FEEDER_BLACKLIST)).findFirst();
                 if (foodCandidate.isPresent()) {
                     var foodSourceStack = foodCandidate.get();
                     var gainedFood = Objects.requireNonNull(foodSourceStack.get(DataComponentTypes.FOOD)).nutrition();

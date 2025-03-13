@@ -26,7 +26,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
     
     @Override
     protected void configure(RegistryWrapper.WrapperLookup lookup) {
-    
+        
         // raw ores
         getOrCreateTagBuilder(ConventionalItemTags.RAW_MATERIALS)
           .add(ItemContent.RAW_NICKEL)
@@ -114,6 +114,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.PLATINUM_INGOTS).add(ItemContent.PLATINUM_INGOT);
         
         getOrCreateTagBuilder(TagContent.URANIUM_RAW_MATERIALS).add(ItemContent.RAW_URANIUM);
+        
+        getOrCreateTagBuilder(TagContent.FEEDER_BLACKLIST)
+          .addOptional(Identifier.of("relics", "infinity_ham"));
         
         // biomass
         getOrCreateTagBuilder(TagContent.BIOMASS)
@@ -254,9 +257,9 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ToolsContent.EXO_LEGGINGS);
         getOrCreateTagBuilder(ItemTags.FOOT_ARMOR)
           .add(ToolsContent.EXO_BOOTS);
-
+        
         getOrCreateTagBuilder(ItemTags.DURABILITY_ENCHANTABLE)
-                .add(ItemContent.WRENCH);
+          .add(ItemContent.WRENCH);
         
         getOrCreateTagBuilder(TagContent.REACTOR_COOLANT)
           .add(Items.ICE, Items.BLUE_ICE, Items.PACKED_ICE);
