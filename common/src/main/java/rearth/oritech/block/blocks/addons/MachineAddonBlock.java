@@ -100,13 +100,13 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
     
     @Override
     protected BlockState rotate(BlockState state, BlockRotation rotation) {
-        if (!constructorAssignmentSupportWorkaround) return state;
+        if (!state.contains(FACING)) return state;
         return super.rotate(state, rotation);
     }
     
     @Override
     protected BlockState mirror(BlockState state, BlockMirror mirror) {
-        if (!constructorAssignmentSupportWorkaround) return state;
+        if (!state.contains(FACING)) return state;
         return super.mirror(state, mirror);
     }
     
