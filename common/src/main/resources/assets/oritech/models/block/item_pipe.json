@@ -6,7 +6,7 @@
 	],
 	"textures": {
 		"0": "oritech:block/item_pipe",
-		"particle": "oritech:block/item_pipe"
+		"particle": "oritech:block/machine_particle_texture"
 	},
 	"elements": [
 		{

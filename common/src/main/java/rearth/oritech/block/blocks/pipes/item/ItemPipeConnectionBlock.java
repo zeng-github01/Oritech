@@ -2,6 +2,7 @@ package rearth.oritech.block.blocks.pipes.item;
 
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
@@ -100,6 +101,36 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
         @Override
         public BlockState getConnectionBlock() {
             return BlockContent.FRAMED_ITEM_PIPE_CONNECTION.getDefaultState();
+        }
+    }
+
+    public static class TransparentItemPipeConnectionBlock extends ItemPipeConnectionBlock {
+
+        public TransparentItemPipeConnectionBlock(Settings settings) {
+            super(settings);
+        }
+
+        @Override
+        public BlockState getNormalBlock() {
+            return BlockContent.TRANSPARENT_ITEM_PIPE.getDefaultState();
+        }
+
+        @Override
+        public BlockState getConnectionBlock() {
+            return BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.getDefaultState();
+        }
+        
+        @Override
+        protected VoxelShape[] createShapes() {
+            VoxelShape inner = Block.createCuboidShape(5, 5, 5, 11, 11, 11);
+            VoxelShape north = Block.createCuboidShape(5, 5, 0, 11, 11, 5);
+            VoxelShape east = Block.createCuboidShape(0, 5, 5, 5, 11, 11);
+            VoxelShape south = Block.createCuboidShape(5, 5, 11, 11, 11, 16);
+            VoxelShape west = Block.createCuboidShape(11, 5, 5, 16, 11, 11);
+            VoxelShape up = Block.createCuboidShape(5, 11, 5, 11, 16, 11);
+            VoxelShape down = Block.createCuboidShape(5, 0, 5, 11, 5, 11);
+            
+            return new VoxelShape[]{inner, north, west, south, east, up, down};
         }
     }
 }

@@ -66,6 +66,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block FRAMED_SUPERCONDUCTOR = new SuperConductorBlock.FramedSuperConductorBlock(AbstractBlock.Settings.copy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block SUPERCONDUCTOR_DUCT_BLOCK = new SuperConductorDuctBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     public static final Block ITEM_PIPE = new ItemPipeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    public static final Block TRANSPARENT_ITEM_PIPE = new ItemPipeBlock.TransparentItemPipe(AbstractBlock.Settings.copy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block FRAMED_ITEM_PIPE = new ItemPipeBlock.FramedItemPipeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final Block ITEM_PIPE_DUCT_BLOCK = new ItemPipeDuctBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     public static final Block ITEM_FILTER_BLOCK = new ItemFilterBlock(AbstractBlock.Settings.copy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
@@ -86,6 +87,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock(AbstractBlock.Settings.copy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
     public static final Block FRAMED_ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock.FramedItemPipeConnectionBlock(AbstractBlock.Settings.copy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    @NoBlockItem
+    public static final Block TRANSPARENT_ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock.TransparentItemPipeConnectionBlock(AbstractBlock.Settings.copy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
     @NoBlockItem
     public static final Block FRAME_GANTRY_ARM = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque());

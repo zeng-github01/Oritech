@@ -29,10 +29,12 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.registerSimpleState(BlockContent.ENERGY_PIPE);
         blockStateModelGenerator.registerSimpleState(BlockContent.SUPERCONDUCTOR);
         blockStateModelGenerator.registerSimpleState(BlockContent.ITEM_PIPE);
+        blockStateModelGenerator.registerSimpleState(BlockContent.TRANSPARENT_ITEM_PIPE);
         blockStateModelGenerator.registerSimpleState(BlockContent.FLUID_PIPE_CONNECTION);
         blockStateModelGenerator.registerSimpleState(BlockContent.ENERGY_PIPE_CONNECTION);
         blockStateModelGenerator.registerSimpleState(BlockContent.SUPERCONDUCTOR_CONNECTION);
         blockStateModelGenerator.registerSimpleState(BlockContent.ITEM_PIPE_CONNECTION);
+        blockStateModelGenerator.registerSimpleState(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION);
         blockStateModelGenerator.registerSimpleState(BlockContent.FRAMED_FLUID_PIPE);
         blockStateModelGenerator.registerSimpleState(BlockContent.FRAMED_ENERGY_PIPE);
         blockStateModelGenerator.registerSimpleState(BlockContent.FRAMED_SUPERCONDUCTOR);

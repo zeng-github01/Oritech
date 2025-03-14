@@ -24,6 +24,7 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
+import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
@@ -112,6 +113,8 @@ public class NetworkContent {
     
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
     }
+    
+    public record ItemPipeVisualTransferPacket(BlockPos position, List<Long> codedStops, ItemStack moved) {}
     
     public record EnchanterSelectionPacket(BlockPos position, String enchantment) {
     }
@@ -326,6 +329,16 @@ public class NetworkContent {
             
             if (entity instanceof DronePortEntity dronePort) {
                 dronePort.setStatusMessage(message.message);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(ItemPipeVisualTransferPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof ItemPipeInterfaceEntity itemPipe) {
+                itemPipe.handleVisualTransferPacket(message);
             }
             
         }));

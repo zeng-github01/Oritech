@@ -48,7 +48,9 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         
         getOrCreateTagBuilder(BlockTags.AXE_MINEABLE)
           .add(BlockContent.ITEM_PIPE)
-          .add(BlockContent.ITEM_PIPE_CONNECTION);
+          .add(BlockContent.TRANSPARENT_ITEM_PIPE)
+          .add(BlockContent.ITEM_PIPE_CONNECTION)
+          .add(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION);
         
         getOrCreateTagBuilder(ConventionalBlockTags.ORES)
           .add(BlockContent.NICKEL_ORE)

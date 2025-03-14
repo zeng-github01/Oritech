@@ -53,6 +53,7 @@ public class ModRenderers {
         BlockEntityRendererFactories.register(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY, ctx -> new SpawnerControllerRenderer());
         BlockEntityRendererFactories.register(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY, ctx -> new AcceleratorControllerRenderer());
         BlockEntityRendererFactories.register(BlockEntitiesContent.BLACK_HOLE_ENTITY, ctx -> new BlackHoleRenderer());
+        BlockEntityRendererFactories.register(BlockEntitiesContent.ITEM_PIPE_ENTITY, ctx -> new ItemPipeTransferRenderer());
         BlockEntityRendererFactories.register(BlockEntitiesContent.CHARGER_BLOCK_ENTITY, ctx -> new ChargerBlockRenderer());
         BlockEntityRendererFactories.register(BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY, ctx -> new UnstableContainerRenderer("models/unstable_container"));
         
@@ -92,6 +93,8 @@ public class ModRenderers {
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_DOUBLE_ROD, RenderLayer.getTranslucent());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_QUAD_ROD, RenderLayer.getTranslucent());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.REACTOR_REDSTONE_PORT, RenderLayer.getTranslucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.TRANSPARENT_ITEM_PIPE, RenderLayer.getTranslucent());
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, RenderLayer.getTranslucent());
         
         EntityRendererRegistry.register(EntitiesContent.PORTAL_ENTITY, PortalEntityRenderer::new);
 

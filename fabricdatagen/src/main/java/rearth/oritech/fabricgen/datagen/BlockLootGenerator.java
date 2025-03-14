@@ -44,45 +44,46 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
         addOreDrop(BlockContent.ENDSTONE_PLATINUM_ORE, ItemContent.RAW_PLATINUM);
         addOreDrop(BlockContent.DEEPSLATE_URANIUM_ORE, ItemContent.RAW_URANIUM);
         addOreDrop(BlockContent.URANIUM_CRYSTAL, ItemContent.RAW_URANIUM);
-
+        
         for (var block : BlockContent.autoRegisteredDrops) {
             addDrop(block);
         }
         
         addDrop(BlockContent.ITEM_PIPE_CONNECTION, BlockContent.ITEM_PIPE);
+        addDrop(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, BlockContent.TRANSPARENT_ITEM_PIPE);
         addDrop(BlockContent.FLUID_PIPE_CONNECTION, BlockContent.FLUID_PIPE);
         addDrop(BlockContent.ENERGY_PIPE_CONNECTION, BlockContent.ENERGY_PIPE);
         addDrop(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
-		addDrop(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
-
+        addDrop(BlockContent.SUPERCONDUCTOR_CONNECTION, BlockContent.SUPERCONDUCTOR);
+        
         addDrop(BlockContent.FRAMED_ITEM_PIPE_CONNECTION, BlockContent.FRAMED_ITEM_PIPE);
         addDrop(BlockContent.FRAMED_FLUID_PIPE_CONNECTION, BlockContent.FRAMED_FLUID_PIPE);
         addDrop(BlockContent.FRAMED_ENERGY_PIPE_CONNECTION, BlockContent.FRAMED_ENERGY_PIPE);
         addDrop(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION, BlockContent.FRAMED_SUPERCONDUCTOR);
-
+        
         addCustomDataDrop(BlockContent.SMALL_TANK_BLOCK);
         addCustomDataDrop(BlockContent.CREATIVE_TANK_BLOCK);
         addCustomDataDrop(BlockContent.SMALL_STORAGE_BLOCK);
         addCustomDataDrop(BlockContent.CREATIVE_STORAGE_BLOCK);
         
         LootCondition.Builder cropDropBuilder = BlockStatePropertyLootCondition.builder(BlockContent.WITHER_CROP_BLOCK)
-                                           .properties(StatePredicate.Builder.create().exactMatch(CropBlock.AGE, 7));
+                                                  .properties(StatePredicate.Builder.create().exactMatch(CropBlock.AGE, 7));
         addDrop(BlockContent.WITHER_CROP_BLOCK, cropDrops(BlockContent.WITHER_CROP_BLOCK, Blocks.TWISTING_VINES_PLANT.asItem(), BlockContent.WITHER_CROP_BLOCK.asItem(), cropDropBuilder));
         
         RegistryWrapper.Impl<Enchantment> impl = this.registryLookup.getWrapperOrThrow(RegistryKeys.ENCHANTMENT);
         // similar to BlockLootTableGenerator.oakLeavesDrops()
-        addDrop(Blocks.JUNGLE_LEAVES, this.leavesDrops(Blocks.JUNGLE_LEAVES, Blocks.JUNGLE_SAPLING, BlockLootTableGenerator.SAPLING_DROP_CHANCE).pool(LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F)).conditionally(this.createWithoutShearsOrSilkTouchCondition()).with(((LeafEntry.Builder)this.addSurvivesExplosionCondition(Blocks.JUNGLE_LEAVES, ItemEntry.builder(ItemContent.BANANA))).conditionally(TableBonusLootCondition.builder(impl.getOrThrow(Enchantments.FORTUNE), new float[]{0.005F, 0.0055555557F, 0.00625F, 0.008333334F, 0.025F})))));
+        addDrop(Blocks.JUNGLE_LEAVES, this.leavesDrops(Blocks.JUNGLE_LEAVES, Blocks.JUNGLE_SAPLING, BlockLootTableGenerator.SAPLING_DROP_CHANCE).pool(LootPool.builder().rolls(ConstantLootNumberProvider.create(1.0F)).conditionally(this.createWithoutShearsOrSilkTouchCondition()).with(((LeafEntry.Builder) this.addSurvivesExplosionCondition(Blocks.JUNGLE_LEAVES, ItemEntry.builder(ItemContent.BANANA))).conditionally(TableBonusLootCondition.builder(impl.getOrThrow(Enchantments.FORTUNE), new float[]{0.005F, 0.0055555557F, 0.00625F, 0.008333334F, 0.025F})))));
     }
     
     private void addOreDrop(Block block, Item item) {
         addDrop(block, oreDrops(block, item));
     }
-
+    
     private void addCustomDataDrop(Block block) {
         // similar to shulkerBoxDrops
         addDrop(block, LootTable.builder().pool(
-            (LootPool.Builder)this.addSurvivesExplosionCondition(block, LootPool.builder()
-                                  .rolls(ConstantLootNumberProvider.create(1.0F))
-                                  .with(ItemEntry.builder(block).apply(NbtBlockLootFunction.builder())))));
+          (LootPool.Builder) this.addSurvivesExplosionCondition(block, LootPool.builder()
+                                                                         .rolls(ConstantLootNumberProvider.create(1.0F))
+                                                                         .with(ItemEntry.builder(block).apply(NbtBlockLootFunction.builder())))));
     }
 }

@@ -7,17 +7,22 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.time.StopWatch;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.network.NetworkContent;
 
 import java.util.*;
 
@@ -29,8 +34,17 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     private final HashMap<BlockPos, BlockApiCache<Storage<ItemVariant>, Direction>> lookupCache = new HashMap<>();
     private List<Pair<Storage<ItemVariant>, BlockPos>> filteredTargetItemStorages;
     
+    // item path cache (invalidated on network update)
+    private final HashMap<BlockPos, ArrayList<BlockPos>> cachedTransferPaths = new HashMap<>();
+    private final boolean renderItems;
+    
+    // client only
+    public Set<RenderStackData> activeStacks = new HashSet<>();
+    
     public ItemPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ITEM_PIPE_ENTITY, pos, state);
+        this.renderItems = state.getBlock().equals(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION);
+        
     }
     
     @Override
@@ -40,7 +54,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             return;
         
         // boosted pipe works every tick, otherwise only every N tick
-        if (world.getTime() % TRANSFER_PERIOD != 0 && !isBoostAvailable())
+        if ((world.getTime() + this.pos.asLong()) % TRANSFER_PERIOD != 0 && !isBoostAvailable())
             return;
         
         // find first itemstack from connected invs (that can be extracted)
@@ -51,6 +65,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
         var stackToMove = ItemStack.EMPTY;
         Storage<ItemVariant> moveFromInventory = null;
+        BlockPos takenFrom = null;
         var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
         
         try (var mainTx = Transaction.openOuter()) {
@@ -66,6 +81,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 if (!firstStack.isEmpty()) {
                     stackToMove = firstStack;
                     moveFromInventory = inventory;
+                    takenFrom = sourcePos;
                     break;
                 }
                 
@@ -101,6 +117,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                                            .toList();
             
             filteredTargetsNetHash = netHash;
+            cachedTransferPaths.clear();
         }
         
         var moveCount = stackToMove.getCount();
@@ -113,10 +130,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 moveCount -= (int) inserted;
                 moved += inserted;
                 
-                if (moveCount <= 0) break;
+                if (inserted > 0)
+                    onItemMoved(this.pos, takenFrom, targetStorage.getRight(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.pos, 0), new HashSet<>()), world, stackToMove.getItem(), (int) inserted);
+                
+                if (moveCount <= 0) break;  // target has been found for all items
             }
             
-            if(moved <= 0) { // no idea how this could ever be negative, but there was this crash: https://github.com/Rearth/Oritech/issues/277
+            if (moved <= 0) { // no idea how this could ever be negative, but there was this crash: https://github.com/Rearth/Oritech/issues/277
                 tx.abort();
                 return;
             }
@@ -132,8 +152,132 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             
         }
         
-        if (moved > 0 && moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
+        if (moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
         
+    }
+    
+    private void onItemMoved(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, World world, Item moved, int movedCount) {
+        if (!renderItems) return;
+        var path = cachedTransferPaths.computeIfAbsent(to, ignored -> calculatePath(startPos, from, to, network, world));
+        if (path == null) return;
+        
+        var codedPath = path.stream().map(BlockPos::asLong).toList();
+        var packet = new NetworkContent.ItemPipeVisualTransferPacket(startPos, codedPath, new ItemStack(moved, movedCount));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(packet);
+        
+    }
+    
+    private static ArrayList<BlockPos> calculatePath(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, World world) {
+        
+        if (network.isEmpty() || !network.contains(startPos)) {
+            Oritech.LOGGER.warn("tried to calculate invalid item pipe from: {} to {} with network size: {}", startPos, to, network.size());
+            return null;
+        }
+        
+        var path = new LinkedList<BlockPos>();
+        path.add(startPos);
+        
+        var visited = new HashSet<BlockPos>();
+        
+        var watch = new StopWatch();
+        watch.start();
+        
+        for (int i = 0; i < network.size() * 3; i++) {
+            
+            var currentPos = path.peekLast();
+            
+            if (currentPos == null || currentPos.getManhattanDistance(to) == 1) { // target reached (or invalid)
+                break;
+            }
+            
+            visited.add(currentPos);
+            
+            var currentPosState = world.getBlockState(currentPos);
+            if (!(currentPosState.getBlock() instanceof AbstractPipeBlock pipeBlock)) break;
+            
+            // collect potential edges in graph, ordered by basic cost heuristic (manhattan dist to target)
+            var openEdges = getNeighbors(currentPos).stream()
+                              .filter(network::contains)
+                              .filter(candidate -> !visited.contains(candidate))
+                              .filter(candidate -> pipeBlock.isConnectingInDirection(currentPosState, getDirectionFromOffset(currentPos, candidate), currentPos, world, false))
+                              .sorted(Comparator.comparingInt(a -> a.getManhattanDistance(to)))
+                              .toArray(BlockPos[]::new);
+            
+            if (openEdges.length == 0) {    // dead end, go back
+                path.pollLast();
+            } else {
+                path.add(openEdges[0]);
+            }
+            
+        }
+        
+        path.addFirst(from);
+        path.add(to);
+        
+        var success = path.size() > 2;
+        
+        // compact path (by removing straight segments)
+        var result = optimizePath(path);
+        
+        watch.stop();
+        
+        System.out.println("pathsize: " + result.size() + " success: " + success + " time ms: " + watch.getNanoTime() / 1_000_000f);
+        return result;
+    }
+    
+    private static ArrayList<BlockPos> optimizePath(LinkedList<BlockPos> path) {
+        var result = new ArrayList<BlockPos>();
+        if (path.isEmpty()) {
+            return result;
+        }
+        
+        var iterator = path.iterator();
+        var first = iterator.next();
+        result.add(first);
+        
+        if (!iterator.hasNext()) {
+            return result;
+        }
+        
+        var current = iterator.next();
+        var currentDirection = current.subtract(first);
+        
+        while (iterator.hasNext()) {
+            var next = iterator.next();
+            var nextDirection = next.subtract(current);
+            
+            if (!nextDirection.equals(currentDirection)) {
+                result.add(current);
+                currentDirection = nextDirection;
+            }
+            
+            current = next;
+        }
+        
+        result.add(current);
+        return result;
+    }
+    
+    // returns all neighboring positions except up
+    private static List<BlockPos> getNeighbors(BlockPos pos) {
+        return Arrays.asList(pos.down(), pos.up(), pos.north(), pos.east(), pos.south(), pos.west());
+    }
+    
+    private static Direction getDirectionFromOffset(BlockPos self, BlockPos target) {
+        var offset = target.subtract(self);
+        return Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
+    }
+    
+    public void handleVisualTransferPacket(NetworkContent.ItemPipeVisualTransferPacket packet) {
+        var path = packet.codedStops().stream().map(BlockPos::fromLong).toList();
+        var pathLength = 0;
+        for (int i = 0; i < path.size() - 1; i++) {
+            var pathPos = path.get(i);
+            var nextPathPos = path.get(i + 1);
+            pathLength += nextPathPos.getManhattanDistance(pathPos);
+        }
+        var data = new RenderStackData(packet.moved(), path, world.getTime(), pathLength);
+        activeStacks.add(data);
     }
     
     @Override
@@ -159,4 +303,6 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         return ItemStack.EMPTY;
     }
+    
+    public record RenderStackData(ItemStack rendered, List<BlockPos> path, Long startedAt, int pathLength) {}
 }
