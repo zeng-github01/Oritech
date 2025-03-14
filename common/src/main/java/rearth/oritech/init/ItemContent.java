@@ -38,7 +38,7 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     @ItemGroupTarget(Groups.equipment)
     public static final Item WEED_KILLER = new WeedKiller(new Item.Settings().maxCount(1));
     @ItemGroupTarget(Groups.equipment)
-    public static final Item WRENCH = new Wrench(new Item.Settings().maxDamage(150).maxCount(1).component(DataComponentTypes.TOOL, Wrench.createToolComponent()));
+    public static final Item WRENCH = new Wrench(new Item.Settings().maxCount(1).component(DataComponentTypes.TOOL, Wrench.createToolComponent()));
 
     // region metals
     // nickel
