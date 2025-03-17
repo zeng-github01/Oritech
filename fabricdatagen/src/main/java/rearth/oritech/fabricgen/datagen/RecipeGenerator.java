@@ -20,6 +20,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -334,6 +335,9 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // framed item pipe
         offerFramedCableRecipe(exporter, new ItemStack(BlockContent.FRAMED_ITEM_PIPE, 8), Ingredient.ofItems(BlockContent.ITEM_PIPE), "item");
         offerCableFromFrameRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE, 1), Ingredient.ofItems(BlockContent.FRAMED_ITEM_PIPE), "item");
+        
+        // transparent pipe
+        offerTankRecipe(exporter, BlockContent.TRANSPARENT_ITEM_PIPE.asItem(), 6, of(ItemTags.PLANKS), of(TagContent.NICKEL_INGOTS), of(ConventionalItemTags.GLASS_BLOCKS), "transparentitem");
         
         // energy pipe duct
         offerCableDuctRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE_DUCT_BLOCK, 4), Ingredient.ofItems(BlockContent.ENERGY_PIPE), "energy");
@@ -1573,7 +1577,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     public void offerTankRecipe(RecipeExporter exporter, Item output, Ingredient plating, Ingredient core, Ingredient sides, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('p', plating).input('s', sides).input('c', core)
+        offerTankRecipe(exporter, output, 1, plating, core, sides, suffix);
+    }
+    
+    public void offerTankRecipe(RecipeExporter exporter, Item output, int count, Ingredient plating, Ingredient core, Ingredient sides, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('p', plating).input('s', sides).input('c', core)
                         .pattern("ppp")
                         .pattern("scs")
                         .pattern("ppp");
