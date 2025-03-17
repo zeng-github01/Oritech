@@ -31,7 +31,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
     private ButtonComponent whiteListButton;
     private ButtonComponent nbtButton;
     private ButtonComponent componentButton;
-    private final FlowLayout[] gridContainers = new FlowLayout[8];
+    private final FlowLayout[] gridContainers = new FlowLayout[12];
     private Map<Integer, ItemStack> cachedItems;
     
     public ItemFilterScreen(ItemFilterScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -48,7 +48,7 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         cachedItems = handler.blockEntity.getFilterSettings().items();
         Oritech.LOGGER.debug("loading item filters: " + cachedItems);
         
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 12; i++) {
             var storedStack = cachedItems.getOrDefault(i, ItemStack.EMPTY);
             
             var container = gridContainers[i];
@@ -101,10 +101,10 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
         
         var overlay = Containers.horizontalFlow(Sizing.fixed(176), Sizing.fixed(166));
         
-        var gridContainer = Containers.grid(Sizing.content(0), Sizing.content(0), 2, 4);
+        var gridContainer = Containers.grid(Sizing.content(0), Sizing.content(0), 3, 4);
         
         for (int x = 0; x < 4; x++) {
-            for (int y = 0; y < 2; y++) {
+            for (int y = 0; y < 3; y++) {
                 
                 var slotContainer = Containers.horizontalFlow(Sizing.fixed(19), Sizing.fixed(18));
                 var background = Components.texture(ITEM_SLOT, 0, 0, 18, 17, 18, 17).positioning(Positioning.absolute(0, 0));
@@ -116,12 +116,12 @@ public class ItemFilterScreen extends BaseOwoHandledScreen<FlowLayout, ItemFilte
                 slotContainer.child(background);
                 var idIndex = y * 4 + x;
                 gridContainers[idIndex] = slotContainer;
-                gridContainer.child(slotContainer, y, x);
+                gridContainer.child(slotContainer.margins(Insets.of(0, 2, 0, 0)), y, x);
                 
             }
         }
         
-        overlay.child(gridContainer.positioning(Positioning.absolute(5, 20)));
+        overlay.child(gridContainer.positioning(Positioning.absolute(5, 18)));
         
         var buttonWidth = 60;
         

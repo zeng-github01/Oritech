@@ -47,7 +47,7 @@ public class ItemFilterScreenHandler extends ScreenHandler {
             if (item.isOf(displayStack.getItem())) return ItemStack.EMPTY;
         }
         var newItems = new HashMap<>(data.items());
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 12; i++) {
             if (!newItems.containsKey(i)) {
                 newItems.put(i, displayStack);
                 break;
