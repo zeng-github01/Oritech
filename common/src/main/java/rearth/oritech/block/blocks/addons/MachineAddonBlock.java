@@ -5,6 +5,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.BlockFace;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -87,6 +88,36 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
         } else {
             this.setDefaultState(getDefaultState().with(ADDON_USED, false));
         }
+    }
+    
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+        
+        // search for addon extender or machine at neighbor
+        // if addon extender, check if its connected to a machine, if so then init it
+        // if machine then init it
+        
+        if (world.isClient) return;
+        
+        for (var direction : Direction.values()) {
+            var checkPos = pos.add(direction.getVector());
+            var checkEntity = world.getBlockEntity(checkPos);
+            if (checkEntity instanceof MachineAddonController machineEntity) {
+                AddonBlockEntity.pendingInits.add(machineEntity);
+                break;
+            } else if (checkEntity instanceof AddonBlockEntity addonEntity) {
+                var addonState = addonEntity.getCachedState();
+                var addonConnected = addonState.get(ADDON_USED);
+                if (!addonConnected) continue;
+                var controllerPos = addonEntity.getControllerPos();
+                if (world.getBlockEntity(controllerPos) instanceof MachineAddonController controllerEntity) {
+                    AddonBlockEntity.pendingInits.add(controllerEntity);
+                    break;
+                }
+            }
+        }
+        
     }
     
     @Override

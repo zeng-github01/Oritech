@@ -37,6 +37,14 @@ subprojects {
         archivesName = "$rootProject.archives_name-$project.name"
     }
 
+    loom {
+        runs.configureEach {
+            vmArg("-Dmixin.env.remapRefMap=true")
+            vmArg("-Dmixin.env.refMapRemappingFile=${projectDir}/build/createSrgToMcp/output.srg")
+        }
+    }
+
+
     repositories {
         maven {
             name = 'Owo'
@@ -79,7 +87,7 @@ subprojects {
 
         // create:
         maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
-        maven { url = "https://maven.createmod.net" }
+        maven { url = "https://maven.createmod.net" }   // create + ponder + flywheel?
 
     }
 

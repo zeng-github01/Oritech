@@ -7,9 +7,21 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MachineAddonProvider;
 
+import java.util.HashSet;
+
 public class AddonBlockEntity extends BlockEntity implements MachineAddonProvider {
+    
+    public static final HashSet<MachineAddonController> pendingInits = new HashSet<>();
+    public static void completeInits() {
+        for (var controller : pendingInits) {
+            controller.initAddons();
+        }
+        
+        pendingInits.clear();
+    }
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     

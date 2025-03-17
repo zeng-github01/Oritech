@@ -10,6 +10,7 @@ import net.minecraft.entity.damage.DamageEffects;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageTypes;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.math.BlockPos;
@@ -17,7 +18,9 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.UpgradableMachineBlock;
+import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 

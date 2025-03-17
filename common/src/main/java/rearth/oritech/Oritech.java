@@ -17,6 +17,7 @@ import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
+import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -53,6 +54,7 @@ public final class Oritech {
         
         // for particle collisions
         ServerTickEvents.END_SERVER_TICK.register(elem -> AcceleratorParticleLogic.onTickEnd());
+        ServerTickEvents.END_SERVER_TICK.register(elem -> AddonBlockEntity.completeInits());
         
         // for player augment modifiers
         ServerPlayConnectionEvents.JOIN.register(((handler, sender, server) -> PlayerAugments.refreshPlayerAugments(handler.player)));
