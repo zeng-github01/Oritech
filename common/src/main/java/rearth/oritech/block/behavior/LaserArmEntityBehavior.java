@@ -19,24 +19,26 @@ import rearth.oritech.util.energy.SingleSlotHandler;
 public class LaserArmEntityBehavior {
     static private LaserArmEntityBehavior transferPowerBehavior;
     static private LaserArmEntityBehavior chargeEntityBehavior;
-
+    
     // possible improvement - the target designator could be used to set up scoreboard teams,
     // and the laser could respect the attackable TargetPredicate to avoid attacking "friendly" mobs or to attack players
     // instead of trying to charge their energy storage chestplates
-
+    
     public boolean fireAtEntity(World world, LaserArmBlockEntity laserEntity, LivingEntity entity) {
         // Don't kill baby animals if the crop filter addon is applied
         if (laserEntity.hasCropFilterAddon && entity instanceof AnimalEntity && entity.isBaby()) {
             return false;
         }
-
+        
+        if (world.getTime() % 10 != 0) return true; // entities can only be damaged twice per second?
+        
         entity.damage(
-            new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.MAGIC), laserEntity.getLaserPlayerEntity()),
-            (float)laserEntity.getDamageTick());
+          new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.LIGHTNING_BOLT), laserEntity.getLaserPlayerEntity()),
+          laserEntity.getDamageTick());
         
         return true;
     }
-
+    
     public static void registerDefaults() {
         transferPowerBehavior = new LaserArmEntityBehavior() {
             @Override
@@ -55,12 +57,12 @@ public class LaserArmEntityBehavior {
             }
         };
         LaserArmBlock.registerEntityBehavior(EntityType.PLAYER, transferPowerBehavior);
-
+        
         chargeEntityBehavior = new LaserArmEntityBehavior() {
             @Override
             public boolean fireAtEntity(World world, LaserArmBlockEntity laserEntity, LivingEntity entity) {
                 entity.getDataTracker().set(CreeperEntity.CHARGED, true);
-
+                
                 // still do the default mob behavior after setting the creeper to charged
                 return super.fireAtEntity(world, laserEntity, entity);
             }
