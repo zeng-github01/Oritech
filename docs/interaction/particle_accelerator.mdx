@@ -17,7 +17,7 @@ Another guide ring needs to be in the particle's path as defined by the guide ri
 
 The maximum distance is calculated with the following formula:
 
-> clamp(sqrt(speed), 2, 10)
+> clamp(sqrt(speed) / 2, 2, 10)
 
 This means that at higher speeds, the distance between guide blocks can be larger.
 
