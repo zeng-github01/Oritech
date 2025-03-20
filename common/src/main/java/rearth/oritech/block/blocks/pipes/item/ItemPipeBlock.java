@@ -4,6 +4,12 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -17,6 +23,7 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class ItemPipeBlock extends GenericPipeBlock {
     
@@ -29,6 +36,21 @@ public class ItemPipeBlock extends GenericPipeBlock {
     @Override
     public TriFunction<World, BlockPos, Direction, Boolean> apiValidationFunction() {
         return ((world, pos, direction) -> ItemStorage.SIDED.find(world, pos, direction) != null);
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        
+        var showExtra = Screen.hasControlDown();
+        if (showExtra) {
+            for (int i = 1; i <= 3; i++) {
+                tooltip.add(Text.translatable("tooltip.oritech.item_pipe." + i).formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+            }
+        } else {
+            tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+        }
+        
+        super.appendTooltip(stack, context, tooltip, options);
     }
     
     @Override

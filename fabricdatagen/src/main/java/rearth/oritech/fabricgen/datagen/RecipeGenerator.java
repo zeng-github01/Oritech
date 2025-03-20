@@ -338,6 +338,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         
         // transparent pipe
         offerTankRecipe(exporter, BlockContent.TRANSPARENT_ITEM_PIPE.asItem(), 6, of(ItemTags.PLANKS), of(TagContent.NICKEL_INGOTS), of(ConventionalItemTags.GLASS_BLOCKS), "transparentitem");
+        offerMachineCoreRecipe(exporter, BlockContent.TRANSPARENT_ITEM_PIPE.asItem(), 8, of(BlockContent.ITEM_PIPE), of(ConventionalItemTags.GLASS_BLOCKS), "totransparent");
+        offerMachineCoreRecipe(exporter, BlockContent.ITEM_PIPE.asItem(), 8, of(BlockContent.TRANSPARENT_ITEM_PIPE), of(ItemTags.PLANKS), "fromtransparent");
         
         // energy pipe duct
         offerCableDuctRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE_DUCT_BLOCK, 4), Ingredient.ofItems(BlockContent.ENERGY_PIPE), "energy");
@@ -1473,7 +1475,11 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     public void offerMachineCoreRecipe(RecipeExporter exporter, Item output, Ingredient base, Ingredient alt, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', base).input('c', alt)
+        offerMachineCoreRecipe(exporter, output, 1, base, alt, suffix);
+    }
+    
+    public void offerMachineCoreRecipe(RecipeExporter exporter, Item output, int count, Ingredient base, Ingredient alt, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('s', base).input('c', alt)
                         .pattern("sss")
                         .pattern("scs")
                         .pattern("sss");
