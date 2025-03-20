@@ -167,8 +167,8 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // lava
         addLavaGen(exporter, FluidStack.create(Fluids.LAVA, 8100), 12, "lava");
         // fuel
-        addFuelGenRecipe(exporter, FluidStack.create(FluidContent.STILL_OIL.get(), 8100), 8, "crude");
-        addFuelGenRecipe(exporter, FluidStack.create(FluidContent.STILL_FUEL.get(), 8100), 24, "fuel");
+        addFuelGenRecipe(exporter, FluidStack.create(FluidContent.STILL_OIL.get(), 8100), 3, "crude");
+        addFuelGenRecipe(exporter, FluidStack.create(FluidContent.STILL_FUEL.get(), 8100), 12, "fuel");
         //steam
         addSteamEngineGen(exporter, FluidStack.create(FluidContent.STILL_STEAM.get(), 32), 1, "steameng");
     }
@@ -1133,10 +1133,10 @@ public class RecipeGenerator extends FabricRecipeProvider {
     }
     
     private void addReactorFuels(RecipeExporter exporter) {
-        addReactorGen(exporter, of(ItemContent.SMALL_URANIUM_PELLET), 200, "smallpellet");
-        addReactorGen(exporter, of(ItemContent.URANIUM_PELLET), 2000, "pellet");
-        addReactorGen(exporter, of(ItemContent.SMALL_PLUTONIUM_PELLET), 2000, "smallplutoniumpellet");
-        addReactorGen(exporter, of(ItemContent.PLUTONIUM_PELLET), 20000, "plutoniumpellet");
+        addReactorGen(exporter, of(ItemContent.SMALL_URANIUM_PELLET), 400, "smallpellet");
+        addReactorGen(exporter, of(ItemContent.URANIUM_PELLET), 4000, "pellet");
+        addReactorGen(exporter, of(ItemContent.SMALL_PLUTONIUM_PELLET), 4000, "smallplutoniumpellet");
+        addReactorGen(exporter, of(ItemContent.PLUTONIUM_PELLET), 40000, "plutoniumpellet");
     }
     
     private void addLaserTransformations(RecipeExporter exporter) {
