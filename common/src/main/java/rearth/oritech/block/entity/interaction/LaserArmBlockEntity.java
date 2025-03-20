@@ -596,6 +596,15 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
         }
     }
     
+    @Override
+    public void markDirty() {
+        // basically the same as the parent method, but without the comparator update for a slight speed increase
+        if (this.world != null)
+            world.markDirty(pos);
+        
+        networkDirty = true;
+    }
+    
     //region multiblock
     @Override
     public ArrayList<BlockPos> getConnectedCores() {

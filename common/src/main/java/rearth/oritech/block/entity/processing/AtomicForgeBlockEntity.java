@@ -1,15 +1,19 @@
 package rearth.oritech.block.entity.processing;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.energy.EnergyApi;
@@ -17,11 +21,68 @@ import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     public AtomicForgeBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick());
+    }
+    
+    @Override
+    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+        super.tick(world, pos, state, blockEntity);
+    }
+    
+    @Override
+    protected boolean canProceed(OritechRecipe value) {     // recipe times are 1 tick, but energy storage needs to be full (sized according to recipe)
+        return  hasEnoughEnergy() && super.canProceed(value);
+    }
+    
+    @Override
+    protected boolean hasEnoughEnergy() {
+        return energyStorage.getCapacity() > 10 && energyStorage.getAmount() >= energyStorage.getCapacity();
+    }
+    
+    @Override
+    protected boolean checkCraftingFinished(OritechRecipe activeRecipe) {
+        return progress > 0;
+    }
+    
+    @Override
+    protected void useEnergy() {
+        energyStorage.amount = 0;
+    }
+    
+    @Override
+    protected Optional<RecipeEntry<OritechRecipe>> getRecipe() {
+        var result = super.getRecipe();
+        
+        // also adjust energy storage when getting recipe
+        if (result.isPresent()) {
+            energyStorage.setCapacity((long) Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick() * result.get().value().getTime());
+        } else {
+            energyStorage.setCapacity(1);
+            energyStorage.setAmount(1);
+        }
+        
+        return result;
+        
+    }
+    
+    @Override
+    public void updateEnergyContainer() {
+        //
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(7, 7, 18, 71);
+    }
+    
+    @Override
+    public float getProgress() {
+        return (float) energyStorage.getAmount() / energyStorage.getCapacity();
     }
     
     @Override

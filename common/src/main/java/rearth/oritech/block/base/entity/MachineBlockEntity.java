@@ -218,7 +218,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         
     }
     
-    private boolean checkCraftingFinished(OritechRecipe activeRecipe) {
+    protected boolean checkCraftingFinished(OritechRecipe activeRecipe) {
         return progress >= activeRecipe.getTime() * getSpeedMultiplier();
     }
     
