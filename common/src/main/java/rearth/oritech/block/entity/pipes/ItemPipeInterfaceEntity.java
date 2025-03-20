@@ -35,8 +35,10 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     private List<Pair<Storage<ItemVariant>, BlockPos>> filteredTargetItemStorages;
     
     // item path cache (invalidated on network update)
-    private final HashMap<BlockPos, ArrayList<BlockPos>> cachedTransferPaths = new HashMap<>();
+    private final HashMap<BlockPos, Pair<ArrayList<BlockPos>, Integer>> cachedTransferPaths = new HashMap<>();
     private final boolean renderItems;
+    
+    private static final HashMap<BlockPos, Long> blockedUntil = new HashMap<>();   // used to fake item movement in transparent pipes
     
     // client only
     public Set<RenderStackData> activeStacks = new HashSet<>();
@@ -70,6 +72,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         try (var mainTx = Transaction.openOuter()) {
             for (var sourcePos : sources) {
+                
+                var blockedTimer = blockedUntil.getOrDefault(sourcePos, 0L);
+                if (world.getTime() < blockedTimer) continue;
+                
+                if (blockedTimer > 0)   // if timer has expired but was set
+                    blockedUntil.remove(sourcePos);
+                
                 var offset = pos.subtract(sourcePos);
                 var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
                 if (!block.isSideExtractable(state, direction.getOpposite())) continue;
@@ -126,12 +135,16 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         try (var tx = Transaction.openOuter()) {
             for (var targetStorage : filteredTargetItemStorages) {
                 if (targetStorage.getLeft().equals(moveFromInventory)) continue;    // skip when targeting same machine
+                
+                var wasEmptyStorage = !targetStorage.getLeft().nonEmptyIterator().hasNext();
+                
                 var inserted = targetStorage.getLeft().insert(ItemVariant.of(stackToMove), moveCount, tx);
                 moveCount -= (int) inserted;
                 moved += inserted;
                 
-                if (inserted > 0)
-                    onItemMoved(this.pos, takenFrom, targetStorage.getRight(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.pos, 0), new HashSet<>()), world, stackToMove.getItem(), (int) inserted);
+                if (inserted > 0) {
+                    onItemMoved(this.pos, takenFrom, targetStorage.getRight(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.pos, 0), new HashSet<>()), world, stackToMove.getItem(), (int) inserted, wasEmptyStorage);
+                }
                 
                 if (moveCount <= 0) break;  // target has been found for all items
             }
@@ -156,23 +169,35 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
     }
     
-    private void onItemMoved(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, World world, Item moved, int movedCount) {
+    private void onItemMoved(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, World world, Item moved, int movedCount, boolean wasEmpty) {
         if (!renderItems) return;
         var path = cachedTransferPaths.computeIfAbsent(to, ignored -> calculatePath(startPos, from, to, network, world));
         if (path == null) return;
         
-        var codedPath = path.stream().map(BlockPos::asLong).toList();
+        var codedPath = path.getLeft().stream().map(BlockPos::asLong).toList();
         var packet = new NetworkContent.ItemPipeVisualTransferPacket(startPos, codedPath, new ItemStack(moved, movedCount));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(packet);
         
+        if (wasEmpty) {
+            var arrivalTime = world.getTime() + (int) calculatePathLength(path.getRight());
+            blockedUntil.putIfAbsent(to, arrivalTime);
+        }
+        
     }
     
-    private static ArrayList<BlockPos> calculatePath(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, World world) {
+    public static double calculatePathLength(int pathBlocksCount) {
+        return Math.pow(pathBlocksCount * 16, 0.6);
+    }
+    
+    // return pair is optimized path and total path length
+    private static Pair<ArrayList<BlockPos>, Integer> calculatePath(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, World world) {
         
         if (network.isEmpty() || !network.contains(startPos)) {
             Oritech.LOGGER.warn("tried to calculate invalid item pipe from: {} to {} with network size: {}", startPos, to, network.size());
             return null;
         }
+        
+        var length = 1;
         
         var path = new LinkedList<BlockPos>();
         path.add(startPos);
@@ -207,6 +232,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 path.pollLast();
             } else {
                 path.add(openEdges[0]);
+                length++;
             }
             
         }
@@ -214,15 +240,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         path.addFirst(from);
         path.add(to);
         
-        var success = path.size() > 2;
-        
         // compact path (by removing straight segments)
         var result = optimizePath(path);
         
         watch.stop();
         
-        System.out.println("pathsize: " + result.size() + " success: " + success + " time ms: " + watch.getNanoTime() / 1_000_000f);
-        return result;
+        Oritech.LOGGER.debug("pathsize: {} success: {} time ms: {}", result.size(), path.size() > 2, watch.getNanoTime() / 1_000_000f);
+        return new Pair<>(result, path.size());
     }
     
     private static ArrayList<BlockPos> optimizePath(LinkedList<BlockPos> path) {

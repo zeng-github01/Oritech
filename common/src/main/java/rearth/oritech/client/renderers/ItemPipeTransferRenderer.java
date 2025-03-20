@@ -24,7 +24,7 @@ public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInt
         
         for (var renderedStack : entity.activeStacks) {
             var age = time - renderedStack.startedAt();
-            var neededTime = Math.pow(renderedStack.pathLength() * 16, 0.8);    // about 2 blocks/s, but much faster on longer paths
+            var neededTime = ItemPipeInterfaceEntity.calculatePathLength(renderedStack.pathLength());    // about 2 blocks/s, but much faster on longer paths
             var progress = age / neededTime;
             if (progress > 1) {
                 removedStacks.add(renderedStack);
