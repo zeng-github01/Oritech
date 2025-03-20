@@ -98,7 +98,7 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
           .forceAddTag(ConventionalBlockTags.BUDS);
         
         getOrCreateTagBuilder(TagContent.LASER_ACCELERATED)
-          .add(Blocks.BUDDING_AMETHYST);
+          .forceAddTag(ConventionalBlockTags.BUDDING_BLOCKS);
 
         getOrCreateTagBuilder(TagContent.CUTTER_LOGS_MINEABLE)
         // using forceAddTag because the datagen wasn't recognizing the vanilla LOGS, LEAVES, and WART_BLOCKS tags
