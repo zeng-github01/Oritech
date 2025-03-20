@@ -1,6 +1,7 @@
 package rearth.oritech.client.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.architectury.platform.Platform;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.*;
 import io.wispforest.owo.ui.container.Containers;
@@ -22,11 +23,15 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
+import rearth.oracle.Oracle;
+import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
+import rearth.oritech.OritechClient;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
@@ -34,6 +39,8 @@ import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
+
+import java.util.Optional;
 
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
     
@@ -199,6 +206,29 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
                 .positioning(Positioning.relative(50, 50))
                 .zIndex(-1)
             );
+        }
+        
+        // show oracle lib help button
+        if (Oritech.CONFIG.enableHelpButton()) {
+            var hasOracleLib = Platform.isModLoaded("oracle_index");
+            Optional<Identifier> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
+            var oracleButton = Components.button(Text.literal("?"), elem -> onOracleButtonClick(hasOracleLib, linkTarget));
+            oracleButton.renderer(ORITECH_BUTTON_DARK);
+            if (hasOracleLib) {
+                oracleButton.tooltip(Text.translatable("tooltip.oritech.oracle_available"));
+            } else {
+                oracleButton.tooltip(Text.translatable("tooltip.oritech.oracle_missing"));
+            }
+            
+            // calculate help button position
+            oracleButton.positioning(Positioning.relative(0, 96));
+            oracleButton.zIndex(10);
+            if (linkTarget.isPresent() || !hasOracleLib) {  // only show button if either lib is not installed, or a link is present
+                rootComponent.child(
+                  Containers.horizontalFlow(Sizing.fixed(176 + 25), Sizing.fixed(166 + 20))
+                    .child(oracleButton)
+                    .positioning(Positioning.relative(50, 50)));
+            }
         }
         
         rootComponent.child(
@@ -444,6 +474,31 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
             addProgressArrow(overlay);
             updateProgressBar();
         }
+    }
+    
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    private void onOracleButtonClick(boolean enabled, Optional<Identifier> target) {
+        if (!enabled || target.isEmpty()) {
+            Oritech.LOGGER.info("Oracle Index mod is missing. Install it here: https://www.curseforge.com/minecraft/mc-mods/oracle-index (or from modrinth)");
+            return;
+        }
+        
+        OracleClient.openScreen("oritech", target.get(), this);
+    }
+    
+    private Optional<Identifier> getHelpBookLink() {
+        
+        if (this.handler.screenData.getWikiLink().isPresent()) return Optional.of(Identifier.of(Oracle.MOD_ID, "books/oritech/" + handler.screenData.getWikiLink().get() + ".mdx"));
+        
+        var blockItem = this.handler.machineBlock.getBlock().asItem();
+        var itemId = Registries.ITEM.getId(blockItem);
+        
+        if (OracleClient.ITEM_LINKS.containsKey(itemId)) {
+            return Optional.of(OracleClient.ITEM_LINKS.get(itemId).linkTarget());
+        } else {
+            return Optional.empty();
+        }
+        
     }
     
     public boolean useHighTitle() {

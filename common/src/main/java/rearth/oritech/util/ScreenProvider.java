@@ -11,6 +11,7 @@ import net.minecraft.util.math.Direction;
 import rearth.oritech.Oritech;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ScreenProvider {
     
@@ -71,6 +72,8 @@ public interface ScreenProvider {
     default BarConfiguration getFluidConfiguration() {
         return new BarConfiguration(147, 6, 21, 74);
     }
+    
+    default Optional<String> getWikiLink() { return Optional.empty(); } // optional override. Expected format is "interaction/enderic_laser". Defaults to the item link defined in the pages markdown.
     
     default ArrowConfiguration getIndicatorConfiguration() {
         return new ArrowConfiguration(

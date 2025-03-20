@@ -121,6 +121,8 @@ public class Config {
     public float machineVolumeMultiplier = 1f;
     @Sync(Option.SyncMode.NONE)
     public boolean showMachinePreview = true;
+    @Sync(Option.SyncMode.NONE)
+    public boolean enableHelpButton = true;
     
     public static class ProcessingMachines {
         

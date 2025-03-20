@@ -41,8 +41,7 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:$rootProject.fabric_api_version"
 
     // Architectury API. This is optional, and you can comment it out if you don't need it.
-    // modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
-    modImplementation "dev.architectury:architectury-fabric:13.0.6"
+    modImplementation "dev.architectury:architectury-fabric:$rootProject.architectury_api_version"
     // because gradle is stupid and my local setup is broken somewhere but deleting the cache doesnt seem to fix it
 
     common(project(path: ':common', configuration: 'namedElements')) { transitive false }
@@ -53,7 +52,7 @@ dependencies {
         transitive = false
     }
 
-    // yes yes all this needs to be cleaned up, and recipe viewers made conditional, but I'm waiting to clean up the CSL mess first
+    // yes yes all this needs to be cleaned up and properly versioned, but I'm waiting to clean up the CSL mess first
 
     // owo lib
     modImplementation "io.wispforest:owo-lib:0.12.11+1.21"
@@ -78,6 +77,10 @@ dependencies {
 
     // mod menu
     modImplementation "com.terraformersmc:modmenu:11.0.3"
+
+    // oracle index
+    modRuntimeOnly "curse.maven:oracle-index-1206582:6300146"
+    implementation "org.jsoup:jsoup:1.17.2"
 
     // compat mods for testing
 //    // Tech Reborn
