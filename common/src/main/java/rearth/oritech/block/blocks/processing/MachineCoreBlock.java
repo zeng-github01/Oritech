@@ -6,10 +6,14 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -19,6 +23,7 @@ import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.util.MultiblockMachineController;
 
+import java.util.List;
 import java.util.Objects;
 
 public class MachineCoreBlock extends Block implements BlockEntityProvider {
@@ -40,6 +45,12 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(USED);
+    }
+    
+    @Override
+    public void appendTooltip(ItemStack stack, Item.TooltipContext context, List<Text> tooltip, TooltipType options) {
+        tooltip.add(Text.translatable("tooltip.oritech.machine_core_block").formatted(Formatting.ITALIC, Formatting.GRAY));
+        super.appendTooltip(stack, context, tooltip, options);
     }
     
     @Override
