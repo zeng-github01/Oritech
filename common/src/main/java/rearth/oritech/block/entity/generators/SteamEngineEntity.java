@@ -105,7 +105,6 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         
         var consumed = Math.max(1, currentRecipe.getFluidInput().getAmount() * speed);
         usedSteamTank.amount -= consumed;
-        usedWaterTank.amount += consumed * 0.9f;
         usedWaterTank.amount = (long) Math.min(usedWaterTank.amount + consumed * 0.9f, usedWaterTank.getCapacity());
         progress = (int) (speed * 100);
         
