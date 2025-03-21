@@ -7,17 +7,15 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.energy.EnergyApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +25,6 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     public AtomicForgeBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY, pos, state, Oritech.CONFIG.processingMachines.atomicForgeData.energyPerTick());
-    }
-    
-    @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
-        super.tick(world, pos, state, blockEntity);
     }
     
     @Override

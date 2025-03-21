@@ -15,7 +15,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.input.RecipeInput;
 import net.minecraft.registry.RegistryWrapper;
@@ -42,7 +41,7 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,7 +56,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    public final SimpleInventory inventory = new SimpleMachineInventory(getInventorySize());
+    public final SimpleMachineInventory inventory = new SimpleMachineInventory(getInventorySize());
     // crafting / processing
     public int progress;
     protected int energyPerTick;
@@ -83,6 +82,9 @@ public abstract class MachineBlockEntity extends BlockEntity
     public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
         
         if (world.isClient || !isActive(state) || disabledViaRedstone) return;
+        
+        if (inventory.needsBalancing)
+            inventory.balance();
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
@@ -303,87 +305,6 @@ public abstract class MachineBlockEntity extends BlockEntity
         disabledViaRedstone = nbt.getBoolean("oritech.redstone");
     }
     
-    private int slotRecipeSearch(ItemStack stack, List<ItemStack> inv) {
-        
-        // find matching recipe
-        // check if currently already using a recipe, if so use this one. This means that all slots are used, and we can just top the slots up
-        if (currentRecipe.getTime() != -1) {
-            return findLowestMatchingSlot(stack, inv, false);
-        }
-        
-        // get all recipe types
-        // filter which ones are available based on stack
-        // filter remaining ones based on inventory
-        // select first (if any) remaining
-        // select lowest filled slot matching positions in recipe
-        
-        var availableRecipes = Objects.requireNonNull(world).getRecipeManager().listAllOfType(getOwnRecipeType());
-        var matchingStackRecipes = new HashSet<OritechRecipe>(availableRecipes.size() / 2);
-        
-        for (var recipe : availableRecipes) {
-            if (recipeUsesStack(recipe.value().getInputs(), stack))
-                matchingStackRecipes.add(recipe.value());
-        }
-        
-        OritechRecipe result = null;
-        for (var recipe : matchingStackRecipes) {
-            if (invCouldAllowRecipe(recipe, inv)) {
-                // found valid recipe, use this one
-                result = recipe;
-                break;
-            }
-        }
-        
-        if (result == null) return -1;
-        
-        // find indices of slots matching stack in recipe
-        // find lowest / first empty slot in those indices
-        var searchTargets = new HashSet<Integer>();
-        var inputs = result.getInputs();
-        
-        for (int i = 0; i < inputs.size(); i++) {
-            var ingredient = inputs.get(i);
-            if (ingredient.test(stack)) searchTargets.add(i);
-        }
-        
-        var lowestCount = 64;
-        var lowestIndex = -1;
-        for (var slot : searchTargets) {
-            var slotContent = inv.get(slot);
-            if (slotContent.isEmpty()) return slot;
-            
-            if (slotContent.getCount() < lowestCount) {
-                lowestIndex = slot;
-                lowestCount = slotContent.getCount();
-            }
-        }
-        
-        return lowestIndex;
-    }
-    
-    private boolean recipeUsesStack(List<Ingredient> inputs, ItemStack stack) {
-        for (var ingredient : inputs) {
-            if (ingredient.test(stack)) {
-                // found recipe containing item
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    private boolean invCouldAllowRecipe(OritechRecipe recipe, List<ItemStack> inv) {
-        
-        List<Ingredient> inputs = recipe.getInputs();
-        for (int i = 0; i < inputs.size(); i++) {
-            var ingredient = inputs.get(i);
-            var slot = inv.get(i);
-            if (!slot.isEmpty() && !ingredient.test(slot)) return false;
-        }
-        
-        return true;
-    }
-    
     private int findLowestMatchingSlot(ItemStack stack, List<ItemStack> inv, boolean allowEmpty) {
         
         var lowestMatchingIndex = -1;
@@ -519,9 +440,6 @@ public abstract class MachineBlockEntity extends BlockEntity
                 inventoryInputMode = InventoryInputMode.FILL_EVENLY;
                 break;
             case FILL_EVENLY:
-                inventoryInputMode = InventoryInputMode.FILL_MATCHING_RECIPE;
-                break;
-            case FILL_MATCHING_RECIPE:
                 inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
                 break;
         }
@@ -624,7 +542,10 @@ public abstract class MachineBlockEntity extends BlockEntity
         this.disabledViaRedstone = isPowered;
     }
     
-    private class SimpleMachineInventory extends SimpleSidedInventory {
+    // this entire class feels like a super dirty hack, and makes me hate the transaction API
+    public class SimpleMachineInventory extends SimpleSidedInventory {
+        
+        public boolean needsBalancing = false;
         
         public SimpleMachineInventory(int size) {
             super(size, getSlots());
@@ -632,7 +553,103 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         @Override
         public void markDirty() {
+            super.markDirty();
             MachineBlockEntity.this.markDirty();
+            
+            if (world == null || world.isClient || inventoryInputMode != InventoryInputMode.FILL_EVENLY) return;
+            needsBalancing = true;
+        }
+        
+        // balances only into empty slots
+        public void balance() {
+            
+            super.markDirty();
+            MachineBlockEntity.this.markDirty();
+            this.needsBalancing = false;
+            
+            // find the bigger stack(s), split the slots
+            
+            var inputInv = getInputView();
+            
+            var emptySlotsCount = 0;
+            var maxCount = 0;
+            var minCount = 64;
+            var maxCountMatching = 0;
+            
+            for (var stack : inputInv) {
+                if (stack.isEmpty()) {
+                    emptySlotsCount++;
+                    minCount = 0;
+                    continue;
+                }
+                
+                if (stack.getCount() > maxCount)
+                    maxCount = stack.getCount();
+                
+                if (stack.getCount() < minCount)
+                    minCount = stack.getCount();
+            }
+            
+            for (var stack : inputInv) {
+                if (stack.getCount() == maxCount) maxCountMatching++;
+            }
+            
+            if (maxCount <= 1) return;
+            
+            var slotsPerSplitStack = emptySlotsCount / maxCountMatching + 1;
+            if (slotsPerSplitStack <= 1) {
+                
+                // try to balance within stacks
+                for (int i = 0; i < inputInv.size(); i++) {
+                    var stack = inputInv.get(i);
+                    if (stack.getCount() <= 1) continue;
+                    for (int j = 0; j < inputInv.size(); j++) {
+                        if (j == i) continue;
+                        var otherStack = inputInv.get(j);
+                        if (!otherStack.getItem().equals(stack.getItem())) continue;
+                        // same item, try to exchange if needed (if difference > 2)
+                        var diff = stack.getCount() - otherStack.getCount();
+                        if (diff < 2) continue;
+                        
+                        var moved = diff / 2;
+                        stack.decrement(moved);
+                        otherStack.increment(moved);
+                    }
+                }
+                
+                return;
+            }
+            
+            var finalOrder = new ArrayList<ItemStack>();
+            
+            for (var stack : inputInv) {
+                if (stack.getCount() != maxCount) {
+                    if (!stack.isEmpty())
+                        finalOrder.add(stack.copy());
+                    continue;
+                }
+                
+                // split stack in N parts
+                var parts = Math.min(slotsPerSplitStack, stack.getCount());
+                var partSize = maxCount / parts;
+                
+                for (int partIndex = 0; partIndex < parts; partIndex++) {
+                    finalOrder.add(stack.copyWithCount(partSize));
+                }
+                
+            }
+            
+            var finalCount = finalOrder.stream().mapToInt(ItemStack::getCount).sum();
+            var initialCount = inputInv.stream().mapToInt(ItemStack::getCount).sum();
+            System.out.println(initialCount + " " + finalCount);
+            System.out.println(finalOrder);
+            if (finalCount != initialCount || finalOrder.size() > inputInv.size()) return;
+            
+            for (int i = 0; i < finalOrder.size(); i++) {
+                var targetStack = finalOrder.get(i);
+                inputInv.set(i, targetStack);
+            }
+            
         }
         
         @Override
@@ -655,10 +672,6 @@ public abstract class MachineBlockEntity extends BlockEntity
                 }
                 case FILL_LEFT_TO_RIGHT -> // fill left to right
                   true;
-                case FILL_MATCHING_RECIPE -> {
-                    var recipeTargetSlot = slotRecipeSearch(stack, inv);
-                    yield recipeTargetSlot >= 0 && config.inputToRealSlot(recipeTargetSlot) == slot;
-                }
             };
         }
     }
