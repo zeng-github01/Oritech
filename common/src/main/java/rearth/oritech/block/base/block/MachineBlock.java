@@ -20,6 +20,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -29,6 +30,7 @@ import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
@@ -74,7 +76,17 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
     
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        
+        onBlockRemoved(world, pos);
+        return super.onBreak(world, pos, state, player);
+    }
+    
+    @Override
+    protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        onBlockRemoved(world, pos);
+        super.onExploded(state, world, pos, explosion, stackMerger);
+    }
+    
+    private static void onBlockRemoved(World world, BlockPos pos) {
         if (!world.isClient) {
             var entity = (MachineBlockEntity) world.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
@@ -85,8 +97,6 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
                 }
             }
         }
-        
-        return super.onBreak(world, pos, state, player);
     }
     
     @NotNull

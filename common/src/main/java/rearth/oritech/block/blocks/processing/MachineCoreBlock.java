@@ -17,6 +17,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.MachineCoreEntity;
@@ -25,6 +26,7 @@ import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
 public class MachineCoreBlock extends Block implements BlockEntityProvider {
     
@@ -60,17 +62,25 @@ public class MachineCoreBlock extends Block implements BlockEntityProvider {
     
     @Override
     public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        
+        onBlockRemoved(state, world, pos);
+        return super.onBreak(world, pos, state, player);
+    }
+    
+    @Override
+    protected void onExploded(BlockState state, World world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+        onBlockRemoved(state, world, pos);
+        super.onExploded(state, world, pos, explosion, stackMerger);
+    }
+    
+    private static void onBlockRemoved(BlockState state, World world, BlockPos pos) {
         if (!world.isClient() && state.get(USED)) {
             var controllerEntity = getControllerEntity(world, pos);
-            if (controllerEntity == null) return state;
+            if (controllerEntity == null) return;
             
             if (controllerEntity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onCoreBroken(pos);
             }
         }
-        
-        return super.onBreak(world, pos, state, player);
     }
     
     @NotNull

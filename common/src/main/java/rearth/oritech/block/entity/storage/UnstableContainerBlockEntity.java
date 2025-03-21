@@ -63,6 +63,7 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     private boolean networkDirty = false;
     private long age = 0;
     public float qualityMultiplier = 1f;
+    private boolean dropped = false;
     
     public final SimpleEnergyStorage laserInputStorage = new SimpleEnergyStorage(100_000_000, 0, 100_000_000);
     
@@ -315,14 +316,14 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     }
     
     private void onBroken(BlockPos eventSource) {
-        
+        if (dropped) return;
+        dropped = true;
         
         for (var corePos : coreBlocksConnected) {
             if (corePos.equals(eventSource)) continue;
             world.setBlockState(corePos, Blocks.AIR.getDefaultState());
         }
         
-        // todo drop item of self
         world.setBlockState(pos, capturedBlock);
         
         var spawnAt = this.pos.toCenterPos().add(0, 1, 0);

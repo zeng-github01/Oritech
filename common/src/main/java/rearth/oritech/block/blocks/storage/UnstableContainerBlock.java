@@ -68,6 +68,8 @@ public class UnstableContainerBlock extends Block implements BlockEntityProvider
             var coreWorldPos = pos.add(coreOffset);
             var coreState = world.getBlockState(coreWorldPos);
             if (!coreState.isAir()) {
+                var breakingPlayer = placer instanceof PlayerEntity ? (PlayerEntity) placer : null;
+                coreState.getBlock().onBreak(world, coreWorldPos, coreState, breakingPlayer);
                 world.breakBlock(coreWorldPos, true, placer, 1);
             }
             world.setBlockState(coreWorldPos, BlockContent.MACHINE_CORE_HIDDEN.getDefaultState());

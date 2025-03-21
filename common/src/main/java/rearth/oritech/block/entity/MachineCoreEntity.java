@@ -57,11 +57,18 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         this.markDirty();
     }
     
+    @Nullable
     public MultiblockMachineController getCachedController() {
-        if (!this.getCachedState().get(MachineCoreBlock.USED)) return null;
+        if (world == null || !this.getCachedState().get(MachineCoreBlock.USED)) return null;
         
-        if (controllerEntity == null || ((BlockEntity) controllerEntity).isRemoved())
-            controllerEntity = (MultiblockMachineController) Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+        if (controllerEntity == null || ((BlockEntity) controllerEntity).isRemoved()) {
+            var candidate = Objects.requireNonNull(world).getBlockEntity(getControllerPos());
+            if (candidate instanceof MultiblockMachineController controller) {
+                controllerEntity = controller;
+            } else {
+                controllerEntity = null;
+            }
+        }
         
         return controllerEntity;
     }
