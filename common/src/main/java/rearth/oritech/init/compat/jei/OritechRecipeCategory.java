@@ -114,7 +114,7 @@ public class OritechRecipeCategory implements IRecipeCategory<OritechRecipe> {
     }
     
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, OritechRecipe recipe, IFocusGroup focuses) {
+    public void setRecipe(@NotNull IRecipeLayoutBuilder builder, OritechRecipe recipe, @NotNull IFocusGroup focuses) {
         
         var offsetX = 23;
         var offsetY = 17;
@@ -151,7 +151,7 @@ public class OritechRecipeCategory implements IRecipeCategory<OritechRecipe> {
         // fluid outputs
         if (!(recipe.getFluidOutput() != null && recipe.getFluidOutput().isEmpty())) {
             var stack = recipe.getFluidOutput();
-            builder.addInputSlot(120, 6).addFluidStack(stack.getFluid(), stack.getAmount() / fluidDivider).setBackground(fluidBackground, -2, -2).setFluidRenderer(stack.getAmount() / 81, false, 10, 46);
+            builder.addOutputSlot(120, 6).addFluidStack(stack.getFluid(), stack.getAmount() / fluidDivider).setBackground(fluidBackground, -2, -2).setFluidRenderer(stack.getAmount() / 81, false, 10, 46);
         }
     }
 }
