@@ -1,5 +1,6 @@
 package rearth.oritech.block.base.entity;
 
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
@@ -19,7 +20,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -305,7 +305,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             
             @Override
             protected long getCapacity(FluidVariant variant) {
-                return CentrifugeBlockEntity.CAPACITY;
+                return 8 * FluidStackHooks.bucketAmount();
             }
             
             @Override

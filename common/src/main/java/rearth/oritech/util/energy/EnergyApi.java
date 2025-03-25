@@ -13,7 +13,7 @@ public class EnergyApi {
         var inserted = to.insert(extracted, simulate);
         extracted = from.extract(inserted, simulate);
         
-        if (extracted > 0) {
+        if (extracted > 0 && !simulate) {
             from.update();
             to.update();
         }

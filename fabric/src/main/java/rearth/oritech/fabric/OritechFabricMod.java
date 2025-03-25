@@ -3,6 +3,7 @@ package rearth.oritech.fabric;
 import net.fabricmc.api.ModInitializer;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.fluid.FluidApi;
 
 public final class OritechFabricMod implements ModInitializer {
     @Override
@@ -11,6 +12,9 @@ public final class OritechFabricMod implements ModInitializer {
         var energyApiInstance = new FabricEnergyApiImpl();
         EnergyApi.BLOCK = energyApiInstance;
         EnergyApi.ITEM = energyApiInstance;
+        
+        var fluidApiInstance = new FabricFluidApiImpl();
+        FluidApi.BLOCK = fluidApiInstance;
         
         // Run our common setup.
         Oritech.runAllRegistries();

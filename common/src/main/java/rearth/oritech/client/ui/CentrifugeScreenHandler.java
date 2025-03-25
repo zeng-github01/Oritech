@@ -1,7 +1,5 @@
 package rearth.oritech.client.ui;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.SimpleInventory;
@@ -11,10 +9,11 @@ import net.minecraft.screen.slot.Slot;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.fluid.FluidApi;
 
 public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {
     
-    public final SingleVariantStorage<FluidVariant> inputTank;
+    public final FluidApi.SingleSlotContainer inputTank;
     public final SimpleInventory bucketInventory;
     
     public CentrifugeScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, MachineAddonController.AddonUiData addonUiData, float coreQuality) {
@@ -28,7 +27,7 @@ public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {
         }
         
         if (centrifugeEntity.hasFluidAddon) {
-            inputTank = centrifugeEntity.inputStorage;
+            inputTank = centrifugeEntity.fluidContainer.getInputContainer();
             bucketInventory = centrifugeEntity.bucketInventory;
             bucketInventory.onOpen(playerInventory.player);
             addBucketSlots();

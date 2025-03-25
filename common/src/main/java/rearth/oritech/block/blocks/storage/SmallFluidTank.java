@@ -100,13 +100,13 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
         var stack = getBasePickStack(tankEntity.isCreative);
         
-        if (tankEntity.getForDirectFluidAccess().amount > 0) {
-            var nbt = new NbtCompound();
-            tankEntity.writeNbt(nbt, world.getRegistryManager());
-            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
-            var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
-            stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable(tankEntity.isCreative ? "block.oritech.creative_tank_block" : "block.oritech.small_tank_block")));
-        }
+//        if (tankEntity.getForDirectFluidAccess().amount > 0) {
+//            var nbt = new NbtCompound();
+//            tankEntity.writeNbt(nbt, world.getRegistryManager());
+//            stack.set(DataComponentTypes.CUSTOM_DATA, NbtComponent.of(nbt));
+//            var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
+//            stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable(tankEntity.isCreative ? "block.oritech.creative_tank_block" : "block.oritech.small_tank_block")));
+//        }
         
         return stack;
     }

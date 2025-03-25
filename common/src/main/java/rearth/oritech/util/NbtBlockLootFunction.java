@@ -33,13 +33,13 @@ public class NbtBlockLootFunction extends ConditionalLootFunction {
 
         var nbt = new NbtCompound();
         if (blockEntity instanceof SmallFluidTankEntity tankEntity) {
-            if (tankEntity.getForDirectFluidAccess().amount > 0) {
-                tankEntity.writeNbt(nbt, context.getWorld().getRegistryManager());
-                var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
-                stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));
-                // make all non-empty tanks unstackable
-                nbt.putUuid("unstackable", UUID.randomUUID());
-            }
+//            if (tankEntity.getForDirectFluidAccess().amount > 0) {    // todo
+//                tankEntity.writeNbt(nbt, context.getWorld().getRegistryManager());
+//                var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
+//                stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));
+//                // make all non-empty tanks unstackable
+//                nbt.putUuid("unstackable", UUID.randomUUID());
+//            }
         } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity) {
             if (storageEntity.getStorage(null).getAmount() > 0) {
                 storageEntity.writeNbt(nbt, context.getWorld().getRegistryManager());

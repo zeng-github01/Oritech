@@ -1,6 +1,6 @@
 package rearth.oritech.block.blocks.storage;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import dev.architectury.fluid.FluidStack;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.screen.Screen;
@@ -48,14 +48,14 @@ public class CreativeFluidTank extends SmallFluidTank {
         
         if(world.isClient || !(world.getBlockEntity(pos) instanceof SmallFluidTankEntity blockEntity)) return super.onUse(state, world, pos, player, hit);
         
+        // todo use proper api here
         var mainHandStack = player.getMainHandStack();
         if (mainHandStack.isOf(Items.BUCKET)) {
-            blockEntity.fluidStorage.amount = 0;
-            blockEntity.fluidStorage.variant = FluidVariant.blank();
+            blockEntity.fluidStorage.setStack(FluidStack.empty());
             blockEntity.markDirty();
             return ActionResult.SUCCESS_NO_ITEM_USED;
         } else if (!mainHandStack.isEmpty() && mainHandStack.getItem() instanceof BucketItem bucketItem) {
-            blockEntity.fluidStorage.variant = FluidVariant.of(bucketItem.arch$getFluid());
+            blockEntity.fluidStorage.setStack(FluidStack.create(bucketItem.arch$getFluid(), 1000));
             blockEntity.markDirty();
             return ActionResult.SUCCESS_NO_ITEM_USED;
         }

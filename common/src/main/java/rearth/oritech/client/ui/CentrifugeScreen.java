@@ -24,7 +24,8 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
         super(handler, inventory, title);
         
         if (((CentrifugeBlockEntity) handler.blockEntity).hasFluidAddon) {
-            inFluidDisplay = initFluidDisplay(handler.inputTank, inputConfig);
+            // inFluidDisplay = initFluidDisplay(handler.inputTank, inputConfig);
+            inFluidDisplay = null;
         } else {
             inFluidDisplay = null;
         }

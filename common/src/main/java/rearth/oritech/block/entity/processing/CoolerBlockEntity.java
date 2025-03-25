@@ -132,7 +132,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidP
         // get recipes matching input items
         var candidates = Objects.requireNonNull(world).getRecipeManager().getAllMatches(getOwnRecipeType(), getInputInventory(), world);
         // filter out recipes based on input tank
-        var fluidRecipe = candidates.stream().filter(candidate -> CentrifugeBlockEntity.recipeMatchesTank(inputTank, candidate.value())).findAny();
+        var fluidRecipe = candidates.stream().filter(candidate -> recipeMatchesTank(inputTank, candidate.value())).findAny();
         if (fluidRecipe.isPresent()) {
             return fluidRecipe;
         }
@@ -140,9 +140,23 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidP
         return super.getRecipe();
     }
     
+    // todo this should not be needed, duplicate of centrifuge
+    public static boolean recipeMatchesTank(SingleVariantStorage<FluidVariant> checkedTank, OritechRecipe recipe) {
+        
+        var isTankEmpty = checkedTank.isResourceBlank() || checkedTank.amount <= 0;
+        var recipeNeedsFluid = recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0;
+        
+        if (!recipeNeedsFluid) return true;
+        if (isTankEmpty) return false;
+        
+        var recipeFluid = recipe.getFluidInput().getFluid();
+        var tankFluid = checkedTank.variant.getFluid();
+        return recipeFluid.equals(tankFluid) && checkedTank.amount >= recipe.getFluidInput().getAmount();
+    }
+    
     @Override
     protected boolean canProceed(OritechRecipe value) {
-        return super.canProceed(value) && CentrifugeBlockEntity.recipeMatchesTank(inputTank, value);
+        return super.canProceed(value) && recipeMatchesTank(inputTank, value);
     }
     
     @Override

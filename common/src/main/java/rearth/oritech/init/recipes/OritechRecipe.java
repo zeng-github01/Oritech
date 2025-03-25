@@ -1,6 +1,7 @@
 package rearth.oritech.init.recipes;
 
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.platform.Platform;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -17,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class OritechRecipe implements Recipe<RecipeInput> {
+    
+    public static final int fluidDivider = Platform.isNeoForge() ? 81 : 1;  // dirty hack because bucket amounts are 81000 in neo, and 1000 in fabric, but datagen/recipes are on fabric
     
     private final OritechRecipeType type;
     private final List<Ingredient> inputs;
@@ -39,7 +42,7 @@ public class OritechRecipe implements Recipe<RecipeInput> {
     }
     
     public OritechRecipe(int time, List<Ingredient> inputs, List<ItemStack> results, OritechRecipeType type, Fluid inVariant, long inAmount, Fluid outVariant, long outAmount) {
-        this(time, inputs, results, type, FluidStack.create(inVariant, inAmount), FluidStack.create(outVariant, outAmount));
+        this(time, inputs, results, type, FluidStack.create(inVariant, inAmount / fluidDivider), FluidStack.create(outVariant, outAmount / fluidDivider));
     }
     
     

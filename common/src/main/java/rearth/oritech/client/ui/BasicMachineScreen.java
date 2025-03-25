@@ -1,6 +1,8 @@
 package rearth.oritech.client.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.platform.Platform;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.*;
@@ -31,7 +33,6 @@ import org.joml.Matrix4f;
 import rearth.oracle.Oracle;
 import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
-import rearth.oritech.OritechClient;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
@@ -164,6 +165,22 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         return new FluidDisplay(fillOverlay, lastFill, background, foreGround, config, container);
     }
+    
+//    protected FluidDisplay initFluidDisplay(FluidApi.SingleSlotContainer container, ScreenProvider.BarConfiguration config) {
+//        var lastFill = 1 - ((float) container.getStack().getAmount() / container.getCapacity());
+//        var background = createFluidRenderer(container.getStack(), config);
+//
+//        var fillOverlay = Components.box(Sizing.fixed(config.width()), Sizing.fixed((int) (config.height() * lastFill)));
+//        fillOverlay.color(new Color(77.6f / 255f, 77.6f / 255f, 77.6f / 255f));
+//        fillOverlay.fill(true);
+//        fillOverlay.positioning(Positioning.absolute(config.x(), config.y()));
+//
+//        var foreGround = Components.texture(getGuiComponents(), 48, 0, 14, 50, 98, 96);
+//        foreGround.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
+//        foreGround.positioning(Positioning.absolute(config.x(), config.y()));
+//
+//        return new FluidDisplay(fillOverlay, lastFill, background, foreGround, config, container);
+//    }
     
     public static Component getItemFrame(int x, int y) {
         return Components.texture(ITEM_SLOT, 0, 0, 18, 18, 18, 18).sizing(Sizing.fixed(18)).positioning(Positioning.absolute(x - 1, y - 1));
@@ -599,10 +616,36 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         return getColoredSpriteComponent(variant, amount, config, sprite, spriteColor);
     }
     
+    public static ColoredSpriteComponent createFluidRenderer(FluidStack stack, ScreenProvider.BarConfiguration config) {
+        var sprite = FluidStackHooks.getStillTexture(stack);
+        var spriteColor = FluidStackHooks.getColor(stack);
+        
+        var parsedColor = Color.ofArgb(spriteColor);
+        var opaqueColor = new Color(parsedColor.red(), parsedColor.green(), parsedColor.blue(), 1f);
+        spriteColor = opaqueColor.argb();
+        
+        return getColoredSpriteComponent(stack, config, sprite, spriteColor);
+    }
+    
     @NotNull
     private static ColoredSpriteComponent getColoredSpriteComponent(FluidVariant variant, long amount, ScreenProvider.BarConfiguration config, Sprite sprite, int spriteColor) {
         var tooltipText = amount > 0
             ? Text.translatable("tooltip.oritech.fluid_content", amount * 1000 / FluidConstants.BUCKET, FluidVariantAttributes.getName(variant).getString())
+            : Text.translatable("tooltip.oritech.fluid_empty");
+        
+        var result = new ColoredSpriteComponent(sprite);
+        result.widthMultiplier = config.width() / 60f;
+        result.color = Color.ofArgb(spriteColor);
+        result.sizing(Sizing.fixed(config.width()), Sizing.fixed(config.height()));
+        result.positioning(Positioning.absolute(config.x(), config.y()));
+        result.tooltip(tooltipText);
+        return result;
+    }
+    
+    @NotNull
+    private static ColoredSpriteComponent getColoredSpriteComponent(FluidStack stack, ScreenProvider.BarConfiguration config, Sprite sprite, int spriteColor) {
+        var tooltipText = stack.getAmount() > 0
+            ? Text.translatable("tooltip.oritech.fluid_content", stack.getAmount() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(stack).toString())
             : Text.translatable("tooltip.oritech.fluid_empty");
         
         var result = new ColoredSpriteComponent(sprite);

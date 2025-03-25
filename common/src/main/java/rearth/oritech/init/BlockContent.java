@@ -37,7 +37,7 @@ import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
-import rearth.oritech.util.ArchitecturyBlockRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.item.OritechGeoItem;
 
 import java.lang.annotation.ElementType;

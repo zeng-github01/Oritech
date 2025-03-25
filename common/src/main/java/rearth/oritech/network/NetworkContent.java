@@ -29,6 +29,7 @@ import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
+import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -112,6 +113,9 @@ public class NetworkContent {
     }
     
     public record SingleVariantFluidSyncPacket(BlockPos position, String fluidType, long amount) {
+    }
+    
+    public record SingleVariantFluidSyncPacketAPI(BlockPos position, String fluidType, long amount) {
     }
     
     public record ItemPipeVisualTransferPacket(BlockPos position, List<Long> codedStops, ItemStack moved) {}
@@ -355,6 +359,17 @@ public class NetworkContent {
             
         }));
         
+        MACHINE_CHANNEL.registerClientbound(SingleVariantFluidSyncPacketAPI.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof SmallFluidTankEntity tankEntity) {
+                var storage = tankEntity.fluidStorage;
+                storage.setStack(FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.amount));
+            }
+            
+        }));
+        
         MACHINE_CHANNEL.registerClientbound(SpawnerSyncPacket.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
@@ -427,12 +442,10 @@ public class NetworkContent {
             
             if (entity instanceof CentrifugeBlockEntity centrifuge) {
                 centrifuge.hasFluidAddon = message.fluidAddon;
-                var inStorage = centrifuge.inputStorage;
-                var outStorage = centrifuge.outputStorage;
-                inStorage.amount = message.amountIn;
-                outStorage.amount = message.amountOut;
-                inStorage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidTypeIn)));
-                outStorage.variant = FluidVariant.of(Registries.FLUID.get(Identifier.of(message.fluidTypeOut)));
+                var inStack = FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidTypeIn)), message.amountIn);
+                var outStack = FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidTypeOut)), message.amountOut);
+                centrifuge.fluidContainer.setInStack(inStack);
+                centrifuge.fluidContainer.setOutStack(outStack);
             }
             
         }));

@@ -18,7 +18,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.ui.*;
-import rearth.oritech.util.ArchitecturyRegistryContainer;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 import rearth.oritech.util.MachineAddonController;
 
 import java.lang.reflect.InvocationTargetException;

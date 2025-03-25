@@ -1,19 +1,11 @@
 package rearth.oritech.block.entity.processing;
 
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.BucketItem;
@@ -31,7 +23,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -42,22 +33,18 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.fluid.FluidApiProvider;
+import rearth.oritech.util.fluid.containers.SimpleInOutFluidContainer;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidProvider {
+public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApiProvider {
     
-    public static final long CAPACITY = Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidConstants.BUCKET;
-    
-    public final SingleVariantStorage<FluidVariant> inputStorage = createBasicTank();
-    public final SingleVariantStorage<FluidVariant> outputStorage = createBasicTank();
-    private final Storage<FluidVariant> exposedInput = FilteringStorage.insertOnlyOf(inputStorage);
-    private final Storage<FluidVariant> exposedOutput = FilteringStorage.extractOnlyOf(outputStorage);
-    private final Storage<FluidVariant> combinedTanks = new CombinedStorage<>(List.of(exposedInput, exposedOutput));
+    public final SimpleInOutFluidContainer fluidContainer = new SimpleInOutFluidContainer(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
     
     public boolean hasFluidAddon = false;
     
@@ -69,7 +56,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         
         @Override
         public boolean canInsert(ItemStack stack) {
-            System.out.println(stack);
             return stack.getItem() instanceof BucketItem;
         }
     };
@@ -91,61 +77,62 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+
+//        if (hasFluidAddon && !world.isClient) {
+//            var bucketIn = bucketInventory.getStack(0);
+//            var bucketOut = bucketInventory.getStack(1);
+//            processBucket(bucketIn, bucketOut, inputStorage, outputStorage);
+//        }
         
-        if (hasFluidAddon && !world.isClient) {
-            var bucketIn = bucketInventory.getStack(0);
-            var bucketOut = bucketInventory.getStack(1);
-            processBucket(bucketIn, bucketOut, inputStorage, outputStorage);
-        }
-        
-        FluidMultiblockGeneratorBlockEntity.resetEmptyFluidTank(inputStorage);
+        // FluidMultiblockGeneratorBlockEntity.resetEmptyFluidTank(inputStorage);
         
         super.tick(world, pos, state, blockEntity);
     }
     
-    private void processBucket(ItemStack inStack, ItemStack outStack, SingleVariantStorage<FluidVariant> inStorage, SingleVariantStorage<FluidVariant> outStorage) {
-        
-        if (inStack != ItemStack.EMPTY && inStack.getItem().equals(Items.BUCKET) && outStorage.amount >= FluidConstants.BUCKET && outStack == ItemStack.EMPTY) {
-            // try to fill empty bucket
-            var filledBucketType = outStorage.variant.getFluid().getBucketItem();
-            if (filledBucketType == null) return;
-            inStack.decrement(1);
-            bucketInventory.heldStacks.set(1, new ItemStack(filledBucketType));
-            bucketInventory.heldStacks.set(0, inStack);
-            outStorage.amount -= FluidConstants.BUCKET;
-            
-            this.markDirty();
-            markNetDirty();
-            
-        } else if (inStack != ItemStack.EMPTY && inStack.getItem() instanceof BucketItem && !inStack.getItem().equals(Items.BUCKET) && outputCanAcceptBucket(outStack)) {
-            // from full input bucket
-            
-            // weird voodoo because the transaction APIs are weird and I have NO idea what this all is
-            var context = ContainerItemContext.ofSingleSlot(bucketStorage.getSlot(0)).find(FluidStorage.ITEM);
-            if (context == null) return;
-            var variant = context.iterator().next().getResource();  // non empty iterator doesnt seem to do what it implies, so whatever
-            if (variant == null) return;
-            
-            var bucketUsed = false;
-            if ((inStorage.variant.isOf(variant.getFluid()) && inStorage.amount + FluidConstants.BUCKET <= inStorage.getCapacity())) {
-                bucketUsed = true;
-                inStorage.amount += FluidConstants.BUCKET;
-            } else if (inStorage.amount == 0) {
-                inStorage.variant = variant;
-                inStorage.amount = FluidConstants.BUCKET;
-                bucketUsed = true;
-            }
-            
-            if (bucketUsed) {
-                bucketInventory.setStack(0, ItemStack.EMPTY);
-                var bucketCount = bucketInventory.getStack(1).getCount();
-                bucketInventory.setStack(1, new ItemStack(Items.BUCKET, bucketCount + 1));
-            }
-            
-            this.markDirty();
-            markNetDirty();
-        }
-    }
+    // todo
+//    private void processBucket(ItemStack inStack, ItemStack outStack, SingleVariantStorage<FluidVariant> inStorage, SingleVariantStorage<FluidVariant> outStorage) {
+//
+//        if (inStack != ItemStack.EMPTY && inStack.getItem().equals(Items.BUCKET) && outStorage.amount >= FluidConstants.BUCKET && outStack == ItemStack.EMPTY) {
+//            // try to fill empty bucket
+//            var filledBucketType = outStorage.variant.getFluid().getBucketItem();
+//            if (filledBucketType == null) return;
+//            inStack.decrement(1);
+//            bucketInventory.heldStacks.set(1, new ItemStack(filledBucketType));
+//            bucketInventory.heldStacks.set(0, inStack);
+//            outStorage.amount -= FluidConstants.BUCKET;
+//
+//            this.markDirty();
+//            markNetDirty();
+//
+//        } else if (inStack != ItemStack.EMPTY && inStack.getItem() instanceof BucketItem && !inStack.getItem().equals(Items.BUCKET) && outputCanAcceptBucket(outStack)) {
+//            // from full input bucket
+//
+//            // weird voodoo because the transaction APIs are weird and I have NO idea what this all is
+//            var context = ContainerItemContext.ofSingleSlot(bucketStorage.getSlot(0)).find(FluidStorage.ITEM);
+//            if (context == null) return;
+//            var variant = context.iterator().next().getResource();  // non empty iterator doesnt seem to do what it implies, so whatever
+//            if (variant == null) return;
+//
+//            var bucketUsed = false;
+//            if ((inStorage.variant.isOf(variant.getFluid()) && inStorage.amount + FluidConstants.BUCKET <= inStorage.getCapacity())) {
+//                bucketUsed = true;
+//                inStorage.amount += FluidConstants.BUCKET;
+//            } else if (inStorage.amount == 0) {
+//                inStorage.variant = variant;
+//                inStorage.amount = FluidConstants.BUCKET;
+//                bucketUsed = true;
+//            }
+//
+//            if (bucketUsed) {
+//                bucketInventory.setStack(0, ItemStack.EMPTY);
+//                var bucketCount = bucketInventory.getStack(1).getCount();
+//                bucketInventory.setStack(1, new ItemStack(Items.BUCKET, bucketCount + 1));
+//            }
+//
+//            this.markDirty();
+//            markNetDirty();
+//        }
+//    }
     
     private boolean outputCanAcceptBucket(ItemStack slot) {
         if (slot == null) return true;
@@ -161,28 +148,20 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         var itemsMatch = super.canProceed(recipe);
         if (!itemsMatch) return false;
         
-        // check if input is available
-        var input = recipe.getFluidInput();
-        if (input != null && input.getAmount() > 0) {   // only verify fluid input match if fluid input exists
-            if (!input.getFluid().equals(inputStorage.variant.getFluid()) || input.getAmount() > inputStorage.amount)   // check if input matches tank
-                return false;   // input tank too low or wrong type
-        }
+        if (!recipeInputMatchesTank(fluidContainer.getInStack(), recipe)) return false;
         
-        // check if output fluid fits
+        // check if output fluid would fit
         var output = recipe.getFluidOutput();
-        if (output != null && output.getAmount() > 0) { // only verify fluid output if fluid output exists
+        if (output != null && !output.isEmpty()) { // only verify fluid output if fluid output exists
             
-            if (output.getFluid().equals(Fluids.EMPTY) || outputStorage.amount == 0)
-                return super.canProceed(recipe);  // no output stored/needed
-            
-            if (outputStorage.amount + output.getAmount() > outputStorage.getCapacity())
+            if (fluidContainer.getOutStack().getAmount() + output.getAmount() > fluidContainer.getCapacity())
                 return false; // output too full
             
-            if (!outputStorage.variant.getFluid().equals(output.getFluid()))
+            if (!fluidContainer.getOutStack().isEmpty() && !output.isFluidEqual(fluidContainer.getOutStack()))
                 return false;   // output type mismatch
         }
         
-        return super.canProceed(recipe);
+        return true;
         
     }
     
@@ -195,7 +174,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         // get recipes matching input items
         var candidates = Objects.requireNonNull(world).getRecipeManager().getAllMatches(getOwnRecipeType(), getInputInventory(), world);
         // filter out recipes based on input tank
-        var fluidRecipe = candidates.stream().filter(candidate -> recipeMatchesTank(inputStorage, candidate.value())).findAny();
+        var fluidRecipe = candidates.stream().filter(candidate -> recipeInputMatchesTank(fluidContainer.getInStack(), candidate.value())).findAny();
         if (fluidRecipe.isPresent()) {
             return fluidRecipe;
         }
@@ -208,17 +187,16 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         return world.getRecipeManager().getFirstMatch(RecipeContent.CENTRIFUGE, getInputInventory(), world);
     }
     
-    public static boolean recipeMatchesTank(SingleVariantStorage<FluidVariant> checkedTank, OritechRecipe recipe) {
+    public static boolean recipeInputMatchesTank(FluidStack available, OritechRecipe recipe) {
         
-        var isTankEmpty = checkedTank.isResourceBlank() || checkedTank.amount <= 0;
+        var isTankEmpty = available.isEmpty();
         var recipeNeedsFluid = recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0;
         
         if (!recipeNeedsFluid) return true;
         if (isTankEmpty) return false;
         
-        var recipeFluid = recipe.getFluidInput().getFluid();
-        var tankFluid = checkedTank.variant.getFluid();
-        return recipeFluid.equals(tankFluid) && checkedTank.amount >= recipe.getFluidInput().getAmount();
+        var recipeFluid = recipe.getFluidInput();
+        return recipeFluid.isFluidEqual(available) && available.getAmount() >= recipe.getFluidInput().getAmount();
     }
     
     @Override
@@ -246,23 +224,19 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         var input = activeRecipe.getFluidInput();
         var output = activeRecipe.getFluidOutput();
         
-        try (var tx = Transaction.openOuter()) {
-            
-            if (input != null && input.getAmount() > 0)
-                inputStorage.extract(FluidVariant.of(input.getFluid()), input.getAmount(), tx);
-            if (output != null && output.getAmount() > 0)
-                outputStorage.insert(FluidVariant.of(output.getFluid()), output.getAmount(), tx);
-            
-            tx.commit();
-            
-        }
+        if (input != null && input.getAmount() > 0)
+            fluidContainer.getInputContainer().extract(input, false);
+        if (output != null && output.getAmount() > 0)
+            fluidContainer.getOutputContainer().insert(output, false);
+        
     }
     
     @Override
     public void initAddons() {
         super.initAddons();
-        world.updateNeighbors(pos, getCachedState().getBlock()); // trigger block update to allow pipes to connect
-        world.updateNeighbors(pos.up(), world.getBlockState(pos.up()).getBlock()); // trigger block update to allow pipes to connect
+        // trigger block update to allow pipes to connect
+        world.updateNeighbors(pos, getCachedState().getBlock());
+        world.updateNeighbors(pos.up(), world.getBlockState(pos.up()).getBlock());
     }
     
     @Override
@@ -283,11 +257,8 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         super.writeNbt(nbt, registryLookup);
         nbt.putBoolean("fluidAddon", hasFluidAddon);
         
-        var inNbt = new NbtCompound();
-        var outNbt = new NbtCompound();
-        
-        SingleVariantStorage.writeNbt(inputStorage, FluidVariant.CODEC, inNbt, registryLookup);
-        SingleVariantStorage.writeNbt(outputStorage, FluidVariant.CODEC, outNbt, registryLookup);
+        // todo
+        fluidContainer.writeNbt(nbt, "");
         
         var bucketStorageNbt = new NbtCompound();
         Inventories.writeNbt(bucketStorageNbt, bucketInventory.heldStacks, false, registryLookup);
@@ -300,10 +271,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         
         hasFluidAddon = nbt.getBoolean("fluidAddon");
         
-        var inNbt = nbt.getCompound("inputStorage");
-        var outNbt = nbt.getCompound("outputStorage");
-        SingleVariantStorage.readNbt(inputStorage, FluidVariant.CODEC, FluidVariant::blank, inNbt, registryLookup);
-        SingleVariantStorage.readNbt(outputStorage, FluidVariant.CODEC, FluidVariant::blank, outNbt, registryLookup);
+        fluidContainer.readNbt(nbt, "");
         
         Inventories.readNbt(nbt.getCompound("bucket"), bucketInventory.heldStacks, registryLookup);
     }
@@ -371,24 +339,26 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     // this will allow full access on top and bottom to specific tank kinds (allowing both insertion and extraction)
     // sides can access both tanks, but insert only to input tank, and extract only from output tank
-    @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        if (!hasFluidAddon) return null;
-        if (direction == null) return combinedTanks;
-        return switch (direction) {
-            case DOWN -> outputStorage;
-            case UP -> inputStorage;
-            default -> combinedTanks;
-        };
-    }
-    
-    @Override
-    public @Nullable SingleVariantStorage<FluidVariant> getForDirectFluidAccess() {
-        
-        if (!hasFluidAddon) return null;
-        
-        return outputStorage;
-    }
+
+
+//    @Override
+//    public Storage<FluidVariant> getFluidStorage(Direction direction) {
+//        if (!hasFluidAddon) return null;
+//        if (direction == null) return combinedTanks;
+//        return switch (direction) {
+//            case DOWN -> outputStorage;
+//            case UP -> inputStorage;
+//            default -> combinedTanks;
+//        };
+//    }
+//
+//    @Override
+//    public @Nullable SingleVariantStorage<FluidVariant> getForDirectFluidAccess() {
+//
+//        if (!hasFluidAddon) return null;
+//
+//        return outputStorage;
+//    }
     
     @Override
     protected void sendNetworkEntry() {
@@ -398,29 +368,14 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
           new NetworkContent.CentrifugeFluidSyncPacket(
             pos,
             hasFluidAddon,
-            Registries.FLUID.getId(inputStorage.variant.getFluid()).toString(),
-            inputStorage.amount,
-            Registries.FLUID.getId(outputStorage.variant.getFluid()).toString(),
-            outputStorage.amount));
+            Registries.FLUID.getId(fluidContainer.getInStack().getFluid()).toString(),
+            fluidContainer.getInStack().getAmount(),
+            Registries.FLUID.getId(fluidContainer.getOutStack().getFluid()).toString(),
+            fluidContainer.getOutStack().getAmount()));
     }
     
-    private SingleVariantStorage<FluidVariant> createBasicTank() {
-        return new SingleVariantStorage<>() {
-            @Override
-            protected FluidVariant getBlankVariant() {
-                return FluidVariant.blank();
-            }
-            
-            @Override
-            protected long getCapacity(FluidVariant variant) {
-                return CAPACITY;
-            }
-            
-            @Override
-            protected void onFinalCommit() {
-                super.onFinalCommit();
-                CentrifugeBlockEntity.this.markDirty();
-            }
-        };
+    @Override
+    public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
+        return fluidContainer.getContainerForDirection(direction);
     }
 }
