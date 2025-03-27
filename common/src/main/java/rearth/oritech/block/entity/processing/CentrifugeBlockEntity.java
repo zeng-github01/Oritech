@@ -256,7 +256,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         super.writeNbt(nbt, registryLookup);
         nbt.putBoolean("fluidAddon", hasFluidAddon);
         
-        // todo
         fluidContainer.writeNbt(nbt, "");
         
         var bucketStorageNbt = new NbtCompound();

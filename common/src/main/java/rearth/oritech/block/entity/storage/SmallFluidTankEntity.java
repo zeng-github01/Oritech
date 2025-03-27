@@ -196,11 +196,6 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
           new NetworkContent.SingleVariantFluidSyncPacketAPI(pos, Registries.FLUID.getId(fluidStorage.getFluid()).toString(), fluidStorage.getAmount()));
     }
     
-    private boolean outputCanAcceptBucket(ItemStack bucket) {
-        var slot = inventory.getStack(1);
-        return (slot.isEmpty() || (slot.isStackable() && ItemStack.areItemsAndComponentsEqual(slot, bucket) && slot.getCount() < slot.getMaxCount()));
-    }
-    
     @Override
     public int getComparatorOutput() {
         if (fluidStorage.getFluid().equals(Fluids.EMPTY)) return 0;
@@ -211,9 +206,10 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
     
     @Override
     public void markDirty() {
-        
         super.markDirty();
+        
         this.netDirty = true;
+        
         if (world != null) {
             world.setBlockState(getPos(), getCachedState().with(SmallFluidTank.LIT, isGlowingFluid()));
         }

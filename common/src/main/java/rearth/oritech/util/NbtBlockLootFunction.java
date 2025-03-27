@@ -2,7 +2,6 @@ package rearth.oritech.util;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariantAttributes;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
@@ -12,10 +11,10 @@ import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunctionType;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
 import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.LootContent;
+import rearth.oritech.util.fluid.FluidApi;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,13 +32,10 @@ public class NbtBlockLootFunction extends ConditionalLootFunction {
 
         var nbt = new NbtCompound();
         if (blockEntity instanceof SmallFluidTankEntity tankEntity) {
-//            if (tankEntity.getForDirectFluidAccess().amount > 0) {    // todo
-//                tankEntity.writeNbt(nbt, context.getWorld().getRegistryManager());
-//                var fluidName = FluidVariantAttributes.getName(tankEntity.getForDirectFluidAccess().variant);
-//                stack.set(DataComponentTypes.CUSTOM_NAME, fluidName.copy().append(" ").append(Text.translatable("block.oritech.small_tank_block")));
-//                // make all non-empty tanks unstackable
-//                nbt.putUuid("unstackable", UUID.randomUUID());
-//            }
+            if (tankEntity.fluidStorage.getAmount() > 0) {
+                stack.set(FluidApi.ITEM.getFluidComponent(), tankEntity.fluidStorage.getStack());
+                nbt.putUuid("unstackable", UUID.randomUUID());
+            }
         } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity) {
             if (storageEntity.getStorage(null).getAmount() > 0) {
                 storageEntity.writeNbt(nbt, context.getWorld().getRegistryManager());
