@@ -382,6 +382,7 @@
   "title.oritech.machine_option_enabled": "🔨 已启用",
   "tooltip.oritech.pulverizer_dust_combine": "自动将细粉合并为矿锭",
   "tooltip.oritech.fluid_content": "%f mB %s",
+  "tooltip.oritech.fluid_content_tank_tooltip": "%f B %s",
   "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
   "tooltip.oritech.fluid_empty": "空",
   "tooltip.oritech.progress_indicator": "%d / %d 刻\n(基础 %d 刻)",
