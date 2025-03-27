@@ -408,7 +408,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
         } else if (value.equals(BlockContent.SMALL_TANK_BLOCK) || value.equals(BlockContent.CREATIVE_TANK_BLOCK)) {
-            var item = new SmallFluidTankBlockItem(value, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).maxCount(1));
+            var item = new SmallFluidTankBlockItem(value, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), item);
             FluidApi.ITEM.registerForItem(() -> item);
         } else {

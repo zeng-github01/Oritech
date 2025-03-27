@@ -17,6 +17,12 @@ public class SimpleItemFluidContainer extends SimpleFluidContainer {
     @Override
     public void update() {
         super.update();
+        
+        if (this.getStack().isEmpty()) {
+            itemStack.remove(FluidApi.ITEM.getFluidComponent());
+            return;
+        }
+        
         itemStack.set(FluidApi.ITEM.getFluidComponent(), this.getStack());
     }
 }
