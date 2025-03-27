@@ -32,6 +32,7 @@ public final class OritechModNeoForge {
         
         fluidApiInstance = new NeoforgeFluidApiImpl();
         FluidApi.BLOCK = fluidApiInstance;
+        FluidApi.ITEM = fluidApiInstance;
         
         energyApiInstance = new NeoforgeEnergyApiImpl();
         EnergyApi.BLOCK = energyApiInstance;

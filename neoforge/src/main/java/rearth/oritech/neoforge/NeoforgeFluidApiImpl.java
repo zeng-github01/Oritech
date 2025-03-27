@@ -5,26 +5,31 @@ import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.fluid.BlockFluidApi;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.FluidApiProvider;
+import rearth.oritech.util.fluid.ItemFluidApi;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class NeoforgeFluidApiImpl implements BlockFluidApi {
+public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
     private final List<Supplier<BlockEntityType<?>>> registeredBlockEntities = new ArrayList<>();
+    private final List<Supplier<Item>> registeredItems = new ArrayList<>();
     
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
@@ -35,7 +40,7 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi {
         for (var supplied : registeredBlockEntities) {
             event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, supplied.get(), (entity, direction) -> {
                 
-                var storage = ((FluidApiProvider) entity).getFluidStorage(direction);
+                var storage = ((FluidApi.FluidApiProvider) entity).getFluidStorage(direction);
                 if (storage instanceof FluidApi.InOutSlotContainer inOutContainer) {
                     return InOutContainerStorageWrapper.of(inOutContainer);
                 } else if (storage instanceof FluidApi.SingleSlotContainer singleContainer) {
@@ -48,6 +53,18 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi {
                 return null;
             });
         }
+        
+        
+        for (var supplied : registeredItems) {
+            event.registerItem(Capabilities.FluidHandler.ITEM,
+              (stack, ignored) -> FluidContainerItemWrapper.of(((FluidApi.ItemApiProvider) stack.getItem()).getFluidStorage(stack), stack),
+              supplied.get());
+        }
+    }
+    
+    @Override
+    public void registerForItem(Supplier<Item> itemSupplier) {
+        registeredItems.add(itemSupplier);
     }
     
     @Override
@@ -64,6 +81,14 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi {
     @Override
     public FluidApi.FluidContainer find(World world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
+    }
+    
+    @Override
+    public FluidApi.FluidContainer find(MutableObject<ItemStack> stack) {
+        var candidate = stack.getValue().getCapability(Capabilities.FluidHandler.ITEM);
+        if (candidate == null) return null;
+        if (candidate instanceof FluidContainerItemWrapper wrapper) return wrapper.container;
+        return new NeoforgeItemStorageWrapper(candidate, stack);
     }
     
     // used to interact with tanks from other mods
@@ -101,6 +126,25 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi {
         
         @Override
         public void update() {
+        }
+    }
+    
+    // used to interact with items from other mods
+    public static class NeoforgeItemStorageWrapper extends NeoforgeStorageWrapper {
+        
+        private final MutableObject<ItemStack> stack;
+        private final IFluidHandlerItem handler;
+        
+        public NeoforgeItemStorageWrapper(IFluidHandlerItem storage, MutableObject<ItemStack> stack) {
+            super(storage);
+            this.stack = stack;
+            this.handler = storage;
+        }
+        
+        @Override
+        public void update() {
+            super.update();
+            stack.setValue(handler.getContainer());
         }
     }
     
@@ -235,5 +279,26 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi {
             
             return new net.neoforged.neoforge.fluids.FluidStack(container.getOutStack().getFluid(), (int) extractedAmount);
         }
+    }
+    
+    public static class FluidContainerItemWrapper extends SingleSlotContainerStorageWrapper implements IFluidHandlerItem {
+        
+        private final ItemStack stack;
+        
+        public static FluidContainerItemWrapper of(FluidApi.SingleSlotContainer container, ItemStack stack) {
+            if (container == null || stack == null || stack.isEmpty()) return null;
+            return new FluidContainerItemWrapper(container, stack);
+        }
+        
+        public FluidContainerItemWrapper(FluidApi.SingleSlotContainer container, ItemStack stack) {
+            super(container);
+            this.stack = stack;
+        }
+        
+        @Override
+        public @NotNull ItemStack getContainer() {
+            return stack;
+        }
+        
     }
 }

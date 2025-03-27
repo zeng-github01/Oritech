@@ -25,12 +25,14 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
-        EnergyStorage.SIDED.registerForBlockEntity((entity, direction) -> ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getStorage(direction)), typeSupplier.get());
+        EnergyStorage.SIDED.registerForBlockEntity((entity, direction) ->
+                                                     ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getStorage(direction)), typeSupplier.get());
     }
     
     @Override
     public void registerForItem(Supplier<net.minecraft.item.Item> itemSupplier) {
-        EnergyStorage.ITEM.registerForItems((stack, context) -> ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getStorage(stack), context, stack), itemSupplier.get());
+        EnergyStorage.ITEM.registerForItems((stack, context) ->
+                                              ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getStorage(stack), context, stack), itemSupplier.get());
     }
     
     @Override

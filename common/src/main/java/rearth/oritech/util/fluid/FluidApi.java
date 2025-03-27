@@ -1,13 +1,36 @@
 package rearth.oritech.util.fluid;
 
 import dev.architectury.fluid.FluidStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class FluidApi {
     
+    public static long transferFirst(FluidContainer from, FluidContainer to, long max, boolean simulate) {
+        if (from.getContent().isEmpty()) return 0L;
+        
+        var kind = from.getContent().getFirst();
+        return transfer(from, to, kind.copyWithAmount(max), simulate);
+    }
+    
+    public static long transfer(FluidContainer from, FluidContainer to, FluidStack toMove, boolean simulate) {
+        var extracted = from.extract(toMove, true);
+        var inserted = to.insert(toMove.copyWithAmount(extracted), simulate);
+        extracted = from.extract(toMove.copyWithAmount(inserted), simulate);
+        
+        if (extracted > 0 && !simulate) {
+            from.update();
+            to.update();
+        }
+        
+        return extracted;
+    }
+    
     public static BlockFluidApi BLOCK;
+    public static ItemFluidApi ITEM;
     
     public static abstract class FluidContainer {
         
@@ -26,6 +49,16 @@ public class FluidApi {
         public abstract List<FluidStack> getContent();
         
         public abstract void update();
+        
+    }
+    
+    public interface ItemApiProvider {
+        SingleSlotContainer getFluidStorage(ItemStack stack);
+    }
+    
+    public interface FluidApiProvider {
+        
+        FluidContainer getFluidStorage(@Nullable Direction direction);
         
     }
     
@@ -50,5 +83,4 @@ public class FluidApi {
         public abstract FluidContainer getContainerForDirection(Direction direction);
         
     }
-    
 }

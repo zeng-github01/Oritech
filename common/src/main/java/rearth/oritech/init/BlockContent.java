@@ -1,5 +1,6 @@
 package rearth.oritech.init;
 
+import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.registries.RegistrySupplier;
 import io.wispforest.owo.registration.reflect.BlockRegistryContainer.NoBlockItem;
 import net.minecraft.block.*;
@@ -37,6 +38,7 @@ import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
+import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.item.OritechGeoItem;
 
@@ -406,7 +408,9 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
         } else if (value.equals(BlockContent.SMALL_TANK_BLOCK) || value.equals(BlockContent.CREATIVE_TANK_BLOCK)) {
-            Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), new SmallFluidTankBlockItem(value, new Item.Settings()));
+            var item = new SmallFluidTankBlockItem(value, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).maxCount(1));
+            Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), item);
+            FluidApi.ITEM.registerForItem(() -> item);
         } else {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), createBlockItem(value, identifier));
         }

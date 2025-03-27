@@ -3,6 +3,7 @@ package rearth.oritech.fabric;
 import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.fabric.FluidStackHooksFabric;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -14,16 +15,19 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.fluid.BlockFluidApi;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.FluidApiProvider;
+import rearth.oritech.util.fluid.ItemFluidApi;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,14 +35,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public class FabricFluidApiImpl implements BlockFluidApi {
+public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
         FluidStorage.SIDED.registerForBlockEntity(
           (entity, direction) -> {
               
-              var storage = ((FluidApiProvider) entity).getFluidStorage(direction);
+              var storage = ((FluidApi.FluidApiProvider) entity).getFluidStorage(direction);
               if (storage instanceof FluidApi.InOutSlotContainer inOutContainer) {
                   return InOutFluidContainerStorageWrapper.of(inOutContainer);
               } else if (storage instanceof FluidApi.SingleSlotContainer singleContainer) {
@@ -50,6 +54,14 @@ public class FabricFluidApiImpl implements BlockFluidApi {
               
               return null;
           }, typeSupplier.get());
+    }
+    
+    @Override
+    public void registerForItem(Supplier<Item> itemSupplier) {
+        FluidStorage.ITEM.registerForItems(
+          (stack, context) -> SingleSlotContainerStorageWrapper.of(((FluidApi.ItemApiProvider) stack.getItem()).getFluidStorage(stack)),
+          itemSupplier.get()
+        );
     }
     
     @Override
@@ -67,6 +79,15 @@ public class FabricFluidApiImpl implements BlockFluidApi {
     @Override
     public FluidApi.FluidContainer find(World world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
+    }
+    
+    @Override
+    public FluidApi.FluidContainer find(MutableObject<ItemStack> stack) {
+        var context = ContainerItemContext.ofSingleSlot(new ItemStackStorage(stack));
+        var candidate = FluidStorage.ITEM.find(stack.getValue(), context);
+        if (candidate == null) return null;
+        if (candidate instanceof SingleSlotContainerStorageWrapper wrapper) return wrapper.container;
+        return new FabricStorageWrapper(candidate);
     }
     
     // this is used to interact with fluid storages from other mods
@@ -324,5 +345,82 @@ public class FabricFluidApiImpl implements BlockFluidApi {
             container.setOutStack(snapshot.getRight());
         }
     }
+    
+    // this is used by other mods to interact with oritech fluid containing items (e.g. portable tank, jetpack)
+//    public static class ItemContainerStorageWrapper extends SnapshotParticipant<FluidStack> implements SingleSlotStorage<FluidVariant> {
+//
+//        private final FluidApi.SingleSlotContainer container;
+//
+//        public ItemContainerStorageWrapper(FluidApi.SingleSlotContainer container) {
+//            this.container = container;
+//        }
+//
+//        @Override
+//        public boolean supportsInsertion() {
+//            return container.supportsInsertion();
+//        }
+//
+//        @Override
+//        public long insert(FluidVariant fluidVariant, long l, TransactionContext transaction) {
+//            updateSnapshots(transaction);
+//            transaction.addCloseCallback((transactionContext, result) -> {
+//                if (result.wasCommitted()) {
+//                    container.update();
+//                }
+//            });
+//            return container.insert(FluidStackHooksFabric.fromFabric(fluidVariant, l), false);
+//        }
+//
+//        @Override
+//        public boolean supportsExtraction() {
+//            return container.supportsExtraction();
+//        }
+//
+//        @Override
+//        public long extract(FluidVariant fluidVariant, long l, TransactionContext transaction) {
+//            updateSnapshots(transaction);
+//            transaction.addCloseCallback((transactionContext, result) -> {
+//                if (result.wasCommitted()) {
+//                    container.update();
+//                }
+//            });
+//            return container.extract(FluidStackHooksFabric.fromFabric(fluidVariant, l), false);
+//        }
+//
+//        @Override
+//        public boolean isResourceBlank() {
+//            return container.getStack().isEmpty();
+//        }
+//
+//        @Override
+//        public FluidVariant getResource() {
+//            return FluidStackHooksFabric.toFabric(container.getStack());
+//        }
+//
+//        @Override
+//        public long getAmount() {
+//            return container.getStack().getAmount();
+//        }
+//
+//        @Override
+//        public long getCapacity() {
+//            return container.getCapacity();
+//        }
+//
+//        @Override
+//        protected FluidStack createSnapshot() {
+//            return container.getStack();
+//        }
+//
+//        @Override
+//        protected void readSnapshot(FluidStack fluidStack) {
+//            container.setStack(fluidStack);
+//        }
+//
+//        @Override
+//        public Iterator<StorageView<FluidVariant>> iterator() {
+//            return SingleSlotStorage.super.iterator();
+//        }
+//    }
     
 }

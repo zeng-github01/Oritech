@@ -15,6 +15,7 @@ public final class OritechFabricMod implements ModInitializer {
         
         var fluidApiInstance = new FabricFluidApiImpl();
         FluidApi.BLOCK = fluidApiInstance;
+        FluidApi.ITEM = fluidApiInstance;
         
         // Run our common setup.
         Oritech.runAllRegistries();

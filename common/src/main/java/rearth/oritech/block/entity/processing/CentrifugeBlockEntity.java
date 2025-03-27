@@ -35,14 +35,13 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.FluidApiProvider;
 import rearth.oritech.util.fluid.containers.SimpleInOutFluidContainer;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApiProvider {
+public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.FluidApiProvider {
     
     public final SimpleInOutFluidContainer fluidContainer = new SimpleInOutFluidContainer(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
     
