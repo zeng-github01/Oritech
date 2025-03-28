@@ -382,7 +382,7 @@
   "title.oritech.machine_option_enabled": "🔨 Etkinleştirildi",
   "tooltip.oritech.pulverizer_dust_combine": "Küçük tozları külçelere otomatik olarak dönüştürür",
   "tooltip.oritech.fluid_content": "%f mB %s",
-  "tooltip.oritech.fluid_content_tank_tooltip": "%f B %s",
+  "tooltip.oritech.fluid_content_tank_tooltip": "%fB %s",
   "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
   "tooltip.oritech.fluid_empty": "Boş",
   "tooltip.oritech.progress_indicator": "%d / %d tik\n(baz %d tik)",
