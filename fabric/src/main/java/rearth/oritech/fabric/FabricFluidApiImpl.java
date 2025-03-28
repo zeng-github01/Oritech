@@ -16,18 +16,18 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.util.StackContext;
 import rearth.oritech.util.fluid.BlockFluidApi;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.ItemFluidApi;
+import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -72,7 +72,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
             case null -> null;
             case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
             case InOutFluidContainerStorageWrapper wrapper -> wrapper.container.getContainerForDirection(direction);
-            default -> new FabricStorageWrapper(candidate);
+            default -> new FabricStorageWrapper(candidate, null);
         };
     }
     
@@ -82,21 +82,23 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     }
     
     @Override
-    public FluidApi.FluidContainer find(MutableObject<ItemStack> stack) {
+    public FluidApi.FluidContainer find(StackContext stack) {
         var context = ContainerItemContext.ofSingleSlot(new ItemStackStorage(stack));
         var candidate = FluidStorage.ITEM.find(stack.getValue(), context);
         if (candidate == null) return null;
-        if (candidate instanceof SingleSlotContainerStorageWrapper wrapper) return wrapper.container;
-        return new FabricStorageWrapper(candidate);
+        if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidContainer itemContainer) return itemContainer.withCallback(ignored -> stack.sync());
+        return new FabricStorageWrapper(candidate, stack);
     }
     
     // this is used to interact with fluid storages from other mods
     public static class FabricStorageWrapper extends FluidApi.FluidContainer {
         
         public final Storage<FluidVariant> storage;
+        public final @Nullable StackContext context;
         
-        public FabricStorageWrapper(Storage<FluidVariant> storage) {
+        public FabricStorageWrapper(Storage<FluidVariant> storage, @Nullable StackContext context) {
             this.storage = storage;
+            this.context = context;
         }
         
         @Override
@@ -129,6 +131,8 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         
         @Override
         public void update() {
+            if (context != null)
+                context.sync();
         }
     }
     

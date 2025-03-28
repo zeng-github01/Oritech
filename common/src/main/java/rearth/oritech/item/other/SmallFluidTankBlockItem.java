@@ -9,6 +9,7 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rearth.oritech.Oritech;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
 
@@ -27,7 +28,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemA
         if (data.isEmpty()) {
             tooltip.add(Text.translatable("tooltip.oritech.fluid_empty"));
         } else {
-            var amount = data.getAmount() / FluidStackHooks.bucketAmount();
+            var amount = data.getAmount() / (float) FluidStackHooks.bucketAmount();
             tooltip.add(Text.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()));
         }
         
@@ -48,5 +49,24 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemA
     @Override
     public FluidApi.SingleSlotContainer getFluidStorage(ItemStack stack) {
         return new SimpleItemFluidContainer(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), stack);
+    }
+    
+    @Override
+    public boolean isItemBarVisible(ItemStack stack) {
+        return true;
+    }
+    
+    @Override
+    public int getItemBarColor(ItemStack stack) {
+        return 0x07bdff;
+    }
+    
+    @Override
+    public int getItemBarStep(ItemStack stack) {
+        
+        var capacity = Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount();
+        var fillAmount = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).getAmount();
+        
+        return Math.round((fillAmount * 100f / capacity) * ITEM_BAR_STEPS) / 100;
     }
 }

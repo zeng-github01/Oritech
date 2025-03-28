@@ -25,7 +25,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.storage.SmallFluidTank;
@@ -142,16 +141,14 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
         
         if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
         
-        var stackRef = new MutableObject<>(inStack);
+        var stackRef = new StackContext(inStack, updated -> inventory.setStack(0, updated));
         var candidate = FluidApi.ITEM.find(stackRef);
         if (candidate == null || !candidate.supportsInsertion()) return;
         
         var moved = FluidApi.transferFirst(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 64, false);
         
-        if (moved > 0) {
-            inventory.setStack(0, stackRef.getValue());
-        } else {
-            // move stack
+        if (moved == 0) {
+            // move stack to out slot
             var outStack = inventory.getStack(2);
             if (outStack.isEmpty()) {
                 inventory.setStack(2, stackRef.getValue());
@@ -169,7 +166,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
         
         if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
         
-        var stackRef = new MutableObject<>(inStack);
+        var stackRef = new StackContext(inStack, updated -> inventory.setStack(1, updated));
         var candidate = FluidApi.ITEM.find(stackRef);
         if (candidate == null || !candidate.supportsExtraction()) return;
         

@@ -23,12 +23,12 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ComparatorOutputProvider;
+import rearth.oritech.util.StackContext;
 import rearth.oritech.util.fluid.FluidApi;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         super(settings);
         this.setDefaultState(this.getDefaultState().with(LIT, false));
     }
-
+    
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(LIT);
@@ -88,7 +88,17 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
             if (stack.getCount() > 1) {
                 usedStack = stack.copyWithCount(1);
             }
-            var stackRef = new MutableObject<>(usedStack);
+            var stackRef = new StackContext(usedStack, updated -> {
+                if (stack.getCount() > 1) {
+                    stack.decrement(1);
+                    if (!player.getInventory().insertStack(updated)) {
+                        player.dropItem(updated, true);
+                    }
+                } else {
+                    player.setStackInHand(hand, updated);
+                }
+            });
+            
             var candidate = FluidApi.ITEM.find(stackRef);
             if (candidate != null) {
                 
@@ -96,30 +106,9 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
                     if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
                         var moved = FluidApi.transferFirst(tankEntity.fluidStorage, candidate, tankEntity.fluidStorage.getCapacity(), false);
                         System.out.println("moved to item " + moved + " " + stackRef.getValue());
-                        if (moved > 0 && player.getStackInHand(hand).getItem().equals(stack.getItem())) {
-                            if (stack.getCount() > 1) {
-                                stack.decrement(1);
-                                if (!player.getInventory().insertStack(stackRef.getValue())) {
-                                    player.dropItem(stackRef.getValue(), true);
-                                }
-                            } else {
-                                player.setStackInHand(hand, stackRef.getValue());
-                            }
-                        }
-                            
                     } else {    // from item to tank
                         var moved = FluidApi.transferFirst(candidate, tankEntity.fluidStorage, tankEntity.fluidStorage.getCapacity(), false);
                         System.out.println("moved from item " + moved + " " + stackRef.getValue());
-                        if (moved > 0 && player.getStackInHand(hand).getItem().equals(stack.getItem())) {
-                            if (stack.getCount() > 1) {
-                                stack.decrement(1);
-                                if (!player.getInventory().insertStack(stackRef.getValue())) {
-                                    player.dropItem(stackRef.getValue(), true);
-                                }
-                            } else {
-                                player.setStackInHand(hand, stackRef.getValue());
-                            }
-                        }
                     }
                 }
                 
@@ -132,14 +121,14 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     
     protected List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
         var droppedStacks = super.getDroppedStacks(state, builder);
-
+        
         var blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
         if (blockEntity instanceof SmallFluidTankEntity tankEntity)
             droppedStacks.addAll(tankEntity.inventory.getHeldStacks());
-
+        
         return droppedStacks;
     }
-
+    
     @Override
     public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return getStackWithData(world, pos);

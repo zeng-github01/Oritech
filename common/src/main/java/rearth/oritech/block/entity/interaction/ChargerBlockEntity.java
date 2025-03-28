@@ -2,7 +2,6 @@ package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.fluid.FluidStack;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
@@ -39,13 +38,12 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
-import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
-import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 
 import java.util.List;
 
@@ -197,8 +195,8 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     private boolean chargeItems() {
         var heldStack = inventory.heldStacks.get(0);
         
-        var slot = ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(0));
-        var slotEnergyContainer = EnergyApi.ITEM.find(heldStack, slot);
+        var stackRef = new StackContext(heldStack, updated -> inventory.heldStacks.set(0, updated));
+        var slotEnergyContainer = EnergyApi.ITEM.find(stackRef);
         if (slotEnergyContainer != null) {
             EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
             return slotEnergyContainer.getAmount() >= slotEnergyContainer.getCapacity();

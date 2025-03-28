@@ -2,13 +2,13 @@ package rearth.oritech.fabric;
 
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
 import net.minecraft.item.ItemStack;
-import org.apache.commons.lang3.mutable.MutableObject;
+import rearth.oritech.util.StackContext;
 
 public class ItemStackStorage extends SingleStackStorage {
     
-    private final MutableObject<ItemStack> stack;
+    private final StackContext stack;
     
-    public ItemStackStorage(MutableObject<ItemStack> stack) {
+    public ItemStackStorage(StackContext stack) {
         this.stack = stack;
     }
     

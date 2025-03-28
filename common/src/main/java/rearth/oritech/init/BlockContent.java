@@ -37,10 +37,12 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeDuctBlock;
 import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
+import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
+import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.item.OritechGeoItem;
+import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -411,6 +413,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
             var item = new SmallFluidTankBlockItem(value, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), item);
             FluidApi.ITEM.registerForItem(() -> item);
+        } else if (value.equals(BlockContent.SMALL_STORAGE_BLOCK)) {
+            var item = new SmallEnergyStorageBlockItem(value, new Item.Settings().component(EnergyApi.ITEM.getEnergyComponent(), 0L));
+            Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), item);
+            EnergyApi.ITEM.registerForItem(() -> item);
         } else {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), createBlockItem(value, identifier));
         }

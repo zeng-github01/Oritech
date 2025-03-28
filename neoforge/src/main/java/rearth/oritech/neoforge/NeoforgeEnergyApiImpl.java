@@ -1,12 +1,10 @@
 package rearth.oritech.neoforge;
 
 import dev.technici4n.grandpower.api.ILongEnergyStorage;
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.ComponentType;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -14,9 +12,11 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.ComponentContent;
+import rearth.oritech.util.StackContext;
 import rearth.oritech.util.energy.BlockEnergyApi;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.ItemEnergyApi;
+import rearth.oritech.util.energy.containers.SimpleEnergyItemStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,10 +53,10 @@ public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(ItemStack stack, ContainerItemContext context) {
-        var candidate = stack.getCapability(ILongEnergyStorage.ITEM);
+    public EnergyApi.EnergyContainer find(StackContext stack) {
+        var candidate = stack.getValue().getCapability(ILongEnergyStorage.ITEM);
         if (candidate == null) return null;
-        if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
+        if (candidate instanceof ContainerStorageWrapper wrapper && wrapper.container instanceof SimpleEnergyItemStorage itemStorage) return itemStorage.withCallback(ignored -> stack.sync());
         return new NeoforgeStorageWrapper(candidate);
     }
     

@@ -1,7 +1,6 @@
 package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -66,7 +65,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     //own storage
-    protected final DynamicStatisticEnergyContainer energyStorage = new DynamicStatisticEnergyContainer(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
+    public final DynamicStatisticEnergyContainer energyStorage = new DynamicStatisticEnergyContainer(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
     private final EnergyApi.EnergyContainer outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
@@ -126,8 +125,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
         var heldStack = inventory.heldStacks.get(0);
         if (heldStack.isEmpty()) return;
         
-        var slot = ContainerItemContext.ofSingleSlot(inventoryStorage.getSlot(0));
-        var slotEnergyContainer = EnergyApi.ITEM.find(heldStack, slot);
+        var stackRef = new StackContext(heldStack, updated -> inventory.heldStacks.set(0, updated));
+        var slotEnergyContainer = EnergyApi.ITEM.find(stackRef);
         if (slotEnergyContainer != null) {
             EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
         }

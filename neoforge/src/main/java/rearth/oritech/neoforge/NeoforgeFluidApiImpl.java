@@ -14,13 +14,14 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.util.StackContext;
 import rearth.oritech.util.fluid.BlockFluidApi;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.ItemFluidApi;
+import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,10 +85,10 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     }
     
     @Override
-    public FluidApi.FluidContainer find(MutableObject<ItemStack> stack) {
+    public FluidApi.FluidContainer find(StackContext stack) {
         var candidate = stack.getValue().getCapability(Capabilities.FluidHandler.ITEM);
         if (candidate == null) return null;
-        if (candidate instanceof FluidContainerItemWrapper wrapper) return wrapper.container;
+        if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidContainer itemContainer) return itemContainer.withCallback(ignored -> stack.sync());
         return new NeoforgeItemStorageWrapper(candidate, stack);
     }
     
@@ -132,10 +133,10 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     // used to interact with items from other mods
     public static class NeoforgeItemStorageWrapper extends NeoforgeStorageWrapper {
         
-        private final MutableObject<ItemStack> stack;
+        private final StackContext stack;
         private final IFluidHandlerItem handler;
         
-        public NeoforgeItemStorageWrapper(IFluidHandlerItem storage, MutableObject<ItemStack> stack) {
+        public NeoforgeItemStorageWrapper(IFluidHandlerItem storage, StackContext stack) {
             super(storage);
             this.stack = stack;
             this.handler = storage;
@@ -145,6 +146,7 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         public void update() {
             super.update();
             stack.setValue(handler.getContainer());
+            stack.sync();
         }
     }
     
