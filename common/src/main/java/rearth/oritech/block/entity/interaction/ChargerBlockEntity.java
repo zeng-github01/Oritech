@@ -1,26 +1,19 @@
 package rearth.oritech.block.entity.interaction;
 
-import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.BucketItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
@@ -37,17 +30,16 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.ComponentContent;
-import rearth.oritech.init.ToolsContent;
-import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidProvider, EnergyApi.BlockProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidApi.FluidApiProvider, EnergyApi.BlockProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::markDirty);
     
@@ -60,30 +52,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     };
     public final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
-    private final SingleVariantStorage<FluidVariant> fluidStorage = new SingleVariantStorage<>() {
-        @Override
-        protected FluidVariant getBlankVariant() {
-            return FluidVariant.blank();
-        }
-        
-        @Override
-        protected long getCapacity(FluidVariant variant) {
-            return (16 * FluidConstants.BUCKET);
-        }
-        
-        @Override
-        protected boolean canInsert(FluidVariant variant) {
-            var jetpackItem = (BaseJetpackItem) ToolsContent.JETPACK.asItem();
-            
-            return jetpackItem.isValidFuel(variant.getFluid()) && super.canInsert(variant);
-        }
-        
-        @Override
-        protected void onFinalCommit() {
-            super.onFinalCommit();
-            ChargerBlockEntity.this.markDirty();
-        }
-    };
+    private final SimpleFluidContainer fluidStorage = new SimpleFluidContainer(16 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     private boolean networkDirty = false;
     
@@ -101,11 +70,10 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
         
         // stop if no input is given, or it's a stackable item
         if (inventory.getStack(0).isEmpty() || inventory.getStack(0).getCount() > 1) return;
-        processBuckets();
         
         var isFull = true;
         var startEnergy = energyStorage.amount;
-        var startFluid = fluidStorage.amount;
+        var startFluid = fluidStorage.getAmount();
         
         // try charge item
         if (!chargeItems()) isFull = false;
@@ -122,44 +90,10 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
             }
         }
         
-        if (fluidStorage.amount != startFluid || energyStorage.amount != startEnergy) {
+        if (fluidStorage.getAmount() != startFluid || energyStorage.amount != startEnergy) {
             ParticleContent.ASSEMBLER_WORKING.spawn(world, pos.toCenterPos().add(0.1, 0.1, 0), 1);
         }
         
-    }
-    
-    private void processBuckets() {
-        var inStack = inventory.getStack(0);
-        
-        if (inStack != ItemStack.EMPTY && inStack.getItem() instanceof BucketItem bucketItem) {
-            // empty input bucket
-            var emptyBucket = ItemVariant.of(Items.BUCKET, inStack.getComponentChanges()).toStack();
-            if (!outputCanAcceptBucket(emptyBucket)) return;
-            var bucketFluid = bucketItem.arch$getFluid();
-            if (bucketFluid == Fluids.EMPTY) return;
-            
-            try (var tx = Transaction.openOuter()) {
-                long inserted = fluidStorage.insert(FluidVariant.of(bucketFluid), FluidConstants.BUCKET, tx);
-                if (inserted != FluidConstants.BUCKET) return;
-                
-                inStack.decrement(1);
-                if (inventory.getStack(1).isEmpty()) {
-                    inventory.heldStacks.set(1, emptyBucket);
-                } else {
-                    inventory.getStack(1).increment(1);
-                }
-                inventory.heldStacks.set(0, inStack);
-                tx.commit();
-            }
-            
-            // shouldn't be necessary, since tx.commit should already be marking this dirty
-            this.markDirty();
-        }
-    }
-    
-    private boolean outputCanAcceptBucket(ItemStack bucket) {
-        var slot = inventory.getStack(1);
-        return (slot.isEmpty() || (slot.isStackable() && ItemStack.areItemsAndComponentsEqual(slot, bucket) && slot.getCount() < slot.getMaxCount()));
     }
     
     @Override
@@ -171,7 +105,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     @Override
     protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.writeNbt(nbt, registryLookup);
-        SingleVariantStorage.writeNbt(fluidStorage, FluidVariant.CODEC, nbt, registryLookup);
+        fluidStorage.writeNbt(nbt, "");
         Inventories.writeNbt(nbt, inventory.heldStacks, false, registryLookup);
         nbt.putLong("energy_stored", energyStorage.amount);
     }
@@ -179,7 +113,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     @Override
     protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
         super.readNbt(nbt, registryLookup);
-        SingleVariantStorage.readNbt(fluidStorage, FluidVariant.CODEC, FluidVariant::blank, nbt, registryLookup);
+        fluidStorage.readNbt(nbt, "");
         Inventories.readNbt(nbt, inventory.heldStacks, registryLookup);
         energyStorage.amount = nbt.getLong("energy_stored");
     }
@@ -188,10 +122,10 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
         networkDirty = false;
         
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacket(pos, Registries.FLUID.getId(fluidStorage.variant.getFluid()).toString(), fluidStorage.amount));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SingleVariantFluidSyncPacketAPI(pos, Registries.FLUID.getId(fluidStorage.getFluid()).toString(), fluidStorage.getAmount()));
     }
     
-    // return true if nothing is left to charge
+    // return true if nothing is left to charge/fill
     private boolean chargeItems() {
         var heldStack = inventory.heldStacks.get(0);
         
@@ -208,32 +142,13 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     // return true if nothing is left to fill
     private boolean fillItems() {
         
-        var inputItem = inventory.getStack(0);
-        var rate = (long) (FluidConstants.BUCKET * 0.05f);
+        var heldStack = inventory.heldStacks.get(0);
         
-        // ensure we are trying to charge a jetpack
-        if (!inputItem.isEmpty() && inputItem.getItem() instanceof BaseJetpackItem jetpackItem) {
-            
-            var container = jetpackItem.getStoredFluid(inputItem);
-            var usedRate = Math.min(rate, jetpackItem.getFuelCapacity() - container.getAmount());
-            
-            if (container.getAmount() >= jetpackItem.getFuelCapacity()) return true;
-            
-            // ensure jetpack can be filled from storage
-            if (fluidStorage.amount > usedRate
-                  && jetpackItem.isValidFuel(fluidStorage.variant.getFluid())
-                  && (container.isEmpty() || container.getFluid().equals(fluidStorage.variant.getFluid()))) {
-                
-                // actually fill jetpack
-                var newAmount = container.getAmount() + usedRate;
-                inputItem.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(fluidStorage.variant.getFluid(), newAmount));
-                fluidStorage.amount -= usedRate;
-                
-                networkDirty = true;
-                
-            }
-            return false;
-            
+        var stackRef = new StackContext(heldStack, updated -> inventory.heldStacks.set(0, updated));
+        var slotFluidContainer = FluidApi.ITEM.find(stackRef);
+        if (slotFluidContainer != null) {
+            var moved = FluidApi.transferFirst(fluidStorage, slotFluidContainer, (long) (FluidStackHooks.bucketAmount() * 0.1f), false);
+            return fluidStorage.getAmount() > 0 && moved == 0;
         } else {
             return true;
         }
@@ -313,12 +228,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     }
     
     @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        return fluidStorage;
-    }
-    
-    @Override
-    public @Nullable SingleVariantStorage<FluidVariant> getForDirectFluidAccess() {
+    public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
         return fluidStorage;
     }
 }

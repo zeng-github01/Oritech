@@ -123,7 +123,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     private void chargeItems() {
         
         var heldStack = inventory.heldStacks.get(0);
-        if (heldStack.isEmpty()) return;
+        if (heldStack.isEmpty() || heldStack.getCount() > 1) return;
         
         var stackRef = new StackContext(heldStack, updated -> inventory.heldStacks.set(0, updated));
         var slotEnergyContainer = EnergyApi.ITEM.find(stackRef);

@@ -21,6 +21,7 @@ import rearth.oritech.util.StackContext;
 import rearth.oritech.util.fluid.BlockFluidApi;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.ItemFluidApi;
+import rearth.oritech.util.fluid.containers.DelegatingFluidStorage;
 import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
 
 import java.util.ArrayList;
@@ -37,19 +38,25 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         registeredBlockEntities.add(typeSupplier);
     }
     
+    @SuppressWarnings("IfCanBeSwitch")
     public void registerEvent(RegisterCapabilitiesEvent event) {
         for (var supplied : registeredBlockEntities) {
             event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, supplied.get(), (entity, direction) -> {
                 
                 var storage = ((FluidApi.FluidApiProvider) entity).getFluidStorage(direction);
+                
+                if (storage == null) return null;
+                
                 if (storage instanceof FluidApi.InOutSlotContainer inOutContainer) {
                     return InOutContainerStorageWrapper.of(inOutContainer);
                 } else if (storage instanceof FluidApi.SingleSlotContainer singleContainer) {
                     return SingleSlotContainerStorageWrapper.of(singleContainer);
+                } else if (storage instanceof DelegatingFluidStorage delegatingFluidStorage) {
+                    return new DelegatingContainerStorageWrapper(delegatingFluidStorage);
                 }
                 
                 Oritech.LOGGER.error("Error during fluid provider registration, unable to register a fluid container");
-                Oritech.LOGGER.error("Erroring container type is: {}", supplied.get());
+                Oritech.LOGGER.error("Erroring container type is: {}", entity);
                 
                 return null;
             });
@@ -127,6 +134,12 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         
         @Override
         public void update() {
+        }
+        
+        @Override
+        public long getCapacity() {
+            Oritech.LOGGER.warn("tried to access capacity of external container");
+            return 0L;
         }
     }
     
@@ -280,6 +293,70 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
                 container.update();
             
             return new net.neoforged.neoforge.fluids.FluidStack(container.getOutStack().getFluid(), (int) extractedAmount);
+        }
+    }
+    
+    public static class DelegatingContainerStorageWrapper implements IFluidHandler {
+        
+        private final DelegatingFluidStorage container;
+        
+        public static DelegatingContainerStorageWrapper of(DelegatingFluidStorage container) {
+            if (container == null) return null;
+            return new DelegatingContainerStorageWrapper(container);
+        }
+        
+        private DelegatingContainerStorageWrapper(DelegatingFluidStorage container) {
+            this.container = container;
+        }
+        
+        @Override
+        public int getTanks() {
+            return container.getContent().size();
+        }
+        
+        @Override
+        public net.neoforged.neoforge.fluids.@NotNull FluidStack getFluidInTank(int i) {
+            return FluidStackHooksForge.toForge(container.getContent().get(i));
+        }
+        
+        @Override
+        public int getTankCapacity(int i) {
+            return (int) container.getCapacity();
+        }
+        
+        @Override
+        public boolean isFluidValid(int i, net.neoforged.neoforge.fluids.@NotNull FluidStack fluidStack) {
+            return true;
+        }
+        
+        @Override
+        public int fill(net.neoforged.neoforge.fluids.@NotNull FluidStack fluidStack, FluidAction fluidAction) {
+            var result = (int) container.insert(FluidStackHooksForge.fromForge(fluidStack), fluidAction.simulate());
+            
+            if (result > 0 && fluidAction.execute())
+                container.update();
+            
+            return result;
+        }
+        
+        @Override
+        public net.neoforged.neoforge.fluids.@NotNull FluidStack drain(net.neoforged.neoforge.fluids.@NotNull FluidStack fluidStack, @NotNull FluidAction fluidAction) {
+            var extractedAmount = container.extract(FluidStackHooksForge.fromForge(fluidStack), fluidAction.simulate());
+            
+            if (extractedAmount > 0 && fluidAction.execute())
+                container.update();
+            
+            return new net.neoforged.neoforge.fluids.FluidStack(fluidStack.getFluid(), (int) extractedAmount);
+        }
+        
+        @Override
+        public net.neoforged.neoforge.fluids.@NotNull FluidStack drain(int i, @NotNull FluidAction fluidAction) {
+            var extractedAmount =  container.extract(container.getContent().getLast().copyWithAmount(i), fluidAction.simulate());
+            
+            if (extractedAmount > 0 && fluidAction.execute())
+                container.update();
+            
+            return new net.neoforged.neoforge.fluids.FluidStack(container.getContent().getLast().getFluid(), (int) extractedAmount);
         }
     }
     

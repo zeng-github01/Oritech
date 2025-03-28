@@ -1,36 +1,37 @@
 package rearth.oritech.block.entity.generators;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.FilteringStorage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
+import dev.architectury.fluid.FluidStack;
 import net.minecraft.block.BlockState;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.text.Text;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.fluid.FluidApi;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,13 +39,9 @@ import java.util.List;
 import java.util.Set;
 
 // progress is abused to sync active speed.
-public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
+public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidApi.FluidApiProvider {
     
     private static final int MAX_SPEED = 10;
-    
-    private final Storage<FluidVariant> waterOutputWrapper = FilteringStorage.extractOnlyOf(waterStorage);
-    private final Storage<FluidVariant> steamWrapperInput = FilteringStorage.insertOnlyOf(inputTank);
-    private final Storage<FluidVariant> exposedSteamEngineStorage = new CombinedStorage<>(List.of(steamWrapperInput, waterOutputWrapper));
     
     private final ArrayList<SteamEngineEntity> connectedTanks = new ArrayList<>();
     private SteamEngineEntity cachedTargetTank = null;
@@ -68,6 +65,11 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
+    public boolean boilerAcceptsInput(Fluid fluid) {
+        return fluid.equals(FluidContent.STILL_STEAM.get());
+    }
+    
+    @Override
     public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
         
         if (world.isClient || !isActive(state)) return;
@@ -84,28 +86,33 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
             return;
         }
         
-        var usedSteamTank = usedTankEntity.inputTank;
-        var usedWaterTank = usedTankEntity.waterStorage;
+        // todo fix networking for extra stats
+        // todo improve chaining behaviour
+        
+        var usedSteamTank = usedTankEntity.boilerStorage.getInputContainer();
+        var usedWaterTank = usedTankEntity.boilerStorage.getOutputContainer();
         var usedEnergyStorage = usedTankEntity.energyStorage;
         
+        // optional config stops
         if (usedEnergyStorage.getAmount() >= usedEnergyStorage.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnEnergyFull()) return;
+        if (usedWaterTank.getStack().getAmount() >= usedWaterTank.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnWaterFull()) return;
         
-        if (usedSteamTank.amount == 0) return;
-        if (usedWaterTank.amount >= usedWaterTank.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnWaterFull()) return;
+        // stop on no steam
+        if (usedSteamTank.getStack().getAmount() <= 0) return;
         
         if (currentRecipe == OritechRecipe.DUMMY) {
-            var candidate = getRecipe(usedSteamTank);
+            var candidate = FluidMultiblockGeneratorBlockEntity.getRecipe(usedSteamTank, world, getOwnRecipeType());
             if (candidate.isEmpty()) return;
             var recipe = candidate.get().value();
-            if (usedSteamTank.variant.getFluid() != recipe.getFluidInput().getFluid()) return;
+            if (!usedSteamTank.getStack().isFluidEqual(recipe.getFluidInput())) return;
             currentRecipe = recipe;
         }
         
         var speed = getSteamProcessingSpeed(usedSteamTank);
         
         var consumed = Math.max(1, currentRecipe.getFluidInput().getAmount() * speed);
-        usedSteamTank.amount -= consumed;
-        usedWaterTank.amount = (long) Math.min(usedWaterTank.amount + consumed * 0.9f, usedWaterTank.getCapacity());
+        usedSteamTank.extract(currentRecipe.getFluidInput().copyWithAmount((long) consumed), false);
+        usedWaterTank.insert(FluidStack.create(Fluids.WATER, (long) (consumed * 0.9f)), false);
         progress = (int) (speed * 100);
         
         var energyEfficiency = getSteamEnergyEfficiency(speed);
@@ -174,14 +181,14 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     
     private SteamEngineEntity reloadTargetTankFromCache() {
         var res = getBestInputFromConnectedEngine();
-        if (res.inputTank.amount == 0) return null;
+        if (res.boilerStorage.getInStack().getAmount() == 0) return null;
         return res;
     }
     
     private SteamEngineEntity getBestInputFromConnectedEngine() {
         
         var res = this;
-        var highest = inputTank.amount;
+        var highest = boilerStorage.getInStack().getAmount();
         
         for (var tank : connectedTanks) {
             
@@ -191,7 +198,7 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
                 return this;
             }
             
-            var tankAmount = tank.inputTank.amount;
+            var tankAmount = tank.boilerStorage.getInStack().getAmount();
             if (tankAmount > highest) {
                 highest = tankAmount;
                 res = tank;
@@ -206,8 +213,8 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
         super.readNbt(nbt, registryLookup);
     }
     
-    private float getSteamProcessingSpeed(SingleVariantStorage<FluidVariant> usedTank) {
-        var fillPercentage = usedTank.amount / (float) usedTank.getCapacity();
+    private float getSteamProcessingSpeed(FluidApi.SingleSlotContainer usedTank) {
+        var fillPercentage = usedTank.getStack().getAmount() / (float) usedTank.getCapacity();
         return fillPercentage * MAX_SPEED;
     }
     
@@ -219,14 +226,13 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     
     @Override
     public BarConfiguration getFluidConfiguration() {
-        return new BarConfiguration(149, 24, 15, 54);
+        return new BarConfiguration(149, 10, 18, 64);
     }
     
     @Override
     protected void sendNetworkEntry() {
         super.sendNetworkEntry();
-        var data = getBaseAddonData();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.SteamEnginePacket(pos, data.speed(), data.efficiency(), waterStorage.amount, energyProducedTick));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, boilerStorage.getInStack().getAmount(), boilerStorage.getOutStack().getAmount()));
         energyProducedTick = 0;
     }
     
@@ -253,11 +259,6 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     @Override
     public int getInventorySize() {
         return 0;
-    }
-    
-    @Override
-    public boolean bucketInputAllowed() {
-        return false;
     }
     
     @Override
@@ -315,12 +316,12 @@ public class SteamEngineEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
-        return exposedSteamEngineStorage;
+    public boolean showProgress() {
+        return false;
     }
     
     @Override
-    public boolean showProgress() {
-        return false;
+    public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
+        return boilerStorage.getContainerForDirection(direction);
     }
 }

@@ -46,6 +46,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> BASIC_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> LAVA_GENERATOR_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> FUEL_GENERATOR_SCREEN = upgradeHandler();
+    public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> STEAM_ENGINE_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> DESTROYER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> PLACER_SCREEN = upgradeHandler();
     public static final ExtendedScreenHandlerType<UpgradableMachineScreenHandler, UpgradableData> FERTILIZER_SCREEN = upgradeHandler();
@@ -57,7 +58,6 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     public static final ExtendedScreenHandlerType<DroneScreenHandler, UpgradableData> DRONE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(DroneScreenHandler.class), UpgradableData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<RedstoneAddonScreenHandler, BasicData> REDSTONE_ADDON_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(RedstoneAddonScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<CentrifugeScreenHandler, UpgradableData> CENTRIFUGE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(CentrifugeScreenHandler.class), UpgradableData.PACKET_CODEC);
-    public static final ExtendedScreenHandlerType<SteamEngineScreenHandler, UpgradableData> STEAM_ENGINE_SCREEN = new ExtendedScreenHandlerType<>(new UpgradeFactory<>(SteamEngineScreenHandler.class), UpgradableData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<ItemFilterScreenHandler, BasicData> ITEM_FILTER_SCREEN = new ExtendedScreenHandlerType<>(new BasicFactory<>(ItemFilterScreenHandler.class), BasicData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<InventoryProxyScreenHandler, InventoryProxyScreenHandler.InvProxyData> INVENTORY_PROXY_SCREEN = new ExtendedScreenHandlerType<>(new InventoryProxyScreenHandler.HandlerFactory(), InventoryProxyScreenHandler.InvProxyData.PACKET_CODEC);
     public static final ExtendedScreenHandlerType<ReactorScreenHandler, BasicData> REACTOR_SCREEN = new ExtendedScreenHandlerType<>(new ReactorScreenHandler.HandlerFactory(), BasicData.PACKET_CODEC);

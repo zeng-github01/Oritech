@@ -24,8 +24,8 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
         super(handler, inventory, title);
         
         if (((CentrifugeBlockEntity) handler.blockEntity).hasFluidAddon) {
-            // inFluidDisplay = initFluidDisplay(handler.inputTank, inputConfig);
-            inFluidDisplay = null;
+            inFluidDisplay = initFluidDisplay(handler.inputTank, inputConfig);
+            
         } else {
             inFluidDisplay = null;
         }
@@ -35,7 +35,6 @@ public class CentrifugeScreen extends UpgradableMachineScreen<CentrifugeScreenHa
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        System.out.println(inFluidDisplay);
         if (inFluidDisplay != null) {
             addFluidDisplay(overlay, inFluidDisplay);
             updateFluidDisplay(inFluidDisplay);

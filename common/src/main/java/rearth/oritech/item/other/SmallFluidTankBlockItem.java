@@ -9,7 +9,6 @@ import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
 
@@ -53,7 +52,8 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemA
     
     @Override
     public boolean isItemBarVisible(ItemStack stack) {
-        return true;
+        var contentEmpty = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).isEmpty();
+        return !contentEmpty;
     }
     
     @Override

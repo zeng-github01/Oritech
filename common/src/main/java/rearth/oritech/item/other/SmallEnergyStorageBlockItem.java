@@ -33,7 +33,8 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
     
     @Override
     public boolean isItemBarVisible(ItemStack stack) {
-        return true;
+        var contentEmpty = stack.getOrDefault(EnergyApi.ITEM.getEnergyComponent(), 0L) <= 0;
+        return !contentEmpty;
     }
     
     @Override

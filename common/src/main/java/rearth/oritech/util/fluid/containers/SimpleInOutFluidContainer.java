@@ -1,7 +1,6 @@
 package rearth.oritech.util.fluid.containers;
 
 import dev.architectury.fluid.FluidStack;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.math.Direction;
@@ -24,8 +23,8 @@ public class SimpleInOutFluidContainer extends FluidApi.InOutSlotContainer {
         this.capacity = capacity;
         this.onUpdate = onUpdate;
         
-        this.contentIn = FluidStack.create(Fluids.EMPTY, 0);
-        this.contentOut = FluidStack.create(Fluids.EMPTY, 0);
+        this.contentIn = FluidStack.empty();
+        this.contentOut = FluidStack.empty();
         
         inputContainer = new FluidApi.SingleSlotContainer() {
             @Override

@@ -135,6 +135,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
         }
     }
     
+    // from block entity to item
     private void processInput() {
         var inStack = inventory.getStack(0);
         var canFill = this.fluidStorage.getAmount() > 0;
@@ -160,6 +161,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
         }
     }
     
+    // from item to fluid storage
     private void processOutput() {
         var inStack = inventory.getStack(1);
         var canFill = this.fluidStorage.getAmount() < this.fluidStorage.getCapacity();
@@ -172,9 +174,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
         
         var moved = FluidApi.transferFirst(candidate, fluidStorage, FluidStackHooks.bucketAmount() * 64, false);
         
-        if (moved > 0) {
-            inventory.setStack(1, stackRef.getValue());
-        } else {
+        if (moved == 0) {
             // move stack
             var outStack = inventory.getStack(2);
             if (outStack.isEmpty()) {

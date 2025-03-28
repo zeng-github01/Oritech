@@ -188,10 +188,10 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     public static boolean recipeInputMatchesTank(FluidStack available, OritechRecipe recipe) {
         
-        var isTankEmpty = available.isEmpty();
         var recipeNeedsFluid = recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0;
-        
         if (!recipeNeedsFluid) return true;
+        
+        var isTankEmpty = available.isEmpty();
         if (isTankEmpty) return false;
         
         var recipeFluid = recipe.getFluidInput();
@@ -334,29 +334,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     public int getAnimationDuration() {
         return 20 * 9;
     }
-    
-    // this will allow full access on top and bottom to specific tank kinds (allowing both insertion and extraction)
-    // sides can access both tanks, but insert only to input tank, and extract only from output tank
-
-
-//    @Override
-//    public Storage<FluidVariant> getFluidStorage(Direction direction) {
-//        if (!hasFluidAddon) return null;
-//        if (direction == null) return combinedTanks;
-//        return switch (direction) {
-//            case DOWN -> outputStorage;
-//            case UP -> inputStorage;
-//            default -> combinedTanks;
-//        };
-//    }
-//
-//    @Override
-//    public @Nullable SingleVariantStorage<FluidVariant> getForDirectFluidAccess() {
-//
-//        if (!hasFluidAddon) return null;
-//
-//        return outputStorage;
-//    }
     
     @Override
     protected void sendNetworkEntry() {

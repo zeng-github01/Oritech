@@ -27,6 +27,7 @@ import rearth.oritech.util.StackContext;
 import rearth.oritech.util.fluid.BlockFluidApi;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.ItemFluidApi;
+import rearth.oritech.util.fluid.containers.DelegatingFluidStorage;
 import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
 
 import java.util.Collections;
@@ -37,16 +38,22 @@ import java.util.function.Supplier;
 
 public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
+    @SuppressWarnings("IfCanBeSwitch")
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
         FluidStorage.SIDED.registerForBlockEntity(
           (entity, direction) -> {
               
               var storage = ((FluidApi.FluidApiProvider) entity).getFluidStorage(direction);
+              
+              if (storage == null) return null;
+              
               if (storage instanceof FluidApi.InOutSlotContainer inOutContainer) {
                   return InOutFluidContainerStorageWrapper.of(inOutContainer);
               } else if (storage instanceof FluidApi.SingleSlotContainer singleContainer) {
                   return SingleSlotContainerStorageWrapper.of(singleContainer);
+              } else if (storage instanceof DelegatingFluidStorage delegatedStorage) {
+                  return DelegatedContainerStorageWrapper.of(delegatedStorage);
               }
               
               Oritech.LOGGER.error("Error during fluid provider registration, unable to register a fluid container");
@@ -72,6 +79,7 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
             case null -> null;
             case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
             case InOutFluidContainerStorageWrapper wrapper -> wrapper.container.getContainerForDirection(direction);
+            case DelegatedContainerStorageWrapper wrapper -> wrapper.storage;
             default -> new FabricStorageWrapper(candidate, null);
         };
     }
@@ -133,6 +141,12 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         public void update() {
             if (context != null)
                 context.sync();
+        }
+        
+        @Override
+        public long getCapacity() {
+            Oritech.LOGGER.warn("tried to access capacity of external container");
+            return 0L;  // this should not be used I guess?
         }
     }
     
@@ -350,81 +364,91 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         }
     }
     
-    // this is used by other mods to interact with oritech fluid containing items (e.g. portable tank, jetpack)
-//    public static class ItemContainerStorageWrapper extends SnapshotParticipant<FluidStack> implements SingleSlotStorage<FluidVariant> {
-//
-//        private final FluidApi.SingleSlotContainer container;
-//
-//        public ItemContainerStorageWrapper(FluidApi.SingleSlotContainer container) {
-//            this.container = container;
-//        }
-//
-//        @Override
-//        public boolean supportsInsertion() {
-//            return container.supportsInsertion();
-//        }
-//
-//        @Override
-//        public long insert(FluidVariant fluidVariant, long l, TransactionContext transaction) {
-//            updateSnapshots(transaction);
-//            transaction.addCloseCallback((transactionContext, result) -> {
-//                if (result.wasCommitted()) {
-//                    container.update();
-//                }
-//            });
-//            return container.insert(FluidStackHooksFabric.fromFabric(fluidVariant, l), false);
-//        }
-//
-//        @Override
-//        public boolean supportsExtraction() {
-//            return container.supportsExtraction();
-//        }
-//
-//        @Override
-//        public long extract(FluidVariant fluidVariant, long l, TransactionContext transaction) {
-//            updateSnapshots(transaction);
-//            transaction.addCloseCallback((transactionContext, result) -> {
-//                if (result.wasCommitted()) {
-//                    container.update();
-//                }
-//            });
-//            return container.extract(FluidStackHooksFabric.fromFabric(fluidVariant, l), false);
-//        }
-//
-//        @Override
-//        public boolean isResourceBlank() {
-//            return container.getStack().isEmpty();
-//        }
-//
-//        @Override
-//        public FluidVariant getResource() {
-//            return FluidStackHooksFabric.toFabric(container.getStack());
-//        }
-//
-//        @Override
-//        public long getAmount() {
-//            return container.getStack().getAmount();
-//        }
-//
-//        @Override
-//        public long getCapacity() {
-//            return container.getCapacity();
-//        }
-//
-//        @Override
-//        protected FluidStack createSnapshot() {
-//            return container.getStack();
-//        }
-//
-//        @Override
-//        protected void readSnapshot(FluidStack fluidStack) {
-//            container.setStack(fluidStack);
-//        }
-//
-//        @Override
-//        public Iterator<StorageView<FluidVariant>> iterator() {
-//            return SingleSlotStorage.super.iterator();
-//        }
-//    }
+    public static class DelegatedContainerStorageWrapper extends SnapshotParticipant<List<FluidStack>> implements Storage<FluidVariant> {
+        
+        private final DelegatingFluidStorage storage;
+        
+        public static DelegatedContainerStorageWrapper of(DelegatingFluidStorage storage) {
+            if (storage == null) return null;
+            return new DelegatedContainerStorageWrapper(storage);
+        }
+        
+        private DelegatedContainerStorageWrapper(DelegatingFluidStorage storage) {
+            this.storage = storage;
+        }
+        
+        @Override
+        public boolean supportsInsertion() {
+            return storage.supportsInsertion();
+        }
+        
+        @Override
+        public long insert(FluidVariant fluidVariant, long l, TransactionContext transaction) {
+            updateSnapshots(transaction);
+            transaction.addCloseCallback((transactionContext, result) -> {
+                if (result.wasCommitted()) {
+                    storage.update();
+                }
+            });
+            return storage.insert(FluidStackHooksFabric.fromFabric(fluidVariant, l), false);
+        }
+        
+        @Override
+        public boolean supportsExtraction() {
+            return storage.supportsExtraction();
+        }
+        
+        @Override
+        public long extract(FluidVariant fluidVariant, long l, TransactionContext transaction) {
+            updateSnapshots(transaction);
+            transaction.addCloseCallback((transactionContext, result) -> {
+                if (result.wasCommitted()) {
+                    storage.update();
+                }
+            });
+            return storage.extract(FluidStackHooksFabric.fromFabric(fluidVariant, l), false);
+        }
+        
+        @Override
+        public @NotNull Iterator<StorageView<FluidVariant>> iterator() {
+            return storage.getContent().stream().map(stack -> new StorageView<FluidVariant>() {
+                
+                @Override
+                public long extract(FluidVariant fluidVariant, long l, TransactionContext transactionContext) {
+                    return DelegatedContainerStorageWrapper.this.extract(fluidVariant, l, transactionContext);
+                }
+                
+                @Override
+                public boolean isResourceBlank() {
+                    return stack.isEmpty();
+                }
+                
+                @Override
+                public FluidVariant getResource() {
+                    return FluidStackHooksFabric.toFabric(stack);
+                }
+                
+                @Override
+                public long getAmount() {
+                    return stack.getAmount();
+                }
+                
+                @Override
+                public long getCapacity() {
+                    return storage.getCapacity();
+                }
+            }.getUnderlyingView()).iterator();
+        }
+        
+        @Override
+        protected List<FluidStack> createSnapshot() {
+            return storage.getContent();
+        }
+        
+        @Override
+        protected void readSnapshot(List<FluidStack> fluidStacks) {
+            storage.setContent(fluidStacks);
+        }
+    }
     
 }

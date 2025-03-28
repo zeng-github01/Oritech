@@ -25,6 +25,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ComparatorOutputProvider;
@@ -105,10 +106,10 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
                 if (!world.isClient) {
                     if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
                         var moved = FluidApi.transferFirst(tankEntity.fluidStorage, candidate, tankEntity.fluidStorage.getCapacity(), false);
-                        System.out.println("moved to item " + moved + " " + stackRef.getValue());
+                        Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());
                     } else {    // from item to tank
                         var moved = FluidApi.transferFirst(candidate, tankEntity.fluidStorage, tankEntity.fluidStorage.getCapacity(), false);
-                        System.out.println("moved from item " + moved + " " + stackRef.getValue());
+                        Oritech.LOGGER.debug("moved from item {} {}", moved, stackRef.getValue());
                     }
                 }
                 

@@ -31,6 +31,7 @@ public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {
             bucketInventory = centrifugeEntity.bucketInventory;
             bucketInventory.onOpen(playerInventory.player);
             addBucketSlots();
+            this.mainFluidContainer = centrifugeEntity.fluidContainer.getOutputContainer();
         } else {
             inputTank = null;
             bucketInventory = null;

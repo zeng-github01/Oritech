@@ -9,27 +9,13 @@ import net.minecraft.text.Text;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.util.ScreenProvider;
 
-public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreenHandler> {
+public class SteamEngineScreen extends UpgradableMachineScreen<UpgradableMachineScreenHandler> {
     
-    private final FluidDisplay waterDisplay;
     protected LabelComponent productionLabel;
     protected LabelComponent steamUsageLabel;
     
-    public SteamEngineScreen(SteamEngineScreenHandler handler, PlayerInventory inventory, Text title) {
+    public SteamEngineScreen(UpgradableMachineScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        
-        var config = handler.screenData.getFluidConfiguration();
-        var offset = -config.width() - 8;
-        var configWater = new ScreenProvider.BarConfiguration(config.x() + offset, config.y(), config.width(), config.height());
-        var container = handler.engineWaterStorage;
-        waterDisplay = initFluidDisplay(container, configWater);
-    }
-    
-    @Override
-    public void fillOverlay(FlowLayout overlay) {
-        super.fillOverlay(overlay);
-        addFluidDisplay(overlay, waterDisplay);
-        updateFluidDisplay(waterDisplay);
     }
     
     @Override
@@ -46,7 +32,6 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
     @Override
     protected void handledScreenTick() {
         super.handledScreenTick();
-        updateFluidDisplay(waterDisplay);
         
         var steamEntity = ((SteamEngineEntity) handler.blockEntity);
         var data = steamEntity.getBaseAddonData();
@@ -60,5 +45,16 @@ public class SteamEngineScreen extends UpgradableMachineScreen<SteamEngineScreen
         efficiencyLabel.text(Text.translatable("title.oritech.machine_efficiency", efficiency));
         productionLabel.text(Text.translatable("title.oritech.machine_energy_production", totalProduction));
         steamUsageLabel.text(Text.translatable("title.oritech.steam_consumption", totalSteamUsage));
+    }
+    
+    @Override
+    public ScreenProvider.BarConfiguration getBoilerInConfig() {
+        return handler.screenData.getFluidConfiguration();
+    }
+    
+    @Override
+    public ScreenProvider.BarConfiguration getBoilerOutConfig() {
+        var config = getBoilerInConfig();
+        return new ScreenProvider.BarConfiguration(config.x() - config.width() - 8, config.y(), config.width(), config.height());
     }
 }

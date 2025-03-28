@@ -1,6 +1,5 @@
 package rearth.oritech.block.entity;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
@@ -12,16 +11,20 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.*;
+import rearth.oritech.util.DelegatingItemStorage;
+import rearth.oritech.util.InventoryProvider;
+import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.fluid.containers.DelegatingFluidStorage;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockProvider, FluidProvider {
+public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockProvider, FluidApi.FluidApiProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;
@@ -84,13 +87,13 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         return controllerEntity.getEnergyStorageForLink(direction);
     }
     
-    private Storage<FluidVariant> getMainFluidStorage(Direction direction) {
+    private FluidApi.FluidContainer getMainFluidStorage(Direction direction) {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        if (!(controllerEntity instanceof FluidProvider fluidProvider)) return null;
+        if (!(controllerEntity instanceof FluidApi.FluidApiProvider fluidProvider)) return null;
         return fluidProvider.getFluidStorage(direction);
     }
     
@@ -112,7 +115,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         });
     }
     
-    private Storage<FluidVariant> getFluidStorageDelegated(Direction direction) {
+    private FluidApi.FluidContainer getFluidStorageDelegated(Direction direction) {
         return delegatedFluid.computeIfAbsent(direction, dir -> new DelegatingFluidStorage(() -> getMainFluidStorage(dir), this::isEnabled));
     }
     
@@ -135,7 +138,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Override
-    public Storage<FluidVariant> getFluidStorage(Direction direction) {
+    public FluidApi.FluidContainer getFluidStorage(Direction direction) {
         return getFluidStorageDelegated(direction);
     }
 }

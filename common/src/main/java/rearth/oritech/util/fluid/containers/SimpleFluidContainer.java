@@ -33,7 +33,11 @@ public class SimpleFluidContainer extends FluidApi.SingleSlotContainer {
     public SimpleFluidContainer(Long capacity, Runnable onUpdate) {
         this.capacity = capacity;
         this.onUpdate = onUpdate;
-        this.content = FluidStack.create(Fluids.EMPTY, 0);
+        this.content = FluidStack.create(getEmptyVariant(), 0);
+    }
+    
+    public Fluid getEmptyVariant() {
+        return Fluids.EMPTY;
     }
     
     public SimpleFluidContainer(Long capacity) {

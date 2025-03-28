@@ -2,7 +2,6 @@ package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registry;
@@ -26,11 +25,10 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
 import rearth.oritech.block.entity.storage.*;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
-import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -62,7 +60,7 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedFluid
     public static final BlockEntityType<CoolerBlockEntity> COOLER_ENTITY = FabricBlockEntityTypeBuilder.create(CoolerBlockEntity::new, BlockContent.COOLER_BLOCK).build();
     
-    @AssignSidedFluidApi
+    @AssignSidedFluid
     @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<CentrifugeBlockEntity> CENTRIFUGE_ENTITY = FabricBlockEntityTypeBuilder.create(CentrifugeBlockEntity::new, BlockContent.CENTRIFUGE_BLOCK).build();
@@ -195,11 +193,11 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     public static final BlockEntityType<CreativeStorageBlockEntity> CREATIVE_STORAGE_ENTITY = FabricBlockEntityTypeBuilder.create(CreativeStorageBlockEntity::new, BlockContent.CREATIVE_STORAGE_BLOCK).build();
     
     @AssignSidedInventory
-    @AssignSidedFluidApi
+    @AssignSidedFluid
     public static final BlockEntityType<SmallFluidTankEntity> SMALL_TANK_ENTITY = FabricBlockEntityTypeBuilder.create((pos, state) -> new SmallFluidTankEntity(pos, state, false), BlockContent.SMALL_TANK_BLOCK).build();
     
     @AssignSidedInventory
-    @AssignSidedFluidApi
+    @AssignSidedFluid
     public static final BlockEntityType<SmallFluidTankEntity> CREATIVE_TANK_ENTITY = FabricBlockEntityTypeBuilder.create((pos, state) -> new SmallFluidTankEntity(pos, state, true), BlockContent.CREATIVE_TANK_BLOCK).build();
     
     public static final BlockEntityType<FluidPipeInterfaceEntity> FLUID_PIPE_ENTITY = FabricBlockEntityTypeBuilder.create(FluidPipeInterfaceEntity::new, BlockContent.FLUID_PIPE_CONNECTION, BlockContent.FRAMED_FLUID_PIPE_CONNECTION).build();
@@ -261,10 +259,6 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
             EnergyApi.BLOCK.registerBlockEntity(() -> value);
         
         if (field.isAnnotationPresent(AssignSidedFluid.class))
-            FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((FluidProvider) blockEntity).getFluidStorage(direction), value);
-        
-        
-        if (field.isAnnotationPresent(AssignSidedFluidApi.class))
             FluidApi.BLOCK.registerBlockEntity(() -> value);
         
         if (field.isAnnotationPresent(AssignSidedInventory.class))
@@ -285,10 +279,5 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface AssignSidedFluid {
-    }
-    
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target({ElementType.FIELD})
-    public @interface AssignSidedFluidApi {
     }
 }

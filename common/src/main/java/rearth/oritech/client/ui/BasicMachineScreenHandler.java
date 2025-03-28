@@ -1,8 +1,6 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.client.screens.SlotGenerator;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,10 +14,12 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.util.FluidProvider;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,12 +40,11 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     public final ScreenProvider screenData;
     
     @Nullable
-    protected final SingleVariantStorage<FluidVariant> steamStorage;
+    protected final FluidApi.SingleSlotContainer steamStorage;
     @Nullable
-    protected final SingleVariantStorage<FluidVariant> waterStorage;
-    
-    
-    protected final FluidProvider fluidProvider;
+    protected final FluidApi.SingleSlotContainer waterStorage;
+    @Nullable
+    protected FluidApi.SingleSlotContainer mainFluidContainer;
     
     protected BlockState machineBlock;
     public BlockEntity blockEntity;
@@ -72,23 +71,21 @@ public class BasicMachineScreenHandler extends ScreenHandler {
             energyStorage = null;
         }
         
-        if (blockEntity instanceof FluidProvider blockFluidProvider && blockFluidProvider.getForDirectFluidAccess() != null) {
-            var fluidIterator = blockFluidProvider.getFluidStorage(null).iterator();
-            if (fluidIterator.hasNext()) {
-                this.fluidProvider = blockFluidProvider;
-            } else {
-                this.fluidProvider = null;
-            }
+        if (blockEntity instanceof FluidApi.FluidApiProvider blockFluidProvider && blockFluidProvider.getFluidStorage(null) instanceof SimpleFluidContainer container) {
+            this.mainFluidContainer = container;
         } else {
-            fluidProvider = null;
+            mainFluidContainer = null;
         }
         
         this.machineBlock = blockEntity.getCachedState();
         this.blockEntity = blockEntity;
         
         if (this.blockEntity instanceof UpgradableGeneratorBlockEntity generatorEntity && generatorEntity.isProducingSteam) {
-            steamStorage = generatorEntity.getSteamStorage();
-            waterStorage = generatorEntity.getWaterStorage();
+            waterStorage = generatorEntity.boilerStorage.getInputContainer();
+            steamStorage = generatorEntity.boilerStorage.getOutputContainer();
+        } else if (this.blockEntity instanceof SteamEngineEntity steamEngineEntity) {
+            waterStorage = steamEngineEntity.boilerStorage.getOutputContainer();
+            steamStorage = steamEngineEntity.boilerStorage.getInputContainer();
         } else {
             steamStorage = null;
             waterStorage = null;

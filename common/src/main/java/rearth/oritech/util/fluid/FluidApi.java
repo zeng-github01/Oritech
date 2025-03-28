@@ -50,6 +50,8 @@ public class FluidApi {
         
         public abstract void update();
         
+        public abstract long getCapacity();
+        
     }
     
     public interface ItemApiProvider {
@@ -67,7 +69,6 @@ public class FluidApi {
         
         public abstract void setStack(FluidStack stack);
         public abstract FluidStack getStack();
-        public abstract long getCapacity();
         
     }
     
@@ -79,7 +80,6 @@ public class FluidApi {
         
         public abstract void setOutStack(FluidStack stack);
         public abstract FluidStack getOutStack();
-        public abstract long getCapacity();
         public abstract FluidContainer getContainerForDirection(Direction direction);
         
     }
