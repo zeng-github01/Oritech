@@ -382,7 +382,7 @@
   "title.oritech.machine_option_enabled": "🔨 有効",
   "tooltip.oritech.pulverizer_dust_combine": "自動的に小さいダストをインゴットに結合",
   "tooltip.oritech.fluid_content": "%f mB %s",
-  "tooltip.oritech.fluid_content_tank_tooltip": "%f B %s",
+  "tooltip.oritech.fluid_content_tank_tooltip": "%fB %s",
   "tooltip.oritech.jetpack_fuel": "%f/%f mB %s",
   "tooltip.oritech.fluid_empty": "空",
   "tooltip.oritech.progress_indicator": "%d / %d ティック\n（基本 %d ティック）",
