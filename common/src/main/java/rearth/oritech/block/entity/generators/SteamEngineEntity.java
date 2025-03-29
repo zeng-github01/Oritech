@@ -15,14 +15,11 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
-import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -33,7 +30,6 @@ import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.fluid.FluidApi;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,26 +38,142 @@ import java.util.Set;
 public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidApi.FluidApiProvider {
     
     private static final int MAX_SPEED = 10;
+    private static final int MAX_CHAIN_SIZE = 20;
+    private static final float WATER_RATIO = 0.9f;
     
-    private final ArrayList<SteamEngineEntity> connectedTanks = new ArrayList<>();
-    private SteamEngineEntity cachedTargetTank = null;
+    // how chaining works:
+    // (non-chained non-empty) generator checks neighbors in both sides in N dist
+    // generator marks neighbors as chained, with timestamp
+    // slaved generator shows only chain notice in popup, moves all inserted steam to master (get api returns master entries)
+    // master processes at X rate, shows chained count in UI
     
-    public int energyProducedTick = 0;
+    // progress is used to store/sync animation speed
+    
+    public long masterHeartbeat; // set from master, used by slave
+    public SteamEngineEntity master;
+    
+    private final Set<SteamEngineEntity> slaves = new HashSet<>();
+    
+    // client only
+    public NetworkContent.SteamEngineSyncPacket clientStats;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.steamToRfRatio());
     }
     
     @Override
-    public void initAddons() {
-        setupTankCache();
-        cachedTargetTank = reloadTargetTankFromCache();
+    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+        
+        if (world.isClient || !isActive(state)) return;
+        
+        var slaved = inSlaveMode();
+        var hasInput = !boilerStorage.getInStack().isEmpty();
+        if (world.getTime() % 80 == 0 && !slaved && hasInput)
+            setupMaster();
+        
+        if (!slaved && hasInput) tickMaster();
+        
+        if (slaved) tickSlave();
+        
+        
+        outputEnergy();
+        if (networkDirty)
+            updateNetwork();
     }
     
-    @Override
-    public boolean initMultiblock(BlockState state) {
-        setupTankCache();
-        return super.initMultiblock(state);
+    // this is only called when steam is available
+    private void tickMaster() {
+        
+        var steamTank = boilerStorage.getInputContainer();
+        var waterTank = boilerStorage.getOutputContainer();
+        
+        // optional config stops (energy full / water full)
+        if (energyStorage.getAmount() >= energyStorage.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnEnergyFull())
+            return;
+        if (waterTank.getStack().getAmount() >= waterTank.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnWaterFull())
+            return;
+        
+        // if not recipe is currently set, or it does not match the steam tank, search for a recipe
+        if (currentRecipe == OritechRecipe.DUMMY || !currentRecipe.getFluidInput().isFluidEqual(steamTank.getStack())) {
+            var candidate = FluidMultiblockGeneratorBlockEntity.getRecipe(steamTank, world, getOwnRecipeType());
+            candidate.ifPresent(recipe -> currentRecipe = recipe.value());
+            if (candidate.isEmpty()) return;
+            currentRecipe = candidate.get().value();
+        }
+        
+        var speed = getSteamProcessingSpeed(steamTank);
+        var workerCount = slaves.size() + 1;
+        
+        var consumedCount = currentRecipe.getFluidInput().getAmount() * speed * workerCount;
+        var producedCount = consumedCount * WATER_RATIO;
+        
+        // update tanks
+        steamTank.extract(currentRecipe.getFluidInput().copyWithAmount((long) consumedCount), false);
+        waterTank.insert(FluidStack.create(Fluids.WATER, (long) producedCount), false);
+        
+        // produce energy
+        var energyEfficiency = getSteamEnergyEfficiency(speed);
+        var energyProduced = consumedCount * energyEfficiency * energyPerTick;
+        energyStorage.insertIgnoringLimit((long) energyProduced, false);
+        
+        spawnParticles();
+        lastWorkedAt = world.getTime();
+        
+        // used for animation speed
+        progress = (int) (speed * 100f);
+        
+        // order/data: speed, efficiency, rf produced, steam consumed, slave count
+        clientStats = new NetworkContent.SteamEngineSyncPacket(pos, speed, energyEfficiency, (long) energyProduced, (long) consumedCount, slaves.size());
+        this.markDirty();
+        
+    }
+    
+    private void tickSlave() {
+        // check if master is actually working
+        var masterStats = master.clientStats;
+        var wasWorking = master.isActivelyWorking();
+        var speed = masterStats.speed();
+        
+        if (wasWorking) {
+            spawnParticles();
+            this.lastWorkedAt = world.getTime();
+            this.markDirty();
+        }
+        
+        // used for animation speed
+        progress = (int) (speed * 100f);
+    }
+    
+    private void setupMaster() {
+        slaves.clear();
+        
+        for (int direction = -1; direction <= 1; direction++) {
+            if (direction == 0) continue;
+            for (int i = 1; i <= MAX_CHAIN_SIZE; i++) {
+                var checkPos = new BlockPos(Geometry.offsetToWorldPosition(getFacing(), new Vec3i(i * direction, 0, 0), pos));
+                
+                var coreCandidate = world.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE_ENTITY);
+                if (coreCandidate.isPresent() && coreCandidate.get().getCachedController() != null)
+                    checkPos = coreCandidate.get().getControllerPos();
+                
+                var candidate = world.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
+                if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getCachedState())) {
+                    break;
+                } else if (!candidate.get().boilerStorage.getInStack().isEmpty()) {
+                    break;
+                } else {
+                    var slave = candidate.get();
+                    slaves.add(slave);
+                    slave.masterHeartbeat = world.getTime();
+                    slave.master = this;
+                }
+            }
+        }
+    }
+    
+    public boolean inSlaveMode() {
+        var heartbeatAge = world.getTime() - masterHeartbeat;
+        return heartbeatAge <= 100 && master != null && !master.isRemoved();
     }
     
     @Override
@@ -69,71 +181,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         return fluid.equals(FluidContent.STILL_STEAM.get());
     }
     
-    @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
-        
-        if (world.isClient || !isActive(state)) return;
-        outputEnergy();
-        
-        progress = 0;
-        var usedTankEntity = cachedTargetTank;
-        
-        if (usedTankEntity == null) {
-            if (world.getTime() % 40 == 0) {
-                setupTankCache();
-                cachedTargetTank = reloadTargetTankFromCache();
-            }
-            return;
-        }
-        
-        // todo fix networking for extra stats
-        // todo improve chaining behaviour
-        
-        var usedSteamTank = usedTankEntity.boilerStorage.getInputContainer();
-        var usedWaterTank = usedTankEntity.boilerStorage.getOutputContainer();
-        var usedEnergyStorage = usedTankEntity.energyStorage;
-        
-        // optional config stops
-        if (usedEnergyStorage.getAmount() >= usedEnergyStorage.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnEnergyFull()) return;
-        if (usedWaterTank.getStack().getAmount() >= usedWaterTank.getCapacity() && Oritech.CONFIG.generators.steamEngineData.stopOnWaterFull()) return;
-        
-        // stop on no steam
-        if (usedSteamTank.getStack().getAmount() <= 0) return;
-        
-        if (currentRecipe == OritechRecipe.DUMMY) {
-            var candidate = FluidMultiblockGeneratorBlockEntity.getRecipe(usedSteamTank, world, getOwnRecipeType());
-            if (candidate.isEmpty()) return;
-            var recipe = candidate.get().value();
-            if (!usedSteamTank.getStack().isFluidEqual(recipe.getFluidInput())) return;
-            currentRecipe = recipe;
-        }
-        
-        var speed = getSteamProcessingSpeed(usedSteamTank);
-        
-        var consumed = Math.max(1, currentRecipe.getFluidInput().getAmount() * speed);
-        usedSteamTank.extract(currentRecipe.getFluidInput().copyWithAmount((long) consumed), false);
-        usedWaterTank.insert(FluidStack.create(Fluids.WATER, (long) (consumed * 0.9f)), false);
-        progress = (int) (speed * 100);
-        
-        var energyEfficiency = getSteamEnergyEfficiency(speed);
-        var energyProduced = consumed * energyEfficiency * energyPerTick;
-        usedEnergyStorage.amount = (long) Math.min(usedEnergyStorage.amount + energyProduced, usedEnergyStorage.capacity);
-        usedTankEntity.energyProducedTick += (int) energyProduced;
-        
-        setBaseAddonData(new BaseAddonData(1 / (speed), 1 / energyEfficiency, 0, 0, 0));
-        
-        spawnParticles();
-        lastWorkedAt = world.getTime();
-        
-        markDirty();
-        
-        if (networkDirty) {
-            updateNetwork();
-        }
-    }
-    
     private void spawnParticles() {
-        if (world.random.nextFloat() > 0.4) return;
+        if (world.random.nextFloat() > 0.5) return;
         // emit particles
         var facing = getFacing();
         var offsetLocal = Geometry.rotatePosition(new Vec3d(0, 0, -0.5), facing);
@@ -145,67 +194,6 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     private float getSteamEnergyEfficiency(float x) {
         // basically a curve that goes through 0:0.5, 7:1 and 10:0.2
         return (float) (0.5f - 0.1966667f * x + 0.09166667f * Math.pow(x, 2) - 0.0075f * Math.pow(x, 3)) + 0.4f;
-    }
-    
-    private void setupTankCache() {
-        connectedTanks.clear();
-        var facing = getFacing();
-        
-        // collect tanks (in both directions)
-        for (int i = 1; i <= 10; i++) {
-            if (!tryAddTank(facing, i)) break;
-        }
-        
-        for (int i = 1; i <= 10; i++) {
-            if (!tryAddTank(facing, -i)) break;
-        }
-    }
-    
-    private boolean tryAddTank(Direction facing, int i) {
-        var checkPos = new BlockPos(Geometry.offsetToWorldPosition(facing, new Vec3i(i, 0, 0), pos));
-        var state = world.getBlockState(checkPos);
-        
-        // redirect in case of machine core
-        if (state.getBlock() instanceof MachineCoreBlock) {
-            checkPos = MachineCoreBlock.getControllerPos(world, checkPos);
-            state = world.getBlockState(checkPos);
-        }
-        
-        if (state.getBlock().equals(BlockContent.STEAM_ENGINE_BLOCK) && state.get(MultiblockMachine.ASSEMBLED)) {
-            connectedTanks.add(((SteamEngineEntity) world.getBlockEntity(new BlockPos(checkPos))));
-        } else {
-            return false;
-        }
-        return true;
-    }
-    
-    private SteamEngineEntity reloadTargetTankFromCache() {
-        var res = getBestInputFromConnectedEngine();
-        if (res.boilerStorage.getInStack().getAmount() == 0) return null;
-        return res;
-    }
-    
-    private SteamEngineEntity getBestInputFromConnectedEngine() {
-        
-        var res = this;
-        var highest = boilerStorage.getInStack().getAmount();
-        
-        for (var tank : connectedTanks) {
-            
-            if (tank == null) {
-                connectedTanks.clear();
-                connectedTanks.add(this);
-                return this;
-            }
-            
-            var tankAmount = tank.boilerStorage.getInStack().getAmount();
-            if (tankAmount > highest) {
-                highest = tankAmount;
-                res = tank;
-            }
-        }
-        
-        return res;
     }
     
     @Override
@@ -221,7 +209,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     @Override
     protected float getAnimationSpeed() {
         if (progress == 0) return 1;
-        return (float) progress / 100;
+        return (float) progress / 100f;
     }
     
     @Override
@@ -233,7 +221,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     protected void sendNetworkEntry() {
         super.sendNetworkEntry();
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GeneratorSteamSyncPacket(pos, boilerStorage.getInStack().getAmount(), boilerStorage.getOutStack().getAmount()));
-        energyProducedTick = 0;
+        
+        if (clientStats != null) NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(clientStats);
     }
     
     @Override
@@ -322,6 +311,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     @Override
     public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
+        if (inSlaveMode()) return master.boilerStorage.getContainerForDirection(direction);
         return boilerStorage.getContainerForDirection(direction);
     }
 }

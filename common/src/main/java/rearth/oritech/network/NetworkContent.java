@@ -98,6 +98,8 @@ public class NetworkContent {
                                      float operationSpeed) {
     }
     
+    public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced, long steamConsumed, int slaves) {}
+    
     public record SpawnerSyncPacket(BlockPos position, Identifier spawnedMob, boolean hasCage, int collectedSouls,
                                     int maxSouls) {
     }
@@ -523,6 +525,15 @@ public class NetworkContent {
                 var oldData = machine.getBaseAddonData();
                 var newData = new MachineAddonController.BaseAddonData(message.operationSpeed, oldData.efficiency(), oldData.energyBonusCapacity(), oldData.energyBonusTransfer(), oldData.extraChambers());
                 machine.setBaseAddonData(newData);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(SteamEngineSyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            if (entity instanceof SteamEngineEntity machine) {
+                machine.clientStats = message;
             }
             
         }));
