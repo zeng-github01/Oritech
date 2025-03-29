@@ -27,25 +27,25 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
-        EnergyStorage.SIDED.registerForBlockEntity((entity, direction) ->
-                                                     ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getStorage(direction)), typeSupplier.get());
+        team.reborn.energy.api.EnergyStorage.SIDED.registerForBlockEntity((entity, direction) ->
+                                                     ContainerStorageWrapper.of(((EnergyApi.BlockProvider) entity).getEnergyStorage(direction)), typeSupplier.get());
     }
     
     @Override
     public void registerForItem(Supplier<net.minecraft.item.Item> itemSupplier) {
-        EnergyStorage.ITEM.registerForItems((stack, context) ->
-                                              ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getStorage(stack), context, stack), itemSupplier.get());
+        team.reborn.energy.api.EnergyStorage.ITEM.registerForItems((stack, context) ->
+                                              ContainerStorageWrapper.of(((EnergyApi.ItemProvider) stack.getItem()).getEnergyStorage(stack), context, stack), itemSupplier.get());
     }
     
     @Override
     public ComponentType<Long> getEnergyComponent() {
-        return EnergyStorage.ENERGY_COMPONENT;
+        return team.reborn.energy.api.EnergyStorage.ENERGY_COMPONENT;
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(StackContext stack) {
+    public EnergyApi.EnergyStorage find(StackContext stack) {
         var context = ContainerItemContext.ofSingleSlot(new ItemStackStorage(stack));
-        var candidate = EnergyStorage.ITEM.find(stack.getValue(), context);
+        var candidate = team.reborn.energy.api.EnergyStorage.ITEM.find(stack.getValue(), context);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper && wrapper.container instanceof SimpleEnergyItemStorage itemStorage)
             return itemStorage.withCallback(ignored -> stack.sync());
@@ -53,20 +53,20 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        var candidate = EnergyStorage.SIDED.find(world, pos, state, entity, direction);
+    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+        var candidate = team.reborn.energy.api.EnergyStorage.SIDED.find(world, pos, state, entity, direction);
         if (candidate == null) return null;
         if (candidate instanceof ContainerStorageWrapper wrapper) return wrapper.container;
         return new FabricStorageWrapper(candidate, null);
     }
     
     @Override
-    public EnergyApi.EnergyContainer find(World world, BlockPos pos, @Nullable Direction direction) {
+    public EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     
     // this is used to interact with energy storages from other mods
-    public static class FabricStorageWrapper extends EnergyApi.EnergyContainer {
+    public static class FabricStorageWrapper extends EnergyApi.EnergyStorage {
         
         public final EnergyStorage storage;
         public final @Nullable StackContext context;
@@ -120,29 +120,29 @@ public class FabricEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     // this is used by other mods to interact with the oritech energy containers (machines/items)
     public static class ContainerStorageWrapper extends SnapshotParticipant<Long> implements EnergyStorage {
         
-        public final EnergyApi.EnergyContainer container;
+        public final EnergyApi.EnergyStorage container;
         @Nullable
         public final ContainerItemContext context;
         @Nullable
         public final ItemStack stack;
         
-        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyContainer container) {
+        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyStorage container) {
             if (container == null) return null;
             return new ContainerStorageWrapper(container);
         }
         
-        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyContainer container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
+        public static ContainerStorageWrapper of(@Nullable EnergyApi.EnergyStorage container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
             if (container == null) return null;
             return new ContainerStorageWrapper(container, context, stack);
         }
         
-        public ContainerStorageWrapper(EnergyApi.EnergyContainer container) {
+        public ContainerStorageWrapper(EnergyApi.EnergyStorage container) {
             this.container = container;
             this.context = null;
             this.stack = null;
         }
         
-        public ContainerStorageWrapper(EnergyApi.EnergyContainer container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
+        public ContainerStorageWrapper(EnergyApi.EnergyStorage container, @Nullable ContainerItemContext context, @Nullable ItemStack stack) {
             this.container = container;
             this.context = context;
             this.stack = stack;

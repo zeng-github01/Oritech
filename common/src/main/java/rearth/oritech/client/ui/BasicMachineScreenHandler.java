@@ -19,7 +19,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     @NotNull
     protected final Inventory inventory;
     @NotNull
-    protected final EnergyApi.EnergyContainer energyStorage;
+    protected final EnergyApi.EnergyStorage energyStorage;
     
     @NotNull
     protected final BlockPos blockPos;
@@ -40,11 +40,11 @@ public class BasicMachineScreenHandler extends ScreenHandler {
     public final ScreenProvider screenData;
     
     @Nullable
-    protected final FluidApi.SingleSlotContainer steamStorage;
+    protected final FluidApi.SingleSlotStorage steamStorage;
     @Nullable
-    protected final FluidApi.SingleSlotContainer waterStorage;
+    protected final FluidApi.SingleSlotStorage waterStorage;
     @Nullable
-    protected FluidApi.SingleSlotContainer mainFluidContainer;
+    protected FluidApi.SingleSlotStorage mainFluidContainer;
     
     protected BlockState machineBlock;
     public BlockEntity blockEntity;
@@ -66,12 +66,12 @@ public class BasicMachineScreenHandler extends ScreenHandler {
         this.playerInventory = playerInventory;
         
         if (blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
-            energyStorage = energyProvider.getStorage(null);
+            energyStorage = energyProvider.getEnergyStorage(null);
         } else {
             energyStorage = null;
         }
         
-        if (blockEntity instanceof FluidApi.FluidApiProvider blockFluidProvider && blockFluidProvider.getFluidStorage(null) instanceof SimpleFluidContainer container) {
+        if (blockEntity instanceof FluidApi.BlockProvider blockProvider && blockProvider.getFluidStorage(null) instanceof SimpleFluidStorage container) {
             this.mainFluidContainer = container;
         } else {
             mainFluidContainer = null;

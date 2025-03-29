@@ -9,7 +9,7 @@ public interface ComparatorOutputProvider {
 		return (int) ((stack.getCount() / (float) stack.getMaxCount()) * 15);
 	}
 
-	static int getFluidStorageComparatorOutput(FluidApi.SingleSlotContainer storage) {
+	static int getFluidStorageComparatorOutput(FluidApi.SingleSlotStorage storage) {
 		return (int) ((storage.getStack().getAmount() / (float) storage.getCapacity()) * 15);
 	}
 

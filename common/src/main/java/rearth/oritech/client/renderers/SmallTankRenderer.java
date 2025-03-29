@@ -11,12 +11,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.Direction;
 import org.joml.Matrix4f;
-import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
 
-public class SmallTankRenderer implements BlockEntityRenderer<SmallFluidTankEntity> {
+public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity> {
     
     @Override
-    public void render(SmallFluidTankEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(SmallTankEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         
         var storage = entity.fluidStorage;
         if (storage.getAmount() <= 0 || storage.getFluid().equals(Fluids.EMPTY)) return;

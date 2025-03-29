@@ -22,7 +22,7 @@ import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.containers.SimpleInOutFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleInOutFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     
     // this is used just for steam
     public boolean isProducingSteam = false;
-    public final SimpleInOutFluidContainer boilerStorage = new SimpleInOutFluidContainer(8 * FluidStackHooks.bucketAmount(), this::markDirty) {
+    public final SimpleInOutFluidStorage boilerStorage = new SimpleInOutFluidStorage(8 * FluidStackHooks.bucketAmount(), this::markDirty) {
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
             if (!boilerAcceptsInput(toInsert.getFluid())) return 0L;

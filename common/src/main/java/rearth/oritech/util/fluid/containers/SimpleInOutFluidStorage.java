@@ -10,23 +10,23 @@ import rearth.oritech.util.fluid.FluidApi;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class SimpleInOutFluidContainer extends FluidApi.InOutSlotContainer {
+public class SimpleInOutFluidStorage extends FluidApi.InOutSlotStorage {
     
     private FluidStack contentIn;
     private FluidStack contentOut;
     private final Long capacity;
     private final Runnable onUpdate;
-    private final FluidApi.SingleSlotContainer inputContainer;
-    private final FluidApi.SingleSlotContainer outputContainer;
+    private final FluidApi.SingleSlotStorage inputContainer;
+    private final FluidApi.SingleSlotStorage outputContainer;
     
-    public SimpleInOutFluidContainer(Long capacity, Runnable onUpdate) {
+    public SimpleInOutFluidStorage(Long capacity, Runnable onUpdate) {
         this.capacity = capacity;
         this.onUpdate = onUpdate;
         
         this.contentIn = FluidStack.empty();
         this.contentOut = FluidStack.empty();
         
-        inputContainer = new FluidApi.SingleSlotContainer() {
+        inputContainer = new FluidApi.SingleSlotStorage() {
             @Override
             public void setStack(FluidStack stack) {
                 contentIn = stack;
@@ -62,7 +62,7 @@ public class SimpleInOutFluidContainer extends FluidApi.InOutSlotContainer {
                 onUpdate.run();
             }
         };
-        outputContainer = new FluidApi.SingleSlotContainer() {
+        outputContainer = new FluidApi.SingleSlotStorage() {
             @Override
             public void setStack(FluidStack stack) {
                 contentOut = stack;
@@ -100,7 +100,7 @@ public class SimpleInOutFluidContainer extends FluidApi.InOutSlotContainer {
         };
     }
     
-    public SimpleInOutFluidContainer(Long capacity) {
+    public SimpleInOutFluidStorage(Long capacity) {
         this(capacity, () -> {
         });
     }
@@ -150,16 +150,16 @@ public class SimpleInOutFluidContainer extends FluidApi.InOutSlotContainer {
         onUpdate.run();
     }
     
-    public FluidApi.SingleSlotContainer getInputContainer() {
+    public FluidApi.SingleSlotStorage getInputContainer() {
         return inputContainer;
     }
     
-    public FluidApi.SingleSlotContainer getOutputContainer() {
+    public FluidApi.SingleSlotStorage getOutputContainer() {
         return outputContainer;
     }
     
     @Override
-    public FluidApi.FluidContainer getContainerForDirection(@Nullable Direction direction) {
+    public FluidApi.FluidStorage getStorageForDirection(@Nullable Direction direction) {
         
         if (direction == null) return this;
         

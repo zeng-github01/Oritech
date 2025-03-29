@@ -27,7 +27,7 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -38,7 +38,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidApi.FluidApiProvider, EnergyApi.BlockProvider, GeoBlockEntity {
+public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<PumpBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
     
     private static final int MAX_SEARCH_COUNT = 100_000;
     private static final int ENERGY_USAGE = 512;   // per block pumped
@@ -51,7 +51,7 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     public Fluid lastPumpedVariant;
     public long lastPumpTime;
     
-    private final SimpleFluidContainer fluidStorage = new SimpleFluidContainer(16 * FluidStackHooks.bucketAmount(), this::markDirty);
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(1000, 0, 20_000);
     private boolean initialized = false;
@@ -252,12 +252,12 @@ public class PumpBlockEntity extends BlockEntity implements BlockEntityTicker<Pu
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(Direction direction) {
         return fluidStorage;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     

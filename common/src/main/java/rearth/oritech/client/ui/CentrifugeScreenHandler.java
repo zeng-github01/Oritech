@@ -13,7 +13,7 @@ import rearth.oritech.util.fluid.FluidApi;
 
 public class CentrifugeScreenHandler extends UpgradableMachineScreenHandler {
     
-    public final FluidApi.SingleSlotContainer inputTank;
+    public final FluidApi.SingleSlotStorage inputTank;
     public final SimpleInventory bucketInventory;
     
     public CentrifugeScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, MachineAddonController.AddonUiData addonUiData, float coreQuality) {

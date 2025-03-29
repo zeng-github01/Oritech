@@ -37,7 +37,7 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
-import rearth.oritech.util.energy.containers.DynamicStatisticEnergyContainer;
+import rearth.oritech.util.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -68,9 +68,9 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     public final SimpleEnergyStorage laserInputStorage = new SimpleEnergyStorage(100_000_000, 0, 100_000_000);
     
     //own storage
-    protected final DynamicStatisticEnergyContainer energyStorage = new DynamicStatisticEnergyContainer(20_000_000L, 20_000_000L, 20_000_000L, this::markDirty);
+    protected final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(20_000_000L, 20_000_000L, 20_000_000L, this::markDirty);
     
-    private final EnergyApi.EnergyContainer outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
+    private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
         public boolean supportsInsertion() {
             return false;
@@ -80,7 +80,7 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
     // client only
-    public DynamicStatisticEnergyContainer.EnergyStatistics currentStats;
+    public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
     
     public UnstableContainerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY, pos, state);
@@ -266,12 +266,12 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     }
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForMultiblock() {
         return pos;
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForMultiblock() {
         return world;
     }
     
@@ -291,13 +291,13 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
+    public InventoryProvider getInventoryForMultiblock() {
         return null;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
-        return getStorage(direction);
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+        return getEnergyStorage(direction);
     }
     
     @Override
@@ -337,7 +337,7 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         
         if (direction == null) return energyStorage;
         

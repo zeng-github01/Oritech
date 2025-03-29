@@ -9,17 +9,17 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public class DelegatingFluidStorage extends FluidApi.FluidContainer {
+public class DelegatingFluidStorage extends FluidApi.FluidStorage {
     
-    protected final Supplier<FluidApi.FluidContainer> backingStorage;
+    protected final Supplier<FluidApi.FluidStorage> backingStorage;
     protected final BooleanSupplier validPredicate;
     
-    public DelegatingFluidStorage(Supplier<FluidApi.FluidContainer> backingStorage, @Nullable BooleanSupplier validPredicate) {
+    public DelegatingFluidStorage(Supplier<FluidApi.FluidStorage> backingStorage, @Nullable BooleanSupplier validPredicate) {
         this.backingStorage = backingStorage;
         this.validPredicate = validPredicate == null ? () -> true : validPredicate;
     }
     
-    public DelegatingFluidStorage(FluidApi.FluidContainer backingStorage, @Nullable BooleanSupplier validPredicate) {
+    public DelegatingFluidStorage(FluidApi.FluidStorage backingStorage, @Nullable BooleanSupplier validPredicate) {
         this(() -> backingStorage, validPredicate);
     }
     
@@ -48,9 +48,9 @@ public class DelegatingFluidStorage extends FluidApi.FluidContainer {
         if (validPredicate.getAsBoolean()) {
             // extract all, then insert new stacks
             var targetStorage = backingStorage.get();
-            if (targetStorage instanceof FluidApi.SingleSlotContainer singleSlotContainer && content.size() == 1) {
+            if (targetStorage instanceof FluidApi.SingleSlotStorage singleSlotContainer && content.size() == 1) {
                 singleSlotContainer.setStack(content.getFirst());
-            } else if (targetStorage instanceof FluidApi.InOutSlotContainer dualSlotContainer && content.size() == 2) {
+            } else if (targetStorage instanceof FluidApi.InOutSlotStorage dualSlotContainer && content.size() == 2) {
                 dualSlotContainer.setInStack(content.getFirst());
                 dualSlotContainer.setOutStack(content.getLast());
             } else {

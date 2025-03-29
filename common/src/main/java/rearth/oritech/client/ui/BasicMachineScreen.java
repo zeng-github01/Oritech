@@ -79,9 +79,9 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         private ColoredSpriteComponent background;
         private final TextureComponent foreGround;
         private final ScreenProvider.BarConfiguration config;
-        private final FluidApi.SingleSlotContainer storage;
+        private final FluidApi.SingleSlotStorage storage;
         
-        private FluidDisplay(BoxComponent fillOverlay, float lastFill, Fluid lastDrawnFluid, ColoredSpriteComponent background, TextureComponent foreGround, ScreenProvider.BarConfiguration config, FluidApi.SingleSlotContainer storage) {
+        private FluidDisplay(BoxComponent fillOverlay, float lastFill, Fluid lastDrawnFluid, ColoredSpriteComponent background, TextureComponent foreGround, ScreenProvider.BarConfiguration config, FluidApi.SingleSlotStorage storage) {
             this.fillOverlay = fillOverlay;
             this.lastFill = lastFill;
             this.lastDrawnFluid = lastDrawnFluid;
@@ -141,7 +141,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         return BACKGROUND;
     }
     
-    protected FluidDisplay initFluidDisplay(FluidApi.SingleSlotContainer container, ScreenProvider.BarConfiguration config) {
+    protected FluidDisplay initFluidDisplay(FluidApi.SingleSlotStorage container, ScreenProvider.BarConfiguration config) {
         var lastFill = 1 - ((float) container.getStack().getAmount() / container.getCapacity());
         var background = createFluidRenderer(container.getStack(), config);
 
@@ -395,7 +395,8 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         container.child(Components.label(Text.translatable("title.oritech.details")).margins(Insets.of(3, 1, 1, 1)));
         
-        if (handler.screenData.inputOptionsEnabled())
+        var inputSlots = handler.screenData.getGuiSlots().stream().filter(slot -> !slot.output()).count();
+        if (handler.screenData.inputOptionsEnabled() && inputSlots > 1)
             container.child(cycleInputButton);
         
         for (var label : handler.screenData.getExtraExtensionLabels()) {

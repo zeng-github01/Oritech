@@ -14,7 +14,7 @@ public interface BlockFluidApi {
     
     void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier);
     
-    FluidApi.FluidContainer find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
+    FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
     
-    FluidApi.FluidContainer find(World world, BlockPos pos, @Nullable Direction direction);
+    FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable Direction direction);
 }

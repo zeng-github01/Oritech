@@ -11,7 +11,7 @@ import rearth.oritech.util.fluid.FluidApi;
 
 import java.util.Objects;
 
-public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements FluidApi.FluidApiProvider {
+public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements FluidApi.BlockProvider {
     
     private UpgradableGeneratorBlockEntity cachedController;
     
@@ -34,7 +34,7 @@ public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements Flu
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(Direction direction) {
         if (!isConnected()) return null;
         return cachedController.boilerStorage;
     }

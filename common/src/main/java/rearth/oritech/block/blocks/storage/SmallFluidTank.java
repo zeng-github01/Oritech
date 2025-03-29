@@ -26,7 +26,7 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.StackContext;
@@ -55,7 +55,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new SmallFluidTankEntity(pos, state, false);
+        return new SmallTankEntity(pos, state, false);
     }
     
     @Override
@@ -84,7 +84,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         
         var blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof SmallFluidTankEntity tankEntity) {
+        if (blockEntity instanceof SmallTankEntity tankEntity) {
             var usedStack = stack;
             if (stack.getCount() > 1) {
                 usedStack = stack.copyWithCount(1);
@@ -124,7 +124,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         var droppedStacks = super.getDroppedStacks(state, builder);
         
         var blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
-        if (blockEntity instanceof SmallFluidTankEntity tankEntity)
+        if (blockEntity instanceof SmallTankEntity tankEntity)
             droppedStacks.addAll(tankEntity.inventory.getHeldStacks());
         
         return droppedStacks;
@@ -137,7 +137,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
     
     @NotNull
     private static ItemStack getStackWithData(WorldView world, BlockPos pos) {
-        var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
+        var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
         var stack = getBasePickStack(tankEntity.isCreative);
         
         if (tankEntity.fluidStorage.getAmount() > 0) {
@@ -157,7 +157,7 @@ public class SmallFluidTank extends Block implements BlockEntityProvider {
         super.onPlaced(world, pos, state, placer, itemStack);
         
         if (itemStack.contains(FluidApi.ITEM.getFluidComponent())) {
-            var tankEntity = (SmallFluidTankEntity) world.getBlockEntity(pos);
+            var tankEntity = (SmallTankEntity) world.getBlockEntity(pos);
             tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()));
         }
     }

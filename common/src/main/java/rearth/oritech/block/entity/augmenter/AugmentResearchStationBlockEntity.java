@@ -55,12 +55,12 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     }
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForMultiblock() {
         return pos;
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForMultiblock() {
         return world;
     }
     
@@ -80,12 +80,12 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
+    public InventoryProvider getInventoryForMultiblock() {
         return null;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
     

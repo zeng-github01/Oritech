@@ -22,7 +22,7 @@ import rearth.oritech.util.fluid.BlockFluidApi;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.ItemFluidApi;
 import rearth.oritech.util.fluid.containers.DelegatingFluidStorage;
-import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,13 +43,13 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         for (var supplied : registeredBlockEntities) {
             event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, supplied.get(), (entity, direction) -> {
                 
-                var storage = ((FluidApi.FluidApiProvider) entity).getFluidStorage(direction);
+                var storage = ((FluidApi.BlockProvider) entity).getFluidStorage(direction);
                 
                 if (storage == null) return null;
                 
-                if (storage instanceof FluidApi.InOutSlotContainer inOutContainer) {
+                if (storage instanceof FluidApi.InOutSlotStorage inOutContainer) {
                     return InOutContainerStorageWrapper.of(inOutContainer);
-                } else if (storage instanceof FluidApi.SingleSlotContainer singleContainer) {
+                } else if (storage instanceof FluidApi.SingleSlotStorage singleContainer) {
                     return SingleSlotContainerStorageWrapper.of(singleContainer);
                 } else if (storage instanceof DelegatingFluidStorage delegatingFluidStorage) {
                     return new DelegatingContainerStorageWrapper(delegatingFluidStorage);
@@ -65,7 +65,7 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         
         for (var supplied : registeredItems) {
             event.registerItem(Capabilities.FluidHandler.ITEM,
-              (stack, ignored) -> FluidContainerItemWrapper.of(((FluidApi.ItemApiProvider) stack.getItem()).getFluidStorage(stack), stack),
+              (stack, ignored) -> FluidContainerItemWrapper.of(((FluidApi.ItemProvider) stack.getItem()).getFluidStorage(stack), stack),
               supplied.get());
         }
     }
@@ -76,31 +76,31 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     }
     
     @Override
-    public FluidApi.FluidContainer find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+    public FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
         var candidate = world.getCapability(Capabilities.FluidHandler.BLOCK, pos, state, entity, direction);
         return switch (candidate) {
             case null -> null;
             case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
-            case InOutContainerStorageWrapper wrapper -> wrapper.container.getContainerForDirection(direction);
+            case InOutContainerStorageWrapper wrapper -> wrapper.container.getStorageForDirection(direction);
             default -> new NeoforgeStorageWrapper(candidate);
         };
     }
     
     @Override
-    public FluidApi.FluidContainer find(World world, BlockPos pos, @Nullable Direction direction) {
+    public FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     
     @Override
-    public FluidApi.FluidContainer find(StackContext stack) {
+    public FluidApi.FluidStorage find(StackContext stack) {
         var candidate = stack.getValue().getCapability(Capabilities.FluidHandler.ITEM);
         if (candidate == null) return null;
-        if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidContainer itemContainer) return itemContainer.withCallback(ignored -> stack.sync());
+        if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidStorage itemContainer) return itemContainer.withCallback(ignored -> stack.sync());
         return new NeoforgeItemStorageWrapper(candidate, stack);
     }
     
     // used to interact with tanks from other mods
-    public static class NeoforgeStorageWrapper extends FluidApi.FluidContainer {
+    public static class NeoforgeStorageWrapper extends FluidApi.FluidStorage {
         
         private final IFluidHandler storage;
         
@@ -166,14 +166,14 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     // this is used by other mods to interact with the oritech fluid containers
     public static class SingleSlotContainerStorageWrapper implements IFluidHandler {
         
-        public final FluidApi.SingleSlotContainer container;
+        public final FluidApi.SingleSlotStorage container;
         
-        public static SingleSlotContainerStorageWrapper of(@Nullable FluidApi.SingleSlotContainer container) {
+        public static SingleSlotContainerStorageWrapper of(@Nullable FluidApi.SingleSlotStorage container) {
             if (container == null) return null;
             return new SingleSlotContainerStorageWrapper(container);
         }
         
-        public SingleSlotContainerStorageWrapper(FluidApi.SingleSlotContainer container) {
+        public SingleSlotContainerStorageWrapper(FluidApi.SingleSlotStorage container) {
             this.container = container;
         }
         
@@ -233,14 +233,14 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     // this is used by other mods to access an oritech in/out container
     public static class InOutContainerStorageWrapper implements IFluidHandler {
         
-        public final FluidApi.InOutSlotContainer container;
+        public final FluidApi.InOutSlotStorage container;
         
-        public static InOutContainerStorageWrapper of(FluidApi.InOutSlotContainer container) {
+        public static InOutContainerStorageWrapper of(FluidApi.InOutSlotStorage container) {
             if (container == null) return null;
             return new InOutContainerStorageWrapper(container);
         }
         
-        public InOutContainerStorageWrapper(FluidApi.InOutSlotContainer container) {
+        public InOutContainerStorageWrapper(FluidApi.InOutSlotStorage container) {
             this.container = container;
         }
         
@@ -364,12 +364,12 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         
         private final ItemStack stack;
         
-        public static FluidContainerItemWrapper of(FluidApi.SingleSlotContainer container, ItemStack stack) {
+        public static FluidContainerItemWrapper of(FluidApi.SingleSlotStorage container, ItemStack stack) {
             if (container == null || stack == null || stack.isEmpty()) return null;
             return new FluidContainerItemWrapper(container, stack);
         }
         
-        public FluidContainerItemWrapper(FluidApi.SingleSlotContainer container, ItemStack stack) {
+        public FluidContainerItemWrapper(FluidApi.SingleSlotStorage container, ItemStack stack) {
             super(container);
             this.stack = stack;
         }

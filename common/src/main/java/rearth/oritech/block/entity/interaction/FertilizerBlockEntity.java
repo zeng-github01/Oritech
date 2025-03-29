@@ -25,16 +25,16 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Objects;
 
-public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidApi.FluidApiProvider {
+public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidApi.BlockProvider {
     
     public static final long FLUID_USAGE = (long) (Oritech.CONFIG.fertilizerConfig.liquidPerBlockUsage() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
     
-    private final SimpleFluidContainer fluidStorage = new SimpleFluidContainer(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
         @Override
         public Fluid getEmptyVariant() {
             return Fluids.WATER;
@@ -196,7 +196,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(Direction direction) {
         return fluidStorage;
     }
 }

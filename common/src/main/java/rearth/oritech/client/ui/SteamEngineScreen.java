@@ -41,6 +41,7 @@ public class SteamEngineScreen extends UpgradableMachineScreen<UpgradableMachine
     @Override
     protected void handledScreenTick() {
         super.handledScreenTick();
+        updateEnergyBar();
         
         var steamEntity = ((SteamEngineEntity) handler.blockEntity);
         var data = steamEntity.clientStats;

@@ -9,14 +9,14 @@ import java.util.List;
 
 public class FluidApi {
     
-    public static long transferFirst(FluidContainer from, FluidContainer to, long max, boolean simulate) {
+    public static long transferFirst(FluidStorage from, FluidStorage to, long max, boolean simulate) {
         if (from.getContent().isEmpty()) return 0L;
         
         var kind = from.getContent().getFirst();
         return transfer(from, to, kind.copyWithAmount(max), simulate);
     }
     
-    public static long transfer(FluidContainer from, FluidContainer to, FluidStack toMove, boolean simulate) {
+    public static long transfer(FluidStorage from, FluidStorage to, FluidStack toMove, boolean simulate) {
         var extracted = from.extract(toMove, true);
         var inserted = to.insert(toMove.copyWithAmount(extracted), simulate);
         extracted = from.extract(toMove.copyWithAmount(inserted), simulate);
@@ -32,7 +32,7 @@ public class FluidApi {
     public static BlockFluidApi BLOCK;
     public static ItemFluidApi ITEM;
     
-    public static abstract class FluidContainer {
+    public static abstract class FluidStorage {
         
         public boolean supportsInsertion() {
             return true;
@@ -54,18 +54,18 @@ public class FluidApi {
         
     }
     
-    public interface ItemApiProvider {
-        SingleSlotContainer getFluidStorage(ItemStack stack);
+    public interface ItemProvider {
+        SingleSlotStorage getFluidStorage(ItemStack stack);
     }
     
-    public interface FluidApiProvider {
+    public interface BlockProvider {
         
-        FluidContainer getFluidStorage(@Nullable Direction direction);
+        FluidStorage getFluidStorage(@Nullable Direction direction);
         
     }
     
     // used for things like tanks, etc.
-    public static abstract class SingleSlotContainer extends FluidContainer {
+    public static abstract class SingleSlotStorage extends FluidStorage {
         
         public abstract void setStack(FluidStack stack);
         public abstract FluidStack getStack();
@@ -73,14 +73,14 @@ public class FluidApi {
     }
     
     // used for things like the centrifuge or steam engine
-    public static abstract class InOutSlotContainer extends FluidContainer {
+    public static abstract class InOutSlotStorage extends FluidStorage {
         
         public abstract void setInStack(FluidStack stack);
         public abstract FluidStack getInStack();
         
         public abstract void setOutStack(FluidStack stack);
         public abstract FluidStack getOutStack();
-        public abstract FluidContainer getContainerForDirection(Direction direction);
+        public abstract FluidStorage getStorageForDirection(Direction direction);
         
     }
 }

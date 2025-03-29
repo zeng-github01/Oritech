@@ -34,11 +34,11 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 
-public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidApiProvider, InventoryProvider, ComparatorOutputProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallFluidTankEntity> {
+public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvider, InventoryProvider, ComparatorOutputProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallTankEntity> {
     
     private boolean netDirty = false;
     private int lastComparatorOutput = 0;
@@ -47,13 +47,13 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
     public final SimpleSidedInventory inventory = new SimpleSidedInventory(3, new InventorySlotAssignment(0, 2, 2, 1)) {
         @Override
         public void markDirty() {
-            SmallFluidTankEntity.this.markDirty();
+            SmallTankEntity.this.markDirty();
         }
     };
     
-    public final SimpleFluidContainer fluidStorage = new SimpleFluidContainer(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
     
-    public SmallFluidTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
+    public SmallTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
         super(isCreative ? BlockEntitiesContent.CREATIVE_TANK_ENTITY : BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);
         this.isCreative = isCreative;
     }
@@ -84,7 +84,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, SmallFluidTankEntity blockEntity) {
+    public void tick(World world, BlockPos pos, BlockState state, SmallTankEntity blockEntity) {
         // fill/drain buckets
         
         if (world.isClient) return;
@@ -122,7 +122,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
         var belowTank = tankCandidate.get().fluidStorage;
         var ownTank = this.fluidStorage;
         
-        SimpleFluidContainer.transfer(ownTank, belowTank, ownTank.getCapacity(), false);
+        SimpleFluidStorage.transfer(ownTank, belowTank, ownTank.getCapacity(), false);
     }
     
     
@@ -294,7 +294,7 @@ public class SmallFluidTankEntity extends BlockEntity implements FluidApi.FluidA
     }
     
     @Override
-    public FluidApi.SingleSlotContainer getFluidStorage(@Nullable Direction direction) {
+    public FluidApi.SingleSlotStorage getFluidStorage(@Nullable Direction direction) {
         return fluidStorage;
     }
 }

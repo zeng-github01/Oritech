@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 // progress is abused to sync active speed.
-public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidApi.FluidApiProvider {
+public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
     
     private static final int MAX_SPEED = 10;
     private static final int MAX_CHAIN_SIZE = 20;
@@ -201,7 +201,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         super.readNbt(nbt, registryLookup);
     }
     
-    private float getSteamProcessingSpeed(FluidApi.SingleSlotContainer usedTank) {
+    private float getSteamProcessingSpeed(FluidApi.SingleSlotStorage usedTank) {
         var fillPercentage = usedTank.getStack().getAmount() / (float) usedTank.getCapacity();
         return fillPercentage * MAX_SPEED;
     }
@@ -310,8 +310,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
-        if (inSlaveMode()) return master.boilerStorage.getContainerForDirection(direction);
-        return boilerStorage.getContainerForDirection(direction);
+    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+        if (inSlaveMode()) return master.boilerStorage.getStorageForDirection(direction);
+        return boilerStorage.getStorageForDirection(direction);
     }
 }

@@ -326,7 +326,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
 
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     

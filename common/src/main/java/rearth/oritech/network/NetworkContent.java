@@ -41,10 +41,10 @@ import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.util.energy.containers.DynamicStatisticEnergyContainer;
+import rearth.oritech.util.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Map;
@@ -115,7 +115,7 @@ public class NetworkContent {
                                        long maxExtract) {
     }
     
-    public record EnergyStatisticsPacket(BlockPos position, DynamicStatisticEnergyContainer.EnergyStatistics data) {
+    public record EnergyStatisticsPacket(BlockPos position, DynamicStatisticEnergyStorage.EnergyStatistics data) {
     }
     
     public record UnstableContainerContentPacket(BlockPos position, Identifier captured, float quality) {
@@ -299,10 +299,10 @@ public class NetworkContent {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
-            if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
+            if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getEnergyStorage(null) instanceof DynamicEnergyStorage storage) {
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
-            } else if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof SimpleEnergyStorage storage) {
+            } else if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getEnergyStorage(null) instanceof SimpleEnergyStorage storage) {
                 storage.setAmount(message.currentEnergy);
             }
             
@@ -335,7 +335,7 @@ public class NetworkContent {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
-            if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getStorage(null) instanceof DynamicEnergyStorage storage) {
+            if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getEnergyStorage(null) instanceof DynamicEnergyStorage storage) {
                 storage.capacity = message.maxEnergy;
                 storage.amount = message.currentEnergy;
                 storage.maxExtract = message.maxExtract;
@@ -379,7 +379,7 @@ public class NetworkContent {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
-            if (entity instanceof FluidApi.FluidApiProvider fluidEntity && fluidEntity.getFluidStorage(null) instanceof SimpleFluidContainer fluidContainer) {
+            if (entity instanceof FluidApi.BlockProvider fluidEntity && fluidEntity.getFluidStorage(null) instanceof SimpleFluidStorage fluidContainer) {
                 fluidContainer.setStack(FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.amount));
             }
             

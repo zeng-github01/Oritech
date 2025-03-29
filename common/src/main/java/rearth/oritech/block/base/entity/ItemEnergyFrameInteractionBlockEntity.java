@@ -99,18 +99,18 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForAddon() {
         return getPos();
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForAddon() {
         return getWorld();
     }
     
@@ -228,7 +228,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public List<BlockPos> getOpenSlots() {
+    public List<BlockPos> getOpenAddonSlots() {
         return openSlots;
     }
     

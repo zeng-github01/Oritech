@@ -21,13 +21,13 @@ import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.TooltipHelper;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.List;
 
 import static rearth.oritech.item.tools.harvesting.ChainsawItem.BAR_STEP_COUNT;
 
-public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemApiProvider {
+public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvider {
     
     boolean requireUpward();
     int getRfUsage();
@@ -219,8 +219,8 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemApiProv
     }
     
     @Override
-    default FluidApi.SingleSlotContainer getFluidStorage(ItemStack stack) {
-        return new SimpleItemFluidContainer(getFuelCapacity(), stack) {
+    default FluidApi.SingleSlotStorage getFluidStorage(ItemStack stack) {
+        return new SimpleItemFluidStorage(getFuelCapacity(), stack) {
             @Override
             public long insert(FluidStack toInsert, boolean simulate) {
                 var valid = isValidFuel(toInsert.getFluid());

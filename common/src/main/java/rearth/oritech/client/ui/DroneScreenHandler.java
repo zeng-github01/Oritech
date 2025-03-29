@@ -14,7 +14,7 @@ import rearth.oritech.util.fluid.FluidApi;
 public class DroneScreenHandler extends UpgradableMachineScreenHandler {
     
     private final SimpleInventory cardInventory;
-    private final FluidApi.SingleSlotContainer fluidTank;
+    private final FluidApi.SingleSlotStorage fluidTank;
     
     public DroneScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity, MachineAddonController.AddonUiData addonUiData, float coreQuality) {
         super(syncId, playerInventory, blockEntity, addonUiData, coreQuality);

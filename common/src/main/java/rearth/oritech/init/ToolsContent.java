@@ -82,7 +82,7 @@ public class ToolsContent implements ArchitecturyRegistryContainer<Item> {
             EnergyApi.ITEM.registerForItem(() -> value);
         }
         
-        if (FluidApi.ITEM != null && value instanceof FluidApi.ItemApiProvider) {
+        if (FluidApi.ITEM != null && value instanceof FluidApi.ItemProvider) {
             FluidApi.ITEM.registerForItem(() -> value);
         }
         

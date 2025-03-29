@@ -35,11 +35,11 @@ import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidApi.FluidApiProvider, EnergyApi.BlockProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::markDirty);
     
@@ -52,7 +52,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     };
     public final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
-    private final SimpleFluidContainer fluidStorage = new SimpleFluidContainer(16 * FluidStackHooks.bucketAmount(), this::markDirty);
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     private boolean networkDirty = false;
     
@@ -178,7 +178,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -228,7 +228,7 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         return fluidStorage;
     }
 }

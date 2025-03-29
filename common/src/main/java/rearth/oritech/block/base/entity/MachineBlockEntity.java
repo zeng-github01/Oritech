@@ -160,7 +160,7 @@ public abstract class MachineBlockEntity extends BlockEntity
         // a few ticks old (e.g. for rendering), as this does not matter as much.
         // Currently not perfect for multiplayer, as it doesn't track individual players. So all players that match the entity handle will receive the packets while
         // the screen is open
-        if (isActivelyViewed()) updateFrequency = 1;
+        if (isActivelyViewed()) updateFrequency = 2;
         
         if (Objects.requireNonNull(this.world).getTime() % updateFrequency != 0) return;
         
@@ -397,7 +397,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     

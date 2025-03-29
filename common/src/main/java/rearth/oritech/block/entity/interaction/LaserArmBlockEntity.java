@@ -617,6 +617,16 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     @Override
+    public BlockPos getPosForMultiblock() {
+        return pos;
+    }
+    
+    @Override
+    public World getWorldForMultiblock() {
+        return world;
+    }
+    
+    @Override
     public float getCoreQuality() {
         return this.coreQuality;
     }
@@ -627,12 +637,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
+    public InventoryProvider getInventoryForMultiblock() {
         return this;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
     }
     
@@ -646,7 +656,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     // energyprovider
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -657,7 +667,7 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     @Override
-    public List<BlockPos> getOpenSlots() {
+    public List<BlockPos> getOpenAddonSlots() {
         return openSlots;
     }
     
@@ -795,12 +805,12 @@ public class LaserArmBlockEntity extends BlockEntity implements GeoBlockEntity, 
     
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForAddon() {
         return getPos();
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForAddon() {
         return getWorld();
     }
     

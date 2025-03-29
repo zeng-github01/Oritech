@@ -421,7 +421,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var entity = world.getBlockEntity(motorBlock);
         if (!(entity instanceof AcceleratorMotorBlockEntity motorEntity)) return;
         
-        var storage = motorEntity.getStorage(null);
+        var storage = motorEntity.getEnergyStorage(null);
         var availableEnergy = storage.getAmount();
         
         var speed = particle.velocity;

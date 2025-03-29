@@ -8,8 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -18,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
 import net.minecraft.text.Text;
@@ -141,8 +138,8 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
         var stack = new ItemStack(BlockContent.SMALL_STORAGE_BLOCK.asItem());
         
         var storageEntity = (SmallStorageBlockEntity) world.getBlockEntity(pos);
-        if (storageEntity.getStorage(null).getAmount() > 0) {
-            stack.set(EnergyApi.ITEM.getEnergyComponent(), storageEntity.getStorage(null).getAmount());
+        if (storageEntity.getEnergyStorage(null).getAmount() > 0) {
+            stack.set(EnergyApi.ITEM.getEnergyComponent(), storageEntity.getEnergyStorage(null).getAmount());
         }
         
         return stack;

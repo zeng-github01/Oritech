@@ -119,12 +119,12 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
+    public InventoryProvider getInventoryForMultiblock() {
         return null;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
     
@@ -196,12 +196,12 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForMultiblock() {
         return getPos();
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForMultiblock() {
         return getWorld();
     }
     

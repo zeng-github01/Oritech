@@ -8,7 +8,7 @@ import net.minecraft.loot.context.LootContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.function.ConditionalLootFunction;
 import net.minecraft.loot.function.LootFunctionType;
-import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
 import rearth.oritech.init.LootContent;
 import rearth.oritech.util.energy.EnergyApi;
@@ -27,7 +27,7 @@ public class NbtBlockLootFunction extends ConditionalLootFunction {
     public ItemStack process(ItemStack stack, LootContext context) {
         var blockEntity = context.get(LootContextParameters.BLOCK_ENTITY);
         
-        if (blockEntity instanceof SmallFluidTankEntity tankEntity && tankEntity.fluidStorage.getAmount() > 0) {
+        if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.fluidStorage.getAmount() > 0) {
             stack.set(FluidApi.ITEM.getFluidComponent(), tankEntity.fluidStorage.getStack());
         } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity && storageEntity.energyStorage.amount > 0) {
             stack.set(EnergyApi.ITEM.getEnergyComponent(), storageEntity.energyStorage.amount);

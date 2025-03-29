@@ -8,7 +8,7 @@ public class EnergyApi {
     public static BlockEnergyApi BLOCK;
     public static ItemEnergyApi ITEM;
     
-    public static Long transfer(EnergyContainer from, EnergyContainer to, long amount, boolean simulate) {
+    public static Long transfer(EnergyStorage from, EnergyStorage to, long amount, boolean simulate) {
         var extracted = from.extract(amount, true);
         var inserted = to.insert(extracted, simulate);
         extracted = from.extract(inserted, simulate);
@@ -23,17 +23,17 @@ public class EnergyApi {
     
     public interface BlockProvider {
         
-        EnergyContainer getStorage(Direction direction);
+        EnergyStorage getEnergyStorage(Direction direction);
         
     }
     
     public interface ItemProvider {
         
-        EnergyContainer getStorage(ItemStack stack);
+        EnergyStorage getEnergyStorage(ItemStack stack);
         
     }
     
-    public abstract static class EnergyContainer {
+    public abstract static class EnergyStorage {
         
         public boolean supportsInsertion() {
             return true;

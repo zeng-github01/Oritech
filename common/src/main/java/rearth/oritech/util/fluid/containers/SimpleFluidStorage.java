@@ -10,9 +10,9 @@ import rearth.oritech.util.fluid.FluidApi;
 
 import java.util.List;
 
-public class SimpleFluidContainer extends FluidApi.SingleSlotContainer {
+public class SimpleFluidStorage extends FluidApi.SingleSlotStorage {
     
-    public static Long transfer(SimpleFluidContainer from, SimpleFluidContainer to, long maxAmount, boolean simulate) {
+    public static Long transfer(SimpleFluidStorage from, SimpleFluidStorage to, long maxAmount, boolean simulate) {
         
         var extracted = from.extract(FluidStack.create(to.getFluid(), maxAmount, to.getChanges()), true);   // check how much we could extract at most
         var inserted = to.insert(FluidStack.create(to.getFluid(), extracted, to.getChanges()), simulate);   // insert max extraction amount
@@ -30,7 +30,7 @@ public class SimpleFluidContainer extends FluidApi.SingleSlotContainer {
     private final Long capacity;
     private final Runnable onUpdate;
     
-    public SimpleFluidContainer(Long capacity, Runnable onUpdate) {
+    public SimpleFluidStorage(Long capacity, Runnable onUpdate) {
         this.capacity = capacity;
         this.onUpdate = onUpdate;
         this.content = FluidStack.create(getEmptyVariant(), 0);
@@ -40,19 +40,19 @@ public class SimpleFluidContainer extends FluidApi.SingleSlotContainer {
         return Fluids.EMPTY;
     }
     
-    public SimpleFluidContainer(Long capacity) {
+    public SimpleFluidStorage(Long capacity) {
         this(capacity, () -> {});
     }
     
     
     @Override
     public long insert(FluidStack toInsert, boolean simulate) {
-        return SimpleInOutFluidContainer.insertTo(toInsert, simulate, capacity, content, stack -> this.content = stack);
+        return SimpleInOutFluidStorage.insertTo(toInsert, simulate, capacity, content, stack -> this.content = stack);
     }
     
     @Override
     public long extract(FluidStack toExtract, boolean simulate) {
-        return SimpleInOutFluidContainer.extractFrom(toExtract, simulate, content);
+        return SimpleInOutFluidStorage.extractFrom(toExtract, simulate, content);
     }
     
     @Override

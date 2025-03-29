@@ -37,7 +37,7 @@ import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.util.energy.containers.DynamicStatisticEnergyContainer;
+import rearth.oritech.util.energy.containers.DynamicStatisticEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     private boolean redstonePowered;
     
     // client only
-    public DynamicStatisticEnergyContainer.EnergyStatistics currentStats;
+    public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
     
     public final SimpleInventory inventory = new SimpleInventory(1) {
         @Override
@@ -65,16 +65,16 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     //own storage
-    public final DynamicStatisticEnergyContainer energyStorage = new DynamicStatisticEnergyContainer(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
+    public final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
-    private final EnergyApi.EnergyContainer outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
+    private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
         public boolean supportsInsertion() {
             return false;
         }
     };
     
-    private final EnergyApi.EnergyContainer inputStorage = new DelegatingEnergyStorage(energyStorage, null) {
+    private final EnergyApi.EnergyStorage inputStorage = new DelegatingEnergyStorage(energyStorage, null) {
         @Override
         public boolean supportsExtraction() {
             return false;
@@ -170,7 +170,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         
         if (direction == null)
             return energyStorage;
@@ -188,7 +188,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     @Override
-    public List<BlockPos> getOpenSlots() {
+    public List<BlockPos> getOpenAddonSlots() {
         return openSlots;
     }
     
@@ -301,12 +301,12 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForAddon() {
         return getPos();
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForAddon() {
         return getWorld();
     }
     

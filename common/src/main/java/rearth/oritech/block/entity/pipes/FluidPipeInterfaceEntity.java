@@ -25,7 +25,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     public static final int MAX_TRANSFER_RATE = (int) (FluidStackHooks.bucketAmount() * Oritech.CONFIG.fluidPipeExtractAmountBuckets());
     private static final int TRANSFER_PERIOD = Oritech.CONFIG.fluidPipeExtractIntervalDuration();
     
-    private List<FluidApi.FluidContainer> filteredFluidTargetsCached;
+    private List<FluidApi.FluidStorage> filteredFluidTargetsCached;
     
     public FluidPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FLUID_PIPE_ENTITY, pos, state);
@@ -45,7 +45,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         // try to get fluid to transfer
         // one transaction for each side
         var stackToMove = FluidStack.empty();
-        FluidApi.FluidContainer takenFrom = null;
+        FluidApi.FluidStorage takenFrom = null;
         var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
         
         for (var sourcePos : sources) {

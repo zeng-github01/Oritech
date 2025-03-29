@@ -4,7 +4,6 @@ import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.fabric.FluidStackHooksFabric;
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -28,7 +27,7 @@ import rearth.oritech.util.fluid.BlockFluidApi;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.ItemFluidApi;
 import rearth.oritech.util.fluid.containers.DelegatingFluidStorage;
-import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -41,16 +40,16 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     @SuppressWarnings("IfCanBeSwitch")
     @Override
     public void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier) {
-        FluidStorage.SIDED.registerForBlockEntity(
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntity(
           (entity, direction) -> {
               
-              var storage = ((FluidApi.FluidApiProvider) entity).getFluidStorage(direction);
+              var storage = ((FluidApi.BlockProvider) entity).getFluidStorage(direction);
               
               if (storage == null) return null;
               
-              if (storage instanceof FluidApi.InOutSlotContainer inOutContainer) {
+              if (storage instanceof FluidApi.InOutSlotStorage inOutContainer) {
                   return InOutFluidContainerStorageWrapper.of(inOutContainer);
-              } else if (storage instanceof FluidApi.SingleSlotContainer singleContainer) {
+              } else if (storage instanceof FluidApi.SingleSlotStorage singleContainer) {
                   return SingleSlotContainerStorageWrapper.of(singleContainer);
               } else if (storage instanceof DelegatingFluidStorage delegatedStorage) {
                   return DelegatedContainerStorageWrapper.of(delegatedStorage);
@@ -65,41 +64,41 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
     @Override
     public void registerForItem(Supplier<Item> itemSupplier) {
-        FluidStorage.ITEM.registerForItems(
-          (stack, context) -> SingleSlotContainerStorageWrapper.of(((FluidApi.ItemApiProvider) stack.getItem()).getFluidStorage(stack)),
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.ITEM.registerForItems(
+          (stack, context) -> SingleSlotContainerStorageWrapper.of(((FluidApi.ItemProvider) stack.getItem()).getFluidStorage(stack)),
           itemSupplier.get()
         );
     }
     
     @Override
-    public FluidApi.FluidContainer find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
-        var candidate = FluidStorage.SIDED.find(world, pos, state, entity, direction);
+    public FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction) {
+        var candidate = net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.find(world, pos, state, entity, direction);
         
         return switch (candidate) {
             case null -> null;
             case SingleSlotContainerStorageWrapper wrapper -> wrapper.container;
-            case InOutFluidContainerStorageWrapper wrapper -> wrapper.container.getContainerForDirection(direction);
+            case InOutFluidContainerStorageWrapper wrapper -> wrapper.container.getStorageForDirection(direction);
             case DelegatedContainerStorageWrapper wrapper -> wrapper.storage;
             default -> new FabricStorageWrapper(candidate, null);
         };
     }
     
     @Override
-    public FluidApi.FluidContainer find(World world, BlockPos pos, @Nullable Direction direction) {
+    public FluidApi.FluidStorage find(World world, BlockPos pos, @Nullable Direction direction) {
         return find(world, pos, null, null, direction);
     }
     
     @Override
-    public FluidApi.FluidContainer find(StackContext stack) {
+    public FluidApi.FluidStorage find(StackContext stack) {
         var context = ContainerItemContext.ofSingleSlot(new ItemStackStorage(stack));
-        var candidate = FluidStorage.ITEM.find(stack.getValue(), context);
+        var candidate = net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.ITEM.find(stack.getValue(), context);
         if (candidate == null) return null;
-        if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidContainer itemContainer) return itemContainer.withCallback(ignored -> stack.sync());
+        if (candidate instanceof SingleSlotContainerStorageWrapper wrapper && wrapper.container instanceof SimpleItemFluidStorage itemContainer) return itemContainer.withCallback(ignored -> stack.sync());
         return new FabricStorageWrapper(candidate, stack);
     }
     
     // this is used to interact with fluid storages from other mods
-    public static class FabricStorageWrapper extends FluidApi.FluidContainer {
+    public static class FabricStorageWrapper extends FluidApi.FluidStorage {
         
         public final Storage<FluidVariant> storage;
         public final @Nullable StackContext context;
@@ -153,15 +152,15 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     // this is used by other mods to interact with the oritech single slot fluid containers (machines/items)
     public static class SingleSlotContainerStorageWrapper extends SnapshotParticipant<FluidStack> implements Storage<FluidVariant> {
         
-        public final FluidApi.SingleSlotContainer container;
+        public final FluidApi.SingleSlotStorage container;
         private Set<StorageView<FluidVariant>> contentView;
         
-        public static SingleSlotContainerStorageWrapper of(@Nullable FluidApi.SingleSlotContainer container) {
+        public static SingleSlotContainerStorageWrapper of(@Nullable FluidApi.SingleSlotStorage container) {
             if (container == null) return null;
             return new SingleSlotContainerStorageWrapper(container);
         }
         
-        public SingleSlotContainerStorageWrapper(FluidApi.SingleSlotContainer container) {
+        public SingleSlotContainerStorageWrapper(FluidApi.SingleSlotStorage container) {
             this.container = container;
         }
         
@@ -246,15 +245,15 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     // this is used by other mods to interact with the oritech in/out fluid containers
     public static class InOutFluidContainerStorageWrapper extends SnapshotParticipant<Pair<FluidStack, FluidStack>> implements Storage<FluidVariant> {
         
-        public final FluidApi.InOutSlotContainer container;
+        public final FluidApi.InOutSlotStorage container;
         private List<@NotNull StorageView<FluidVariant>> storageViews;
         
-        public static InOutFluidContainerStorageWrapper of(FluidApi.InOutSlotContainer container) {
+        public static InOutFluidContainerStorageWrapper of(FluidApi.InOutSlotStorage container) {
             if (container == null) return null;
             return new InOutFluidContainerStorageWrapper(container);
         }
         
-        private InOutFluidContainerStorageWrapper(FluidApi.InOutSlotContainer container) {
+        private InOutFluidContainerStorageWrapper(FluidApi.InOutSlotStorage container) {
             this.container = container;
         }
         

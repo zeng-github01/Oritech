@@ -47,7 +47,7 @@ import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -63,7 +63,7 @@ import java.util.Objects;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class DronePortEntity extends BlockEntity implements InventoryProvider, FluidApi.FluidApiProvider, EnergyApi.BlockProvider, GeoBlockEntity, BlockEntityTicker<DronePortEntity>, MultiblockMachineController, MachineAddonController, ExtendedScreenHandlerFactory, ScreenProvider, RedstoneAddonBlockEntity.RedstoneControllable {
+public class DronePortEntity extends BlockEntity implements InventoryProvider, FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, BlockEntityTicker<DronePortEntity>, MultiblockMachineController, MachineAddonController, ExtendedScreenHandlerFactory, ScreenProvider, RedstoneAddonBlockEntity.RedstoneControllable {
 
     // addon data
     private final List<BlockPos> connectedAddons = new ArrayList<>();
@@ -224,7 +224,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
         // Trigger block updates for pipes to connect
         world.updateNeighbors(pos, getCachedState().getBlock());
         for (Vec3i corePosition : getCorePositions()) {
-            var worldPos = new BlockPos(Geometry.offsetToWorldPosition(getFacingForMultiblock(), corePosition, getMachinePos()));
+            var worldPos = new BlockPos(Geometry.offsetToWorldPosition(getFacingForMultiblock(), corePosition, getPosForAddon()));
             world.updateNeighbors(worldPos, world.getBlockState(worldPos).getBlock());
         }
     }
@@ -396,7 +396,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -428,12 +428,12 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
     }
     
     @Override
-    public BlockPos getMachinePos() {
+    public BlockPos getPosForAddon() {
         return pos;
     }
     
     @Override
-    public World getMachineWorld() {
+    public World getWorldForAddon() {
         return world;
     }
     
@@ -453,17 +453,17 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
+    public InventoryProvider getInventoryForMultiblock() {
         return this;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
     }
 
     @Override
-    public @Nullable FluidApi.FluidContainer getFluidStorage(Direction direction) {
+    public @Nullable FluidApi.FluidStorage getFluidStorage(Direction direction) {
         return hasFluidAddon ? fluidStorage : null;
     }
 
@@ -505,7 +505,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
     }
 
     @Override
-    public List<BlockPos> getOpenSlots() {
+    public List<BlockPos> getOpenAddonSlots() {
         return openSlots;
     }
 
@@ -751,6 +751,16 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
     public String getStatusMessage() {
         return statusMessage;
     }
+    
+    @Override
+    public BlockPos getPosForMultiblock() {
+        return pos;
+    }
+    
+    @Override
+    public World getWorldForMultiblock() {
+        return world;
+    }
 
     public record DroneTransferData(List<ItemStack> transferredStacks, FluidStack movedFluid, long arrivesAt) {
     }
@@ -783,7 +793,7 @@ public class DronePortEntity extends BlockEntity implements InventoryProvider, F
         }
     }
 
-    public class DronePortFluidStorage extends SimpleFluidContainer {
+    public class DronePortFluidStorage extends SimpleFluidStorage {
         
         public DronePortFluidStorage(Long capacity, Runnable onUpdate) {
             super(capacity, onUpdate);

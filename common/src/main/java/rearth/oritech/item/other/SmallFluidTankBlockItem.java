@@ -10,11 +10,11 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleItemFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.List;
 
-public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemApiProvider {
+public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemProvider {
     
     public SmallFluidTankBlockItem(Block block, Settings settings) {
         super(block, settings);
@@ -46,8 +46,8 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemA
     }
     
     @Override
-    public FluidApi.SingleSlotContainer getFluidStorage(ItemStack stack) {
-        return new SimpleItemFluidContainer(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), stack);
+    public FluidApi.SingleSlotStorage getFluidStorage(ItemStack stack) {
+        return new SimpleItemFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), stack);
     }
     
     @Override

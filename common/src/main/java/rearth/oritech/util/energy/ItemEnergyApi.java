@@ -10,7 +10,7 @@ public interface ItemEnergyApi {
     
     void registerForItem(Supplier<Item> itemSupplier);
     
-    EnergyApi.EnergyContainer find(StackContext stack);
+    EnergyApi.EnergyStorage find(StackContext stack);
     
     ComponentType<Long> getEnergyComponent();
     

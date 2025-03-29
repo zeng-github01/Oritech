@@ -6,6 +6,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.InventoryProvider;
@@ -56,13 +57,23 @@ public abstract class MultiblockFrameInteractionEntity extends ItemEnergyFrameIn
     }
     
     @Override
-    public InventoryProvider getInventoryForLink() {
+    public InventoryProvider getInventoryForMultiblock() {
         return this;
     }
     
     @Override
-    public EnergyApi.EnergyContainer getEnergyStorageForLink(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
+    }
+    
+    @Override
+    public BlockPos getPosForMultiblock() {
+        return pos;
+    }
+    
+    @Override
+    public World getWorldForMultiblock() {
+        return world;
     }
     
     @Override

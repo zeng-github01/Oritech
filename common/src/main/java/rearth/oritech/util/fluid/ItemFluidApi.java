@@ -12,7 +12,7 @@ public interface ItemFluidApi {
     
     void registerForItem(Supplier<Item> itemSupplier);
     
-    FluidApi.FluidContainer find(StackContext stack);
+    FluidApi.FluidStorage find(StackContext stack);
     
     default ComponentType<FluidStack> getFluidComponent() {
         return ComponentContent.STORED_FLUID.get();

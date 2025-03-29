@@ -21,14 +21,14 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Optional;
 
-public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidApi.FluidApiProvider {
+public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
     
-    public final SimpleFluidContainer fluidStorage = new SimpleFluidContainer(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty) {
         @Override
         public long insert(FluidStack toInsert, boolean simulate) {
             if (toInsert.getFluid().equals(Fluids.WATER)) return 0L;    // to avoid mixups with players inserting water for boiler into main storage
@@ -112,11 +112,11 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         return getRecipe(fluidStorage);
     }
     
-    protected Optional<RecipeEntry<OritechRecipe>> getRecipe(SimpleFluidContainer checkedTank) {
+    protected Optional<RecipeEntry<OritechRecipe>> getRecipe(SimpleFluidStorage checkedTank) {
         return getRecipe(checkedTank, world, getOwnRecipeType());
     }
     
-    public static Optional<RecipeEntry<OritechRecipe>> getRecipe(FluidApi.SingleSlotContainer checkedTank, World world, OritechRecipeType ownType) {
+    public static Optional<RecipeEntry<OritechRecipe>> getRecipe(FluidApi.SingleSlotStorage checkedTank, World world, OritechRecipeType ownType) {
         
         if (checkedTank.getStack().isEmpty()) return Optional.empty();
         
@@ -177,7 +177,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         return fluidStorage;
     }
 }

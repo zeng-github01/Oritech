@@ -27,18 +27,18 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidApi.FluidApiProvider {
+public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     private boolean inColdArea;
     private boolean initialized = false;
     
-    public final SimpleFluidContainer fluidStorage = new SimpleFluidContainer(4 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     public CoolerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.COOLER_ENTITY, pos, state, Oritech.CONFIG.processingMachines.coolerData.energyPerTick());
@@ -183,7 +183,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         return fluidStorage;
     }
 }

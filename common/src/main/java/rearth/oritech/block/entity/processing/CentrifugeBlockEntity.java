@@ -35,15 +35,15 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.fluid.containers.SimpleInOutFluidContainer;
+import rearth.oritech.util.fluid.containers.SimpleInOutFluidStorage;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.FluidApiProvider {
+public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
-    public final SimpleInOutFluidContainer fluidContainer = new SimpleInOutFluidContainer(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
     
     public boolean hasFluidAddon = false;
     
@@ -350,7 +350,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(@Nullable Direction direction) {
-        return fluidContainer.getContainerForDirection(direction);
+    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+        return fluidContainer.getStorageForDirection(direction);
     }
 }

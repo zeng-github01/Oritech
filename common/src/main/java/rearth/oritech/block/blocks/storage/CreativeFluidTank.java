@@ -17,7 +17,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.entity.storage.SmallFluidTankEntity;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
 
 import java.util.List;
 
@@ -40,13 +40,13 @@ public class CreativeFluidTank extends SmallFluidTank {
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return new SmallFluidTankEntity(pos, state, true);
+        return new SmallTankEntity(pos, state, true);
     }
     
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         
-        if(world.isClient || !(world.getBlockEntity(pos) instanceof SmallFluidTankEntity blockEntity)) return super.onUse(state, world, pos, player, hit);
+        if(world.isClient || !(world.getBlockEntity(pos) instanceof SmallTankEntity blockEntity)) return super.onUse(state, world, pos, player, hit);
         
         // todo use proper api here
         var mainHandStack = player.getMainHandStack();

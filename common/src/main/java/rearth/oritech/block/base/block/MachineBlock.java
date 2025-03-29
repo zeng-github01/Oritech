@@ -131,7 +131,7 @@ public abstract class MachineBlock extends HorizontalFacingBlock implements Bloc
     public ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         
         var blockEntity = world.getBlockEntity(pos);
-        if (blockEntity instanceof FluidApi.FluidApiProvider tankEntity) {
+        if (blockEntity instanceof FluidApi.BlockProvider tankEntity) {
             var usedStack = stack;
             if (stack.getCount() > 1) {
                 usedStack = stack.copyWithCount(1);

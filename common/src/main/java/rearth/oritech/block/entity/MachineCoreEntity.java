@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockProvider, FluidApi.FluidApiProvider {
+public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockProvider, FluidApi.BlockProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;
@@ -77,23 +77,23 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Nullable
-    private EnergyApi.EnergyContainer getMainEnergyStorage(Direction direction) {
+    private EnergyApi.EnergyStorage getMainEnergyStorage(Direction direction) {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
         if (controllerEntity == null) return new SimpleEnergyStorage(0, 0, 0);    // this should never happen
-        return controllerEntity.getEnergyStorageForLink(direction);
+        return controllerEntity.getEnergyStorageForMultiblock(direction);
     }
     
-    private FluidApi.FluidContainer getMainFluidStorage(Direction direction) {
+    private FluidApi.FluidStorage getMainFluidStorage(Direction direction) {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        if (!(controllerEntity instanceof FluidApi.FluidApiProvider fluidProvider)) return null;
+        if (!(controllerEntity instanceof FluidApi.BlockProvider fluidProvider)) return null;
         return fluidProvider.getFluidStorage(direction);
     }
     
@@ -108,19 +108,25 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Nullable
-    private EnergyApi.EnergyContainer getEnergyStorageDelegated(Direction direction) {
+    private EnergyApi.EnergyStorage getEnergyStorageDelegated(Direction direction) {
         return delegatedEnergy.computeIfAbsent(direction, dir -> {
             if (getMainEnergyStorage(dir) == null) return null;
             return new DelegatingEnergyStorage(() -> getMainEnergyStorage(dir), this::isEnabled);
         });
     }
     
-    private FluidApi.FluidContainer getFluidStorageDelegated(Direction direction) {
-        return delegatedFluid.computeIfAbsent(direction, dir -> new DelegatingFluidStorage(() -> getMainFluidStorage(dir), this::isEnabled));
+    private FluidApi.FluidStorage getFluidStorageDelegated(Direction direction) {
+        return delegatedFluid.computeIfAbsent(direction, dir -> {
+            if (getMainFluidStorage(dir) == null) return null;
+            return new DelegatingFluidStorage(() -> getMainFluidStorage(dir), this::isEnabled);
+        });
     }
     
     private Storage<ItemVariant> getItemStorageDelegated(Direction direction) {
-        return delegatedItem.computeIfAbsent(direction, dir -> new DelegatingItemStorage(() -> getMainItemStorage(dir), this::isEnabled));
+        return delegatedItem.computeIfAbsent(direction, dir -> {
+            if (getMainItemStorage(dir) == null) return null;
+            return new DelegatingItemStorage(() -> getMainItemStorage(dir), this::isEnabled);
+        });
     }
     
     public boolean isEnabled() {
@@ -128,7 +134,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Override
-    public EnergyApi.EnergyContainer getStorage(Direction direction) {
+    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return getEnergyStorageDelegated(direction);
     }
     
@@ -138,7 +144,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Override
-    public FluidApi.FluidContainer getFluidStorage(Direction direction) {
+    public FluidApi.FluidStorage getFluidStorage(Direction direction) {
         return getFluidStorageDelegated(direction);
     }
 }
