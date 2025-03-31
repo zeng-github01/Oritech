@@ -827,7 +827,7 @@
     }
   ],
   "message.oritech.catalyst.cost": "Maliyet: %d",
-  "message.oritech.steamengine.controller_link": "Steam engine is chained to main engine (see highlighted block). Use only the main engine.",
+  "message.oritech.steamengine.controller_link": "Buhar motoru, ana motora zincirlenmiştir (vurgulanan bloğa bakın). Sadece ana motoru kullanın.",
   "message.oritech.deep_drill.ore_placement": "Makine cevher düğümlerine yerleştirilmelidir",
   "message.oritech.generator.production_rate": "Üretim oranı: %d çekirdek çarpanı ile: %d",
   "message.oritech.machine.missing_core": "Makine birleştirilmedi. Lütfen eksik çekirdek bloklarını ekleyin",
