@@ -17,12 +17,14 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.item.ItemApi;
 
 @Mod(Oritech.MOD_ID)
 public final class OritechModNeoForge {
     
     private final NeoforgeEnergyApiImpl energyApiInstance;
     private final NeoforgeFluidApiImpl fluidApiInstance;
+    private final NeoforgeItemApiImpl itemApiInstance;
     
     public OritechModNeoForge(IEventBus eventBus) {
         // Run our common setup.
@@ -33,6 +35,9 @@ public final class OritechModNeoForge {
         fluidApiInstance = new NeoforgeFluidApiImpl();
         FluidApi.BLOCK = fluidApiInstance;
         FluidApi.ITEM = fluidApiInstance;
+        
+        itemApiInstance = new NeoforgeItemApiImpl();
+        ItemApi.BLOCK = itemApiInstance;
         
         energyApiInstance = new NeoforgeEnergyApiImpl();
         EnergyApi.BLOCK = energyApiInstance;
@@ -69,6 +74,7 @@ public final class OritechModNeoForge {
         
         @SubscribeEvent
         public void registerCapabilities(RegisterCapabilitiesEvent event) {
+            itemApiInstance.registerEvent(event);
             fluidApiInstance.registerEvent(event);
             energyApiInstance.registerEvent(event);
         }

@@ -41,7 +41,7 @@ import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.item.OritechGeoItem;
+import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 
 import java.lang.annotation.ElementType;
