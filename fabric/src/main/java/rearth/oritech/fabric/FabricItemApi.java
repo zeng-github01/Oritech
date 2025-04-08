@@ -20,9 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.item.BlockItemApi;
 import rearth.oritech.util.item.ItemApi;
-import rearth.oritech.util.item.containers.SimpleInventoryStorage;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -65,6 +63,7 @@ public class FabricItemApi implements BlockItemApi {
         
         @Override
         public int insert(ItemStack inserted, boolean simulate) {
+            if (inserted.isEmpty()) return 0;
             try (var transaction = Transaction.openOuter()) {
                 var insertCount = storage.insert(ItemVariant.of(inserted), inserted.getCount(), transaction);
                 if (!simulate)
@@ -74,7 +73,8 @@ public class FabricItemApi implements BlockItemApi {
         }
         
         @Override
-        public ItemStack insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+        public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+            if (inserted.isEmpty()) return 0;
             
             // this usually won't be used
             if (storage instanceof SlottedStorage<ItemVariant> slottedStorage) {
@@ -82,12 +82,12 @@ public class FabricItemApi implements BlockItemApi {
                     var insertCount = slottedStorage.getSlot(slot).insert(ItemVariant.of(inserted), inserted.getCount(), transaction);
                     if (!simulate)
                         transaction.commit();
-                    return inserted.copyWithCount((int) insertCount);
+                    return (int) insertCount;
                 }
                 
             }
             
-            return ItemStack.EMPTY;
+            return 0;
         }
         
         @Override
@@ -97,6 +97,7 @@ public class FabricItemApi implements BlockItemApi {
         
         @Override
         public int extract(ItemStack extracted, boolean simulate) {
+            if (extracted.isEmpty()) return 0;
             try (var transaction = Transaction.openOuter()) {
                 var extractedCount = storage.extract(ItemVariant.of(extracted), extracted.getCount(), transaction);
                 if (!simulate)
@@ -106,19 +107,20 @@ public class FabricItemApi implements BlockItemApi {
         }
         
         @Override
-        public ItemStack extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
+        public int extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
+            if (extracted.isEmpty()) return 0;
             
             if (storage instanceof SlottedStorage<ItemVariant> slottedStorage) {
                 try (var transaction = Transaction.openOuter()) {
                     var extractedCount = slottedStorage.getSlot(slot).extract(ItemVariant.of(extracted), extracted.getCount(), transaction);
                     if (!simulate)
                         transaction.commit();
-                    return extracted.copyWithCount((int) extractedCount);
+                    return (int) extractedCount;
                 }
                 
             }
             
-            return ItemStack.EMPTY;
+            return 0;
         }
         
         @Override
@@ -166,14 +168,14 @@ public class FabricItemApi implements BlockItemApi {
     
     public static class ContainerStorageWrapper extends SnapshotParticipant<List<ItemStack>> implements Storage<ItemVariant> {
         
-        private final SimpleInventoryStorage container;
+        private final ItemApi.InventoryStorage container;
         
-        public static ContainerStorageWrapper of(SimpleInventoryStorage container) {
+        public static ContainerStorageWrapper of(ItemApi.InventoryStorage container) {
             if (container == null) return null;
             return new ContainerStorageWrapper(container);
         }
         
-        public ContainerStorageWrapper(SimpleInventoryStorage container) {
+        public ContainerStorageWrapper(ItemApi.InventoryStorage container) {
             this.container = container;
         }
         
@@ -223,8 +225,7 @@ public class FabricItemApi implements BlockItemApi {
                         }
                     });
                     
-                    var extracted = container.extractFromSlot(resource.toStack((int) maxAmount), slot, false);
-                    return extracted.getCount();
+                    return container.extractFromSlot(resource.toStack((int) maxAmount), slot, false);
                 }
                 
                 @Override
@@ -244,11 +245,11 @@ public class FabricItemApi implements BlockItemApi {
                 
                 @Override
                 public long getCapacity() {
-                    return container.getMaxCount(getStack());
+                    return container.getSlotLimit(slot);
                 }
                 
                 private ItemStack getStack() {
-                    return container.getStack(slot);
+                    return container.getStackInSlot(slot);
                 }
                 
             }.getUnderlyingView()).iterator();
@@ -256,13 +257,12 @@ public class FabricItemApi implements BlockItemApi {
         
         @Override
         protected List<ItemStack> createSnapshot() {
-            return new ArrayList<>(container.heldStacks);
+            return IntStream.range(0, container.getSlotCount()).mapToObj(container::getStackInSlot).toList();
         }
         
         @Override
         protected void readSnapshot(List<ItemStack> snapshot) {
-            container.clear();
-            container.heldStacks.addAll(snapshot);
+            IntStream.range(0, snapshot.size()).forEach(slot -> container.setStackInSlot(slot, snapshot.get(slot)));
         }
     }
     

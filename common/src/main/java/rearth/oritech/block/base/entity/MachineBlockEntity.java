@@ -1,9 +1,6 @@
 package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -35,19 +32,20 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.InOutInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public abstract class MachineBlockEntity extends BlockEntity
-  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, InventoryProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
+  implements ExtendedScreenHandlerFactory, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
     public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
@@ -56,7 +54,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    public final SimpleMachineInventory inventory = new SimpleMachineInventory(getInventorySize());
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(getInventorySize(), this::markDirty, getSlotAssignments());
     // crafting / processing
     public int progress;
     protected int energyPerTick;
@@ -82,9 +80,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
         
         if (world.isClient || !isActive(state) || disabledViaRedstone) return;
-        
-        if (inventory.needsBalancing)
-            inventory.balance();
         
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
@@ -266,15 +261,15 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     protected abstract OritechRecipeType getOwnRecipeType();
     
-    public abstract InventorySlotAssignment getSlots();
+    public abstract InventorySlotAssignment getSlotAssignments();
     
     protected List<ItemStack> getInputView() {
-        var slots = getSlots();
+        var slots = getSlotAssignments();
         return this.inventory.heldStacks.subList(slots.inputStart(), slots.inputStart() + slots.inputCount());
     }
     
     protected List<ItemStack> getOutputView() {
-        var slots = getSlots();
+        var slots = getSlotAssignments();
         return this.inventory.heldStacks.subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
     }
     
@@ -458,11 +453,6 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     public abstract int getInventorySize();
     
-    @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return InventoryStorage.of(inventory, direction);
-    }
-    
     public boolean isActive(BlockState state) {
         return true;
     }
@@ -499,6 +489,11 @@ public abstract class MachineBlockEntity extends BlockEntity
     
     @Override
     public Inventory getDisplayedInventory() {
+        return inventory;
+    }
+    
+    @Override
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
         return inventory;
     }
     
@@ -540,139 +535,5 @@ public abstract class MachineBlockEntity extends BlockEntity
     @Override
     public void onRedstoneEvent(boolean isPowered) {
         this.disabledViaRedstone = isPowered;
-    }
-    
-    // this entire class feels like a super dirty hack, and makes me hate the transaction API
-    public class SimpleMachineInventory extends SimpleSidedInventory {
-        
-        public boolean needsBalancing = false;
-        
-        public SimpleMachineInventory(int size) {
-            super(size, getSlots());
-        }
-        
-        @Override
-        public void markDirty() {
-            super.markDirty();
-            MachineBlockEntity.this.markDirty();
-            
-            if (world == null || world.isClient || inventoryInputMode != InventoryInputMode.FILL_EVENLY) return;
-            needsBalancing = true;
-        }
-        
-        // balances only into empty slots
-        public void balance() {
-            
-            super.markDirty();
-            MachineBlockEntity.this.markDirty();
-            this.needsBalancing = false;
-            
-            // find the bigger stack(s), split the slots
-            
-            var inputInv = getInputView();
-            
-            var emptySlotsCount = 0;
-            var maxCount = 0;
-            var minCount = 64;
-            var maxCountMatching = 0;
-            
-            for (var stack : inputInv) {
-                if (stack.isEmpty()) {
-                    emptySlotsCount++;
-                    minCount = 0;
-                    continue;
-                }
-                
-                if (stack.getCount() > maxCount)
-                    maxCount = stack.getCount();
-                
-                if (stack.getCount() < minCount)
-                    minCount = stack.getCount();
-            }
-            
-            for (var stack : inputInv) {
-                if (stack.getCount() == maxCount) maxCountMatching++;
-            }
-            
-            if (maxCount <= 1) return;
-            
-            var slotsPerSplitStack = emptySlotsCount / maxCountMatching + 1;
-            if (slotsPerSplitStack <= 1) {
-                
-                // try to balance within stacks
-                for (int i = 0; i < inputInv.size(); i++) {
-                    var stack = inputInv.get(i);
-                    if (stack.getCount() <= 1) continue;
-                    for (int j = 0; j < inputInv.size(); j++) {
-                        if (j == i) continue;
-                        var otherStack = inputInv.get(j);
-                        if (!otherStack.getItem().equals(stack.getItem())) continue;
-                        // same item, try to exchange if needed (if difference > 2)
-                        var diff = stack.getCount() - otherStack.getCount();
-                        if (diff < 2) continue;
-                        
-                        var moved = diff / 2;
-                        stack.decrement(moved);
-                        otherStack.increment(moved);
-                    }
-                }
-                
-                return;
-            }
-            
-            var finalOrder = new ArrayList<ItemStack>();
-            
-            for (var stack : inputInv) {
-                if (stack.getCount() != maxCount) {
-                    if (!stack.isEmpty())
-                        finalOrder.add(stack.copy());
-                    continue;
-                }
-                
-                // split stack in N parts
-                var parts = Math.min(slotsPerSplitStack, stack.getCount());
-                var partSize = maxCount / parts;
-                
-                for (int partIndex = 0; partIndex < parts; partIndex++) {
-                    finalOrder.add(stack.copyWithCount(partSize));
-                }
-                
-            }
-            
-            var finalCount = finalOrder.stream().mapToInt(ItemStack::getCount).sum();
-            var initialCount = inputInv.stream().mapToInt(ItemStack::getCount).sum();
-            System.out.println(initialCount + " " + finalCount);
-            System.out.println(finalOrder);
-            if (finalCount != initialCount || finalOrder.size() > inputInv.size()) return;
-            
-            for (int i = 0; i < finalOrder.size(); i++) {
-                var targetStack = finalOrder.get(i);
-                inputInv.set(i, targetStack);
-            }
-            
-        }
-        
-        @Override
-        public boolean canInsert(int slot, ItemStack stack, @Nullable Direction side) {
-            // Check that this is an insert slot, and is being inserted on an accepted side.
-            if (!super.canInsert(slot, stack, side))
-                return false;
-            
-            var mode = inventoryInputMode;
-            var config = getSlots();
-            
-            var inv = getInputView();
-            
-            // fill equally
-            // check all slots, find the one with the lowest (or empty) type
-            return switch (mode) {
-                case FILL_EVENLY -> {
-                    var target = findLowestMatchingSlot(stack, inv, true);
-                    yield target >= 0 && config.inputToRealSlot(target) == slot;
-                }
-                case FILL_LEFT_TO_RIGHT -> // fill left to right
-                  true;
-            };
-        }
     }
 }

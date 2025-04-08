@@ -281,7 +281,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
+    public InventorySlotAssignment getSlotAssignments() {
         return new InventorySlotAssignment(0, 1, 1, 2);
     }
     

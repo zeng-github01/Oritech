@@ -2,9 +2,6 @@ package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -12,7 +9,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
@@ -31,26 +27,25 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.*;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.InventorySlotAssignment;
+import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.util.StackContext;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.InOutInventoryStorage;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, InventoryProvider, ScreenProvider, ExtendedScreenHandlerFactory {
+public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker<ChargerBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, ItemApi.BlockProvider, ScreenProvider, ExtendedScreenHandlerFactory {
     
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.charger.energyCapacity(), Oritech.CONFIG.charger.maxEnergyInsertion(), Oritech.CONFIG.charger.maxEnergyExtraction(), this::markDirty);
     
     // 0 = bucket/item to be charged/filled, 1 = empty bucket/charged/fill item
-    public final SimpleInventory inventory = new SimpleSidedInventory(2, new InventorySlotAssignment(0, 1, 1, 1)) {
-        @Override
-        public void markDirty() {
-            ChargerBlockEntity.this.markDirty();
-        }
-    };
-    public final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::markDirty, new InventorySlotAssignment(0, 1, 1, 1));
     
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
     
@@ -183,8 +178,8 @@ public class ChargerBlockEntity extends BlockEntity implements BlockEntityTicker
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return inventoryStorage;
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
     
     @Override

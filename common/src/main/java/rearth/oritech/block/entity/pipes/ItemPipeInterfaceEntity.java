@@ -129,6 +129,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             var targetStorage = storagePair.getLeft();
             var wasEmptyStorage = IntStream.range(0, targetStorage.getSlotCount()).allMatch(slot -> targetStorage.getStackInSlot(slot).isEmpty());
             
+            
             var inserted = targetStorage.insert(stackToMove, false);
             toMove -= inserted;
             moved += inserted;
@@ -142,7 +143,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         var extracted = moveFromInventory.extract(stackToMove.copyWithCount(moved), false);
         
         if (extracted != moved) {
-            Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position " + pos);
+            Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position {}", pos);
         }
         
         if (moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
@@ -296,8 +297,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             var slotStack = inventory.getStackInSlot(i);
             if (slotStack.isEmpty()) continue;
             var extracted = inventory.extractFromSlot(slotStack.copyWithCount(maxTransferAmount), i, true);
-            if (!extracted.isEmpty()) return extracted;
-            
+            if (extracted > 0) return slotStack.copyWithCount(extracted);
         }
         
         return ItemStack.EMPTY;

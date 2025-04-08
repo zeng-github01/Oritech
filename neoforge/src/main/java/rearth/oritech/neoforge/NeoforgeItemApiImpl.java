@@ -66,8 +66,8 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
         }
         
         @Override
-        public ItemStack insertToSlot(ItemStack inserted, int slot, boolean simulate) {
-            return container.insertItem(slot, inserted, simulate);
+        public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+            return inserted.getCount() - container.insertItem(slot, inserted, simulate).getCount();
         }
         
         @Override
@@ -84,8 +84,8 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
         }
         
         @Override
-        public ItemStack extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
-            return container.extractItem(slot, extracted.getCount(), simulate);
+        public int extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
+            return container.extractItem(slot, extracted.getCount(), simulate).getCount();
         }
         
         @Override
@@ -145,24 +145,26 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
         
         @Override
         public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack arg, boolean simulate) {
-            var inserted =  container.insertToSlot(arg, slot, simulate);
+            var inserted = container.insertToSlot(arg, slot, simulate);
             
-            if (!inserted.isEmpty() && !simulate) {
+            if (inserted > 0 && !simulate) {
                 container.update();
             }
             
-            return inserted;
+            // need to return the remainder here
+            return arg.copyWithCount(arg.getCount() - inserted);
         }
         
         @Override
         public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-            var extracted = container.extractFromSlot(container.getStackInSlot(slot).copyWithCount(amount), slot, simulate);
+            var slotStack = container.getStackInSlot(slot);
+            var extracted = container.extractFromSlot(slotStack.copyWithCount(amount), slot, simulate);
             
-            if (!extracted.isEmpty() && !simulate) {
+            if (extracted > 0 && !simulate) {
                 container.update();
             }
             
-            return extracted;
+            return slotStack.copyWithCount(extracted);
         }
         
         @Override
@@ -172,7 +174,7 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
         
         @Override
         public boolean isItemValid(int i, @NotNull ItemStack arg) {
-            return container.insertToSlot(arg, i, true).getCount() > 0;
+            return container.insertToSlot(arg, i, true) > 0;
         }
         
         @Override

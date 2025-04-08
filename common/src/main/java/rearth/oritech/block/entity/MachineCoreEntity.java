@@ -1,7 +1,5 @@
 package rearth.oritech.block.entity;
 
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -11,26 +9,26 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.DelegatingItemStorage;
-import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.containers.DelegatingFluidStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.DelegatingInventoryStorage;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class MachineCoreEntity extends BlockEntity implements InventoryProvider, EnergyApi.BlockProvider, FluidApi.BlockProvider {
+public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, FluidApi.BlockProvider {
     
     private BlockPos controllerPos = BlockPos.ORIGIN;
     private MultiblockMachineController controllerEntity;
     private final Map<Direction, DelegatingEnergyStorage> delegatedEnergy = new HashMap<>(6);
     private final Map<Direction, DelegatingFluidStorage> delegatedFluid = new HashMap<>(6);
-    private final Map<Direction, DelegatingItemStorage> delegatedItem = new HashMap<>(6);
+    private final Map<Direction, DelegatingInventoryStorage> delegatedItem = new HashMap<>(6);
     
     public MachineCoreEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.MACHINE_CORE_ENTITY, pos, state);
@@ -97,14 +95,14 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         return fluidProvider.getFluidStorage(direction);
     }
     
-    private Storage<ItemVariant> getMainItemStorage(Direction direction) {
+    private ItemApi.InventoryStorage getMainItemStorage(Direction direction) {
         
         var isUsed = this.getCachedState().get(MachineCoreBlock.USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        if (!(controllerEntity instanceof InventoryProvider itemProvider)) return null;
-        return itemProvider.getInventory(direction);
+        if (!(controllerEntity instanceof ItemApi.BlockProvider itemProvider)) return null;
+        return itemProvider.getInventoryStorage(direction);
     }
     
     @Nullable
@@ -122,10 +120,10 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
         });
     }
     
-    private Storage<ItemVariant> getItemStorageDelegated(Direction direction) {
+    private ItemApi.InventoryStorage getItemStorageDelegated(Direction direction) {
         return delegatedItem.computeIfAbsent(direction, dir -> {
             if (getMainItemStorage(dir) == null) return null;
-            return new DelegatingItemStorage(() -> getMainItemStorage(dir), this::isEnabled);
+            return new DelegatingInventoryStorage(() -> getMainItemStorage(dir), this::isEnabled);
         });
     }
     
@@ -139,7 +137,7 @@ public class MachineCoreEntity extends BlockEntity implements InventoryProvider,
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
         return getItemStorageDelegated(direction);
     }
     

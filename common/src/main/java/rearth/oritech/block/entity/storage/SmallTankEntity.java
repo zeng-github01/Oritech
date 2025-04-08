@@ -2,9 +2,6 @@ package rearth.oritech.block.entity.storage;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -35,16 +32,19 @@ import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.*;
 import rearth.oritech.util.fluid.FluidApi;
 import rearth.oritech.util.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.InOutInventoryStorage;
 
 import java.util.List;
 
-public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvider, InventoryProvider, ComparatorOutputProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallTankEntity> {
+public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallTankEntity> {
     
     private boolean netDirty = false;
     private int lastComparatorOutput = 0;
     public final boolean isCreative;
     
-    public final SimpleSidedInventory inventory = new SimpleSidedInventory(3, new InventorySlotAssignment(0, 2, 2, 1)) {
+    // todo update UI for this
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::markDirty, new InventorySlotAssignment(0, 2, 2, 1)) {
         @Override
         public void markDirty() {
             SmallTankEntity.this.markDirty();
@@ -230,8 +230,8 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return InventoryStorage.of(inventory, direction);
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
     
     @Override

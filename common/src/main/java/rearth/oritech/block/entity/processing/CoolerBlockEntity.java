@@ -147,7 +147,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
+    public InventorySlotAssignment getSlotAssignments() {
         return new InventorySlotAssignment(0, 0, 0, 1);
     }
     

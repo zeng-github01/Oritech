@@ -10,8 +10,8 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.ArrayList;
 
@@ -58,8 +58,8 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
     }
     
     @Override
-    public InventoryProvider getInventoryForMultiblock() {
-        return this;
+    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+        return inventory;
     }
     
     @Override

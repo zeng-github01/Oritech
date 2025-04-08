@@ -10,9 +10,9 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +80,7 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     }
     
     @Override
-    public InventoryProvider getInventoryForMultiblock() {
+    public ItemApi.InventoryStorage getInventoryForMultiblock() {
         return null;
     }
     

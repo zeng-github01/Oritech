@@ -231,7 +231,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
+    public InventorySlotAssignment getSlotAssignments() {
         return new InventorySlotAssignment(0, 0, 0, 0);
     }
     

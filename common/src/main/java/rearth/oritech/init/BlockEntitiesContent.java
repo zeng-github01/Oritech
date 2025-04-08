@@ -2,7 +2,6 @@ package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -25,9 +24,9 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
 import rearth.oritech.block.entity.storage.*;
-import rearth.oritech.util.InventoryProvider;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.util.item.ItemApi;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 import java.lang.annotation.ElementType;
@@ -262,7 +261,7 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
             FluidApi.BLOCK.registerBlockEntity(() -> value);
         
         if (field.isAnnotationPresent(AssignSidedInventory.class))
-            ItemStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((InventoryProvider) blockEntity).getInventory(direction), value);
+            ItemApi.BLOCK.registerBlockEntity(() -> value);
         
     }
     

@@ -23,6 +23,7 @@ import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,7 @@ public interface MultiblockMachineController {
     
     float getCoreQuality();
     
-    InventoryProvider getInventoryForMultiblock();
+    ItemApi.InventoryStorage getInventoryForMultiblock();
     
     EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction);
     

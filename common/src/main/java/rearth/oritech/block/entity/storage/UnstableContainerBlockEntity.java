@@ -39,6 +39,7 @@ import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -51,7 +52,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class UnstableContainerBlockEntity extends BlockEntity implements ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<UnstableContainerBlockEntity>, GeoBlockEntity, MultiblockMachineController, EnergyApi.BlockProvider {
+public class UnstableContainerBlockEntity extends BlockEntity implements ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<UnstableContainerBlockEntity>,
+                                                                           GeoBlockEntity, MultiblockMachineController, EnergyApi.BlockProvider {
     
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("setup").thenPlay("idle");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
@@ -291,7 +293,7 @@ public class UnstableContainerBlockEntity extends BlockEntity implements ScreenP
     }
     
     @Override
-    public InventoryProvider getInventoryForMultiblock() {
+    public ItemApi.InventoryStorage getInventoryForMultiblock() {
         return null;
     }
     

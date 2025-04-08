@@ -163,7 +163,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
     
     @Override
-    public InventorySlotAssignment getSlots() {
+    public InventorySlotAssignment getSlotAssignments() {
         return new InventorySlotAssignment(0, 1, 1, 1);
     }
     

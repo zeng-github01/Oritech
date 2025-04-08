@@ -1,9 +1,6 @@
 package rearth.oritech.block.base.entity;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -38,12 +35,14 @@ import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.util.energy.containers.DynamicStatisticEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.SimpleInventoryStorage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, InventoryProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
+public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity implements EnergyApi.BlockProvider, ItemApi.BlockProvider, MachineAddonController, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<ExpandableEnergyStorageBlockEntity> {
     
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     private final List<BlockPos> openSlots = new ArrayList<>();
@@ -55,14 +54,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     // client only
     public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
     
-    public final SimpleInventory inventory = new SimpleInventory(1) {
-        @Override
-        public void markDirty() {
-            ExpandableEnergyStorageBlockEntity.this.markDirty();
-        }
-    };
-    
-    protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::markDirty);
     
     //own storage
     public final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
@@ -160,8 +152,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return inventoryStorage;
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
     
     public Direction getFacing() {

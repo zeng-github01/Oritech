@@ -2,14 +2,13 @@ package rearth.oritech.util.item;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
-import rearth.oritech.util.item.containers.SimpleInventoryStorage;
 
 public class ItemApi {
     
     public static BlockItemApi BLOCK;
-
+    
     public interface BlockProvider {
-        SimpleInventoryStorage getInventoryStorage(Direction direction);
+        InventoryStorage getInventoryStorage(Direction direction);
     }
     
     public interface InventoryStorage {
@@ -18,21 +17,52 @@ public class ItemApi {
             return true;
         }
         
-        // returns how much was inserted
+        /**
+         * Inserts the given ItemStack into the inventory.
+         *
+         * @param inserted the ItemStack to insert
+         * @param simulate if true, the insertion is only simulated
+         * @return the amount of items successfully inserted
+         */
         int insert(ItemStack inserted, boolean simulate);
         
-        // returns the remainder
-        ItemStack insertToSlot(ItemStack inserted, int slot, boolean simulate);
+        /**
+         * Inserts the given ItemStack into a specific slot in the inventory.
+         *
+         * @param inserted the ItemStack to insert
+         * @param slot     the slot to insert into
+         * @param simulate if true, the insertion is only simulated
+         * @return the amount of items successfully inserted
+         */
+        int insertToSlot(ItemStack inserted, int slot, boolean simulate);
         
+        /**
+         * Checks if the inventory supports extraction.
+         *
+         * @return true if extraction is supported, false otherwise
+         */
         default boolean supportsExtraction() {
             return true;
         }
         
-        // returns how much was extracted
-        int extract(ItemStack inserted, boolean simulate);
+        /**
+         * Extracts the given ItemStack from the inventory.
+         *
+         * @param extracted the ItemStack to extract
+         * @param simulate  if true, the extraction is only simulated
+         * @return the amount of items successfully extracted
+         */
+        int extract(ItemStack extracted, boolean simulate);
         
-        // returns the extracted stack
-        ItemStack extractFromSlot(ItemStack extracted, int slot, boolean simulate);
+        /**
+         * Extracts the given ItemStack from a specific slot in the inventory.
+         *
+         * @param extracted the ItemStack to extract
+         * @param slot      the slot to extract from
+         * @param simulate  if true, the extraction is only simulated
+         * @return the amount of items successfully extracted
+         */
+        int extractFromSlot(ItemStack extracted, int slot, boolean simulate);
         
         void setStackInSlot(int slot, ItemStack stack);
         
@@ -46,5 +76,5 @@ public class ItemApi {
         
     }
     
-
+    
 }

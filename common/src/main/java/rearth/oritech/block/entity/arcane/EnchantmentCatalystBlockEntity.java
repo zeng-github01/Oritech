@@ -2,8 +2,6 @@ package rearth.oritech.block.entity.arcane;
 
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.component.DataComponentTypes;
@@ -12,7 +10,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -32,9 +29,14 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.*;
+import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
+import rearth.oritech.util.ComparatorOutputProvider;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.energy.EnergyApi;
 import rearth.oritech.util.energy.containers.SimpleEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.util.item.containers.SimpleInventoryStorage;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -46,7 +48,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.List;
 
 public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
-  implements InventoryProvider, EnergyApi.BlockProvider, ScreenProvider, ComparatorOutputProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
+  implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider, ComparatorOutputProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedScreenHandlerFactory<ModScreens.BasicData> {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
@@ -66,12 +68,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     private String lastAnimation = "idle";
     private int lastComparatorOutput;
     
-    public final SimpleInventory inventory = new SimpleInventory(2) {
-        @Override
-        public void markDirty() {
-            EnchantmentCatalystBlockEntity.this.markDirty();
-        }
-    };
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(2, this::markDirty);
     
     public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(10_000, 0, 50_000);
     
@@ -321,10 +318,10 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    public Storage<ItemVariant> getInventory(Direction direction) {
-        return inventoryStorage;
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
     }
-
+    
     @Override
     public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
