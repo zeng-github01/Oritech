@@ -64,7 +64,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<ScreenHandlerTy
     public static final ExtendedScreenHandlerType<PlayerModifierScreenHandler, BasicData> MODIFIER_SCREEN = new ExtendedScreenHandlerType<>(new PlayerModifierScreenHandler.HandlerFactory(), BasicData.PACKET_CODEC);
     
     public static void assignScreens() {
-        HandledScreens.register(TANK_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
+        HandledScreens.register(TANK_SCREEN, TankScreen::new);
         HandledScreens.register(TREEFELLER_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(ATOMIC_FORGE_SCREEN, BasicMachineScreen<BasicMachineScreenHandler>::new);
         HandledScreens.register(CATALYST_SCREEN, CatalystScreen::new);

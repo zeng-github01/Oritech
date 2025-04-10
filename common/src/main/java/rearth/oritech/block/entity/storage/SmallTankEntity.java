@@ -43,7 +43,6 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     private int lastComparatorOutput = 0;
     public final boolean isCreative;
     
-    // todo update UI for this
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::markDirty, new InventorySlotAssignment(0, 2, 2, 1)) {
         @Override
         public void markDirty() {
@@ -236,7 +235,7 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     
     @Override
     public List<GuiSlot> getGuiSlots() {
-        return List.of(new GuiSlot(0, 50, 30), new GuiSlot(1, 50, 63), new GuiSlot(2, 100, 40, true));
+        return List.of(new GuiSlot(0, 50, 19), new GuiSlot(1, 50, 61), new GuiSlot(2, 130, 42, true));
     }
     
     @Override
@@ -279,8 +278,11 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     }
     
     @Override
-    public boolean showProgress() {
-        return false;
+    public ArrowConfiguration getIndicatorConfiguration() {
+        return new ArrowConfiguration(
+          Oritech.id("textures/gui/modular/arrow_empty.png"),
+          Oritech.id("textures/gui/modular/arrow_full.png"),
+          95, 40, 29, 16, true);
     }
     
     @Override
