@@ -68,11 +68,15 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     private String lastAnimation = "idle";
     private int lastComparatorOutput;
     
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(2, this::markDirty);
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(2, this::markDirty) {
+        @Override
+        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
+            if (slot == 0 && !addedStack.isEmpty() && !addedStack.getItem().equals(Items.ENCHANTED_BOOK)) return 0; // only allow enchanter books in slot 0
+            return super.insertToSlot(addedStack, slot, simulate);
+        }
+    };
     
     public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(10_000, 0, 50_000);
-    
-    protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     public EnchantmentCatalystBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY, pos, state);
