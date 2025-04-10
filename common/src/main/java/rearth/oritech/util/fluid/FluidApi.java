@@ -13,6 +13,15 @@ public class FluidApi {
         if (from.getContent().isEmpty()) return 0L;
         
         var kind = from.getContent().getFirst();
+        if (kind.isEmpty()) return 0L;
+        return transfer(from, to, kind.copyWithAmount(max), simulate);
+    }
+    
+    public static long transferLast(FluidStorage from, FluidStorage to, long max, boolean simulate) {
+        if (from.getContent().isEmpty()) return 0L;
+        
+        var kind = from.getContent().getLast();
+        if (kind.isEmpty()) return 0L;
         return transfer(from, to, kind.copyWithAmount(max), simulate);
     }
     
