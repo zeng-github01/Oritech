@@ -201,7 +201,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public SimpleInventory getInventoryForAddon() {
+    public ItemApi.InventoryStorage getInventoryForAddon() {
         return inventory;
     }
     

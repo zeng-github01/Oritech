@@ -200,7 +200,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends BlockEntity imp
     }
     
     @Override
-    public SimpleInventory getInventoryForAddon() {
+    public ItemApi.InventoryStorage getInventoryForAddon() {
         return inventory;
     }
     

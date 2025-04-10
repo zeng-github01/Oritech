@@ -474,7 +474,7 @@ public class DronePortEntity extends BlockEntity implements ItemApi.BlockProvide
     }
     
     @Override
-    public SimpleInventory getInventoryForAddon() {
+    public ItemApi.InventoryStorage getInventoryForAddon() {
         return inventory;
     }
     
@@ -760,16 +760,9 @@ public class DronePortEntity extends BlockEntity implements ItemApi.BlockProvide
         }
         
         @Override
-        public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+        public int insertToSlot(ItemStack toExtract, int slot, boolean simulate) {
             if (DronePortEntity.this.incomingPacket != null) return 0;
-            return super.insertToSlot(inserted, slot, simulate);
-        }
-        
-        // used by very few methods only
-        @Override
-        public boolean canInsert(ItemStack stack) {
-            if (DronePortEntity.this.incomingPacket != null) return false;
-            return super.canInsert(stack);
+            return super.insertToSlot(toExtract, slot, simulate);
         }
     }
     

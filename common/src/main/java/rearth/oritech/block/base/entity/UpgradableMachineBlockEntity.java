@@ -20,6 +20,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +125,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
     
     @Override
-    public SimpleInventory getInventoryForAddon() {
+    public ItemApi.InventoryStorage getInventoryForAddon() {
         return inventory;
     }
     

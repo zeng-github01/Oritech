@@ -121,7 +121,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     protected void produceResultItems() {
         if (!pendingOutputs.isEmpty()) {
             for (var stack : pendingOutputs) {
-                this.inventory.addStack(stack);
+                this.inventory.insert(stack, false);
             }
         }
         

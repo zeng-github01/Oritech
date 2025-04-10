@@ -121,7 +121,7 @@ public class SmallStorageBlock extends Block implements BlockEntityProvider {
     protected List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
         var droppedStacks = super.getDroppedStacks(state, builder);
 
-        var blockEntity = (BlockEntity)builder.getOptional(LootContextParameters.BLOCK_ENTITY);
+        var blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
         if (blockEntity instanceof SmallStorageBlockEntity storageEntity)
             droppedStacks.addAll(storageEntity.inventory.getHeldStacks());
 

@@ -157,14 +157,14 @@ public class NeoforgeItemApiImpl implements BlockItemApi {
         
         @Override
         public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-            var slotStack = container.getStackInSlot(slot);
-            var extracted = container.extractFromSlot(slotStack.copyWithCount(amount), slot, simulate);
+            var takenStack = container.getStackInSlot(slot).copyWithCount(amount);
+            var extracted = container.extractFromSlot(takenStack, slot, simulate);
             
             if (extracted > 0 && !simulate) {
                 container.update();
             }
             
-            return slotStack.copyWithCount(extracted);
+            return takenStack.copyWithCount(extracted);
         }
         
         @Override

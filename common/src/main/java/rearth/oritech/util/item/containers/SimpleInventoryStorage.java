@@ -1,42 +1,50 @@
 package rearth.oritech.util.item.containers;
 
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
 import rearth.oritech.util.item.ItemApi;
 
-public class SimpleInventoryStorage extends SimpleInventory implements ItemApi.InventoryStorage {
+public class SimpleInventoryStorage implements Inventory, ItemApi.InventoryStorage {
+    
+    private final int size;
+    public final DefaultedList<ItemStack> heldStacks;
     
     private final Runnable onUpdate;
     
     public SimpleInventoryStorage(int size, Runnable onUpdate) {
-        super(size);
+        this.size = size;
         this.onUpdate = onUpdate;
+        this.heldStacks = DefaultedList.ofSize(size, ItemStack.EMPTY);
     }
     
     @Override
-    public int insert(ItemStack inserted, boolean simulate) {
-        var remaining = inserted.getCount();
+    public int insert(ItemStack toInsert, boolean simulate) {
+        var remaining = toInsert.getCount();
         for (var slot = 0; slot < size() && remaining > 0; slot++) {
-            remaining -= insertToSlot(inserted.copyWithCount(remaining), slot, simulate);
+            remaining -= insertToSlot(toInsert.copyWithCount(remaining), slot, simulate);
         }
         
-        return inserted.getCount() - remaining;
+        return toInsert.getCount() - remaining;
     }
     
     @Override
-    public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
+    public int insertToSlot(ItemStack toExtract, int slot, boolean simulate) {
         var slotStack = getStack(slot);
         var slotLimit = getSlotLimit(slot);
         
         if (slotStack.isEmpty()) {
-            var toInsert = Math.min(slotLimit, inserted.getCount());
-            if (!simulate) setStack(slot, inserted.copyWithCount(toInsert));
+            var toInsert = Math.min(slotLimit, toExtract.getCount());
+            if (!simulate) setStack(slot, toExtract.copyWithCount(toInsert));
             return toInsert;
         }
         
-        if (ItemStack.areItemsAndComponentsEqual(slotStack, inserted)) {
+        if (ItemStack.areItemsAndComponentsEqual(slotStack, toExtract)) {
             var available = slotLimit - slotStack.getCount();
-            var toInsert = Math.min(available, inserted.getCount());
+            var toInsert = Math.min(available, toExtract.getCount());
             if (toInsert > 0) {
                 if (!simulate) slotStack.increment(toInsert);
                 return toInsert;
@@ -47,12 +55,12 @@ public class SimpleInventoryStorage extends SimpleInventory implements ItemApi.I
     }
     
     @Override
-    public int extract(ItemStack extracted, boolean simulate) {
-        var remaining = extracted.getCount();
+    public int extract(ItemStack toExtract, boolean simulate) {
+        var remaining = toExtract.getCount();
         for (var slot = 0; slot < size() && remaining > 0; slot++) {
-            remaining -= extractFromSlot(extracted.copyWithCount(remaining), slot, simulate);
+            remaining -= extractFromSlot(toExtract.copyWithCount(remaining), slot, simulate);
         }
-        return extracted.getCount() - remaining;
+        return toExtract.getCount() - remaining;
     }
     
     @Override
@@ -89,6 +97,76 @@ public class SimpleInventoryStorage extends SimpleInventory implements ItemApi.I
     @Override
     public void update() {
         onUpdate.run();
+    }
+    
+    
+    // these are mostly a copy of SimpleInventory, with minor changes and only essential things included to avoid confusion
+    @Override
+    public int size() {
+        return size;
+    }
+    
+    @Override
+    public boolean isEmpty() {
+        for (var itemStack : this.heldStacks) {
+            if (!itemStack.isEmpty()) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    @Override
+    public ItemStack getStack(int slot) {
+        return heldStacks.get(slot);
+    }
+    
+    @Override
+    public ItemStack removeStack(int slot, int amount) {
+        var itemStack = Inventories.splitStack(this.heldStacks, slot, amount);
+        if (!itemStack.isEmpty()) {
+            this.markDirty();
+        }
+        
+        return itemStack;
+    }
+    
+    @Override
+    public ItemStack removeStack(int slot) {
+        var itemStack = this.heldStacks.get(slot);
+        if (itemStack.isEmpty()) {
+            return ItemStack.EMPTY;
+        } else {
+            this.heldStacks.set(slot, ItemStack.EMPTY);
+            return itemStack;
+        }
+    }
+    
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+        this.heldStacks.set(slot, stack);
+        stack.capCount(this.getMaxCount(stack));
         this.markDirty();
+    }
+    
+    @Override
+    public void markDirty() {
+        this.update();
+    }
+    
+    @Override
+    public boolean canPlayerUse(PlayerEntity player) {
+        return true;
+    }
+    
+    @Override
+    public void clear() {
+        this.heldStacks.clear();
+        this.markDirty();
+    }
+    
+    public DefaultedList<ItemStack> getHeldStacks() {
+        return heldStacks;
     }
 }

@@ -157,11 +157,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
             return false;
         }
         
-        @Override
         public boolean canInsert(ItemStack stack) {
-            
-            var wouldFit = super.canInsert(stack);
-            if (!wouldFit) return false;
             
             // check filter settings
             var checkNbt = filterSettings.useNbt;
@@ -209,12 +205,12 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
         }
         
         @Override
-        public int insertToSlot(ItemStack stack, int slot, boolean simulate) {
+        public int insertToSlot(ItemStack toExtract, int slot, boolean simulate) {
             
-            if (!canInsert(stack))
+            if (!canInsert(toExtract))
                 return 0;
             
-            return super.insertToSlot(stack, slot, simulate);
+            return super.insertToSlot(toExtract, slot, simulate);
         }
     }
     

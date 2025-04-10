@@ -225,7 +225,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         
         // yes, this will discard items that wont fit anymore
         for (var stack : dropped) {
-            this.inventory.addStack(stack);
+            this.inventory.insert(stack, false);
         }
         
         try {
@@ -267,7 +267,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
                 
                 @Override
                 public boolean giveItemStack(ItemStack itemStack) {
-                    LaserArmBlockEntity.this.inventory.addStack(itemStack);
+                    LaserArmBlockEntity.this.inventory.insert(itemStack, false);
                     return true;
                 }
             };
@@ -676,7 +676,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public SimpleInventory getInventoryForAddon() {
+    public ItemApi.InventoryStorage getInventoryForAddon() {
         return inventory;
     }
     

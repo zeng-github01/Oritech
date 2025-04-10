@@ -65,11 +65,6 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(6, this::markDirty) {
         
         @Override
-        public boolean canInsert(ItemStack stack) {
-            return false;
-        }
-        
-        @Override
         public boolean supportsInsertion() {
             return false;
         }
@@ -140,7 +135,7 @@ public class TreefellerBlockEntity extends BlockEntity implements BlockEntityTic
             world.playSound(null, candidate, candidateState.getSoundGroup().getBreakSound(), SoundCategory.BLOCKS, 0.5f, 1f);
         world.setBlockState(candidate, Blocks.AIR.getDefaultState());
         
-        dropped.forEach(inventory::addStack);
+        dropped.forEach(stack -> inventory.insert(stack, false));
         return ActionResult.SUCCESS;
     }
 

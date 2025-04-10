@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.util.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.util.item.ItemApi;
 
 import java.util.*;
 
@@ -34,7 +35,7 @@ public interface MachineAddonController {
     
     DynamicEnergyStorage getStorageForAddon();
     
-    SimpleInventory getInventoryForAddon();
+    ItemApi.InventoryStorage getInventoryForAddon();
     
     ScreenProvider getScreenProvider();
     
