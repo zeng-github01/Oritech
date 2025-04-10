@@ -3,6 +3,7 @@ package rearth.oritech.init.recipes;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.Platform;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.recipe.Ingredient;
@@ -14,8 +15,11 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.util.SimpleCraftingInventory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public class OritechRecipe implements Recipe<RecipeInput> {
     
@@ -52,6 +56,10 @@ public class OritechRecipe implements Recipe<RecipeInput> {
         
         if (world.isClient) return false;
         
+        if (inputs.size() > 1) {
+            return complexMatch(input);
+        }
+        
         if (input.getSize() < inputs.size()) return false;
         
         var ingredients = getInputs();
@@ -60,6 +68,31 @@ public class OritechRecipe implements Recipe<RecipeInput> {
             if (!entry.test(input.getStackInSlot(i))) {
                 return false;
             }
+        }
+        
+        return true;
+    }
+    
+    private boolean complexMatch(RecipeInput input) {
+        
+        if (!(input instanceof SimpleCraftingInventory simpleInventory)) return false;
+        
+        // Input does not need to be in the correct slots / split into different slots.
+        // We just check if we can remove all ingredients from the inventory, and fail is any input is not able to be removed.
+        
+        for (var ingredient : getInputs()) {
+            
+            var found = false;
+            
+            for (var heldStack : simpleInventory.heldStacks) {
+                if (ingredient.test(heldStack)) {
+                    heldStack.decrement(1);
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) return false;
         }
         
         return true;

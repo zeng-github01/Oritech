@@ -29,7 +29,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     protected boolean canProceed(OritechRecipe value) {     // recipe times are 1 tick, but energy storage needs to be full (sized according to recipe)
-        return  hasEnoughEnergy() && super.canProceed(value);
+        return hasEnoughEnergy() && super.canProceed(value);
     }
     
     @Override
@@ -101,7 +101,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 38),            
+          new GuiSlot(0, 56, 38),
           new GuiSlot(1, 83, 21),
           new GuiSlot(2, 83, 54),
           new GuiSlot(3, 117, 36, true));
@@ -125,14 +125,14 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(1, 0,1),
-          new Vec3i(1, 0,0),
-          new Vec3i(1, 0,-1),
-          new Vec3i(0, 0,1),
-          new Vec3i(0, 0,-1),
-          new Vec3i(-1, 0,1),
-          new Vec3i(-1, 0,0),
-          new Vec3i(-1, 0,-1)
+          new Vec3i(1, 0, 1),
+          new Vec3i(1, 0, 0),
+          new Vec3i(1, 0, -1),
+          new Vec3i(0, 0, 1),
+          new Vec3i(0, 0, -1),
+          new Vec3i(-1, 0, 1),
+          new Vec3i(-1, 0, 0),
+          new Vec3i(-1, 0, -1)
         );
     }
     

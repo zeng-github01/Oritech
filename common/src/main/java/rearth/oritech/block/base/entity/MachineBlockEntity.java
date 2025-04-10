@@ -23,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
@@ -84,12 +85,14 @@ public abstract class MachineBlockEntity extends BlockEntity
         
         if (world.isClient || !isActive(state) || disabledViaRedstone) return;
         
+        // if a recipe is found, this means the input items are all available
         var recipeCandidate = getRecipe();
         if (recipeCandidate.isEmpty())
             currentRecipe = OritechRecipe.DUMMY;     // reset recipe when invalid or no input is given
         
         if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value()) && canProceed(recipeCandidate.get().value())) {
             
+            // reset when recipe was switched while running
             if (currentRecipe != recipeCandidate.get().value()) resetProgress();
             
             // this is separate so that progress is not reset when out of energy
@@ -98,7 +101,6 @@ public abstract class MachineBlockEntity extends BlockEntity
                 currentRecipe = activeRecipe;
                 lastWorkedAt = world.getTime();
                 
-                // check energy
                 useEnergy();
                 
                 // increase progress
@@ -123,15 +125,8 @@ public abstract class MachineBlockEntity extends BlockEntity
         }
     }
     
-    // returns true if input items match
+    // used to do additional checks, if the recipe match is not enough
     protected boolean canProceed(OritechRecipe value) {
-        
-        var inputInv = getInputInventory();
-        for (int i = 0; i < value.getInputs().size(); i++) {
-            var input = value.getInputs().get(i);
-            if (!input.test(inputInv.getStackInSlot(i))) return false;
-        }
-        
         return true;
     }
     
@@ -211,9 +206,21 @@ public abstract class MachineBlockEntity extends BlockEntity
             }
         }
         
-        // remove inputs
-        for (int i = 0; i < inputs.size(); i++) {
-            Inventories.splitStack(inputInventory, i, 1);
+        // remove inputs. Each input is 1 ingredient.
+        var startOffset = 0;    // used so when multiple matching stacks are available, they're drained somewhat evenly
+        for (var removedIng : inputs) {
+            // try to find current ingredient
+            for (int i = 0; i < inputInventory.size(); i++) {
+                var inputStack = inputInventory.get((i + startOffset) % inputInventory.size());
+                if (removedIng.test(inputStack)) {
+                    inputStack.decrement(1);
+                    startOffset++;
+                    break;
+                }
+            }
+            
+            Oritech.LOGGER.warn("Unable to remove ingredient from inventory: {}. This should never happen.", removedIng);
+            
         }
         
     }
@@ -277,7 +284,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     }
     
     protected RecipeInput getInputInventory() {
-        return new SimpleCraftingInventory(getInputView().toArray(ItemStack[]::new));
+        return new SimpleCraftingInventory(getInputView().stream().map(ItemStack::copy).toArray(ItemStack[]::new));
     }
     
     protected Inventory getOutputInventory() {
@@ -557,7 +564,7 @@ public abstract class MachineBlockEntity extends BlockEntity
                 // start at slot with fewest items
                 var lowestSlot = 0;
                 var lowestSlotCount = Integer.MAX_VALUE;
-                for (int i = getSlotAssignments().inputStart(); i < getSlotAssignments().inputCount(); i++) {
+                for (int i = getSlotAssignments().inputStart(); i < getSlotAssignments().inputStart() + getSlotAssignments().inputCount(); i++) {
                     var content = this.getStack(i);
                     if (!content.isEmpty() && !content.getItem().equals(toInsert.getItem())) continue;    // skip slots containing other items
                     if (content.getCount() < lowestSlotCount) {

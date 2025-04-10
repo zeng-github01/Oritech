@@ -144,9 +144,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         
         if (!hasFluidAddon) return super.canProceed(recipe);
         
-        var itemsMatch = super.canProceed(recipe);
-        if (!itemsMatch) return false;
-        
         if (!recipeInputMatchesTank(fluidContainer.getInStack(), recipe)) return false;
         
         // check if output fluid would fit
@@ -204,7 +201,8 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         var chamberCount = getBaseAddonData().extraChambers() + 1;
         
         for (int i = 0; i < chamberCount; i++) {
-            if (!canOutputRecipe(activeRecipe) || !canProceed(activeRecipe)) break;
+            var newRecipe = getRecipe();
+            if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe)) break;
             super.craftItem(activeRecipe, outputInventory, inputInventory);
             
             if (hasFluidAddon) {
