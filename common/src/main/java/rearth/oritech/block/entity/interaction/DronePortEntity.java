@@ -760,9 +760,9 @@ public class DronePortEntity extends BlockEntity implements ItemApi.BlockProvide
         }
         
         @Override
-        public int insertToSlot(ItemStack toExtract, int slot, boolean simulate) {
+        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
             if (DronePortEntity.this.incomingPacket != null) return 0;
-            return super.insertToSlot(toExtract, slot, simulate);
+            return super.insertToSlot(addedStack, slot, simulate);
         }
     }
     

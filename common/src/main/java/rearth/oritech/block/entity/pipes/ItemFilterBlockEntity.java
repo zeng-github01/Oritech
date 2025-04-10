@@ -205,12 +205,12 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
         }
         
         @Override
-        public int insertToSlot(ItemStack toExtract, int slot, boolean simulate) {
+        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
             
-            if (!canInsert(toExtract))
+            if (!canInsert(addedStack))
                 return 0;
             
-            return super.insertToSlot(toExtract, slot, simulate);
+            return super.insertToSlot(addedStack, slot, simulate);
         }
     }
     

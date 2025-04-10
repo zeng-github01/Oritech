@@ -54,7 +54,7 @@ public abstract class MachineBlockEntity extends BlockEntity
     public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(getInventorySize(), this::markDirty, getSlotAssignments());
+    
     // crafting / processing
     public int progress;
     protected int energyPerTick;
@@ -62,9 +62,12 @@ public abstract class MachineBlockEntity extends BlockEntity
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
     protected boolean disabledViaRedstone = false;
     public long lastWorkedAt;
+    
     // network state
     protected boolean networkDirty = true;
+    
     //own storage
+    public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::markDirty, getSlotAssignments());
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
@@ -536,4 +539,57 @@ public abstract class MachineBlockEntity extends BlockEntity
     public void onRedstoneEvent(boolean isPowered) {
         this.disabledViaRedstone = isPowered;
     }
+    
+    public class FilteringInventory extends InOutInventoryStorage {
+        
+        public FilteringInventory(int size, Runnable onUpdate, InventorySlotAssignment slotAssignment) {
+            super(size, onUpdate, slotAssignment);
+        }
+        
+        @Override
+        public int insert(ItemStack toInsert, boolean simulate) {
+            
+            if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY)) {
+                var remaining = toInsert.getCount();
+                var slotCountTarget = toInsert.getCount() / getSlotAssignments().inputCount();
+                slotCountTarget = Math.clamp(slotCountTarget, 1, remaining);
+                
+                // start at slot with fewest items
+                var lowestSlot = 0;
+                var lowestSlotCount = Integer.MAX_VALUE;
+                for (int i = getSlotAssignments().inputStart(); i < getSlotAssignments().inputCount(); i++) {
+                    var content = this.getStack(i);
+                    if (!content.isEmpty() && !content.getItem().equals(toInsert.getItem())) continue;    // skip slots containing other items
+                    if (content.getCount() < lowestSlotCount) {
+                        lowestSlotCount = content.getCount();
+                        lowestSlot = i;
+                    }
+                }
+                
+                for (var slot = 0; slot < size() && remaining > 0; slot++) {
+                    remaining -= customSlotInsert(toInsert.copyWithCount(slotCountTarget), (slot + lowestSlot) % size(), simulate);
+                }
+                
+                return toInsert.getCount() - remaining;
+            }
+            
+            
+            return super.insert(toInsert, simulate);
+        }
+        
+        @Override
+        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
+            
+            if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY)) {
+                return insert(addedStack, simulate);
+            }
+            
+            return customSlotInsert(addedStack, slot, simulate);
+        }
+        
+        private int customSlotInsert(ItemStack toInsert, int slot, boolean simulate) {
+            return super.insertToSlot(toInsert, slot, simulate);
+        }
+    }
+    
 }

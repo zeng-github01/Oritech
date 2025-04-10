@@ -13,9 +13,9 @@ public class InOutInventoryStorage extends SimpleInventoryStorage {
     }
     
     @Override
-    public int insertToSlot(ItemStack toExtract, int slot, boolean simulate) {
+    public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
         if (!slotAssignment.isInput(slot)) return 0;
-        return super.insertToSlot(toExtract, slot, simulate);
+        return super.insertToSlot(addedStack, slot, simulate);
     }
     
     @Override
