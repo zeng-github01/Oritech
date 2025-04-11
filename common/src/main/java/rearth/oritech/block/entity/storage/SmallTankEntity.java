@@ -36,6 +36,8 @@ import rearth.oritech.util.item.ItemApi;
 import rearth.oritech.util.item.containers.InOutInventoryStorage;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider, ScreenProvider, ExtendedScreenHandlerFactory, BlockEntityTicker<SmallTankEntity> {
     
@@ -43,12 +45,9 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     private int lastComparatorOutput = 0;
     public final boolean isCreative;
     
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::markDirty, new InventorySlotAssignment(0, 2, 2, 1)) {
-        @Override
-        public void markDirty() {
-            SmallTankEntity.this.markDirty();
-        }
-    };
+    private ApiLookupCache<FluidApi.FluidStorage> downLookupCache;
+    
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::markDirty, new InventorySlotAssignment(0, 2, 2, 1));
     
     public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(Oritech.CONFIG.portableTankCapacityBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
     
@@ -88,7 +87,7 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
         
         if (world.isClient) return;
         
-        if (world.getTime() % 100 == 0)
+        if (world.getTime() % 80 == 0)
             netDirty = true;    // to ensure this syncs when no charges are triggered, and inventory isn't opened
         
         // in creative, set tank fill level
@@ -103,7 +102,7 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
         processInput();
         processOutput();
         
-        if ((world.getTime() + this.pos.getY()) % 20 == 0 && fluidStorage.getAmount() > 0)
+        if (fluidStorage.getAmount() > 0)
             outputToBelow();
         
         if (netDirty) {
@@ -115,10 +114,18 @@ public class SmallTankEntity extends BlockEntity implements FluidApi.BlockProvid
     
     private void outputToBelow() {
         if (isCreative) return;
-        var tankCandidate = world.getBlockEntity(pos.down(), BlockEntitiesContent.SMALL_TANK_ENTITY);
         
-        if (tankCandidate.isEmpty()) return;
-        var belowTank = tankCandidate.get().fluidStorage;
+        if (downLookupCache == null) {
+            downLookupCache = ApiLookupCache.create(
+              pos.down(),
+              Direction.UP, Objects.requireNonNull(world),
+              ((world1, targetPos, targetState, targetEntity, direction) -> FluidApi.BLOCK.find(world1, targetPos, targetState, targetEntity, direction)));
+            
+        }
+        
+        var tankCandidate = downLookupCache.lookup();
+        
+        if (!(tankCandidate instanceof SimpleFluidStorage belowTank)) return;
         var ownTank = this.fluidStorage;
         
         SimpleFluidStorage.transfer(ownTank, belowTank, ownTank.getCapacity(), false);

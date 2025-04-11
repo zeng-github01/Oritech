@@ -14,9 +14,9 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage {
     
     public static Long transfer(SimpleFluidStorage from, SimpleFluidStorage to, long maxAmount, boolean simulate) {
         
-        var extracted = from.extract(FluidStack.create(to.getFluid(), maxAmount, to.getChanges()), true);   // check how much we could extract at most
-        var inserted = to.insert(FluidStack.create(to.getFluid(), extracted, to.getChanges()), simulate);   // insert max extraction amount
-        extracted = from.extract(FluidStack.create(to.getFluid(), inserted, to.getChanges()), simulate);    // extract only how much was actually inserted
+        var extracted = from.extract(FluidStack.create(from.getFluid(), maxAmount, from.getChanges()), true);   // check how much we could extract at most
+        var inserted = to.insert(FluidStack.create(from.getFluid(), extracted, from.getChanges()), simulate);   // insert max extraction amount
+        extracted = from.extract(FluidStack.create(from.getFluid(), inserted, from.getChanges()), simulate);    // extract only how much was actually inserted
         
         if (extracted > 0 && !simulate) {
             from.update();
