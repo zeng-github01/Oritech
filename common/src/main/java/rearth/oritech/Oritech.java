@@ -107,7 +107,7 @@ public final class Oritech {
         res.put(RegistryKeys.ITEM_GROUP.getValue(), () -> ArchitecturyRegistryContainer.register(ItemGroups.class, MOD_ID, false));
         res.put(RegistryKeys.RECIPE_SERIALIZER.getValue(), ArchitecturyRecipeRegistryContainer::finishSerializerRegister);
         res.put(RegistryKeys.LOOT_FUNCTION_TYPE.getValue(), FluidContent::registerItemsToGroups);
-        res.put(Identifier.of("neoforge", "biome_modifier_serializers"), PlayerAugments::init);   // this works just fine on fabric aswell, as they key is not really relevant there. Intentionally registered later to avoid locking issues on neoforge
+        res.put(Identifier.of("minecraft", "enchantment_provider_type"), PlayerAugments::init);   // this works just fine on fabric aswell, as they key is not really relevant there. Intentionally registered before the real attachments to avoid locking issues on neoforge
         
         return res;
     }

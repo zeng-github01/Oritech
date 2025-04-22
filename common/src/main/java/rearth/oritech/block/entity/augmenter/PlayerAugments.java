@@ -4,11 +4,7 @@ import com.mojang.serialization.Codec;
 import io.wispforest.owo.network.ClientAccess;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
-import net.minecraft.block.Block;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.SpawnReason;
@@ -18,10 +14,7 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -30,17 +23,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.world.World;
-
-import org.joml.Vector2i;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.attachment.Attachment;
+import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.client.other.OreFinderRenderer;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
+// Todo refactor the whole handling here. Make all augments init as attachments, which can be of type stat, effect or custom.
 public class PlayerAugments {
     public static final Map<Identifier, PlayerAugment> allAugments = new HashMap<>();
 
@@ -192,7 +188,6 @@ public class PlayerAugments {
         }
     };
 
-    // stored int is the number of hunger bars current buffered
     public static final PlayerAugment autoFeeder = new PlayerTickingAugment(Oritech.id("autofeeder"), true) {
 
         @Override
@@ -201,44 +196,30 @@ public class PlayerAugments {
             // ensure that player has at least 1 food missing
             var playerHungerCapacity = 20 - player.getHungerManager().getFoodLevel();
             if (playerHungerCapacity < 2) return;
-
-            var storedFood = player.getAttached(getOwnType());
-            if (storedFood == null) return;
-
-            // we have food consumed/stored already, use it
-            if (storedFood > 0) {
-                var usedFood = Math.min(playerHungerCapacity, storedFood);
-                player.getHungerManager().add(usedFood, 1f);
-                player.setAttached(getOwnType(), storedFood - usedFood);
-            } else {
-                var foodCandidate = player.getInventory().main.stream().filter(item -> item.contains(DataComponentTypes.FOOD) && !item.isIn(TagContent.FEEDER_BLACKLIST)).findFirst();
-                if (foodCandidate.isPresent()) {
-                    var foodSourceStack = foodCandidate.get();
-                    var gainedFood = Objects.requireNonNull(foodSourceStack.get(DataComponentTypes.FOOD)).nutrition();
-                    foodSourceStack.decrement(1);
-                    player.setAttached(getOwnType(), gainedFood);
-                }
-            }
+            
+            var foodStackStream = player.getInventory().main.stream().filter(item -> item.contains(DataComponentTypes.FOOD) && !item.isIn(TagContent.FEEDER_BLACKLIST));
+            var selectedFood = foodStackStream.reduce((a, b) -> Math.abs(a.get(DataComponentTypes.FOOD).nutrition() - playerHungerCapacity) <= Math.abs(b.get(DataComponentTypes.FOOD).nutrition() - playerHungerCapacity) ? a : b);
+            selectedFood.ifPresent(food -> food.finishUsing(player.getWorld(), player));
 
         }
 
         @Override
         public void toggle(PlayerEntity player) {
             super.toggle(player);
-            var value = player.getAttached(getOwnType());
+            var value = AttachmentApi.getAttachmentValue(player, getOwnType());
             if (value == null) return;
 
             if (value >= 0) {
-                player.setAttached(getOwnType(), -1);
+                AttachmentApi.setAttachment(player, getOwnType(), -1);
             } else {
-                player.setAttached(getOwnType(), 0);
+                AttachmentApi.setAttachment(player, getOwnType(), 0);
             }
 
         }
 
         @Override
         public boolean isEnabled(PlayerEntity player) {
-            var value = player.getAttached(getOwnType());
+            var value = AttachmentApi.getAttachmentValue(player, getOwnType());
             return value != null && value >= 0;
         }
     };
@@ -267,20 +248,20 @@ public class PlayerAugments {
         @Override
         public void toggle(PlayerEntity player) {
             super.toggle(player);
-            var value = player.getAttached(getOwnType());
+            var value = AttachmentApi.getAttachmentValue(player, getOwnType());
             if (value == null) return;
 
             if (value >= 0) {
-                player.setAttached(getOwnType(), -1);
+                AttachmentApi.setAttachment(player, getOwnType(), -1);
             } else {
-                player.setAttached(getOwnType(), 0);
+                AttachmentApi.setAttachment(player, getOwnType(), 0);
             }
 
         }
 
         @Override
         public boolean isEnabled(PlayerEntity player) {
-            var value = player.getAttached(getOwnType());
+            var value = AttachmentApi.getAttachmentValue(player, getOwnType());
             return value != null && value >= 0;
         }
     };
@@ -318,20 +299,20 @@ public class PlayerAugments {
         @Override
         public void toggle(PlayerEntity player) {
             super.toggle(player);
-            var value = player.getAttached(getOwnType());
+            var value = AttachmentApi.getAttachmentValue(player, getOwnType());
             if (value == null) return;
 
             if (value >= 0) {
-                player.setAttached(getOwnType(), -1);
+                AttachmentApi.setAttachment(player, getOwnType(), -1);
             } else {
-                player.setAttached(getOwnType(), 0);
+                AttachmentApi.setAttachment(player, getOwnType(), 0);
             }
 
         }
 
         @Override
         public boolean isEnabled(PlayerEntity player) {
-            var value = player.getAttached(getOwnType());
+            var value = AttachmentApi.getAttachmentValue(player, getOwnType());
             return value != null && value >= 0;
         }
     };
@@ -483,7 +464,7 @@ public class PlayerAugments {
     @SuppressWarnings("UnstableApiUsage")
     public static class PlayerCustomAugment extends PlayerAugment {
 
-        private AttachmentType<Integer> OWN_TYPE;
+        private Attachment<Integer> OWN_TYPE;
 
         protected PlayerCustomAugment(Identifier id) {
             this(id, false);
@@ -495,27 +476,39 @@ public class PlayerAugments {
 
         @Override
         public void register() {
-
-            OWN_TYPE = AttachmentRegistry.<Integer>builder()
-                    .copyOnDeath()
-                    .persistent(Codec.INT)
-                    .initializer(() -> -1)
-//                    .syncWith(PacketCodecs.VAR_INT.cast(), AttachmentSyncPredicate.targetOnly())   // because FFAPI isnt updated yet this cannot be used
-                    .buildAndRegister(this.id);
+            
+            OWN_TYPE = new Attachment<>() {
+                
+                @Override
+                public Identifier identifier() {
+                    return id;
+                }
+                
+                @Override
+                public Codec<Integer> persistenceCodec() {
+                    return Codec.INT;
+                }
+                
+                @Override
+                public Supplier<Integer> initializer() {
+                    return () -> 1;
+                }
+            };
+            AttachmentApi.register(OWN_TYPE);
         }
 
-        public AttachmentType<Integer> getOwnType() {
+        public Attachment<Integer> getOwnType() {
             return OWN_TYPE;
         }
 
         @Override
         public boolean isInstalled(PlayerEntity player) {
-            return player.hasAttached(OWN_TYPE);
+            return AttachmentApi.hasAttachment(player, OWN_TYPE);
         }
 
         @Override
         public void installToPlayer(PlayerEntity player) {
-            player.setAttached(OWN_TYPE, 0);
+            AttachmentApi.setAttachment(player, OWN_TYPE, 0);
             this.onInstalled(player);
 
             if (autoSync && !player.getWorld().isClient)
@@ -524,7 +517,7 @@ public class PlayerAugments {
 
         @Override
         public void removeFromPlayer(PlayerEntity player) {
-            player.removeAttached(OWN_TYPE);
+            AttachmentApi.removeAttachment(player, OWN_TYPE);
             this.onRemoved(player);
 
             if (autoSync && !player.getWorld().isClient)
@@ -535,37 +528,49 @@ public class PlayerAugments {
     @SuppressWarnings("UnstableApiUsage")
     public static class PlayerPortalAugment extends PlayerAugment {
         
-        private AttachmentType<GlobalPos> OWN_TYPE;
+        private Attachment<GlobalPos> OWN_TYPE;
         protected PlayerPortalAugment(Identifier id, boolean toggleable) {
             super(id, toggleable, true);
         }
 
         @Override
         public void register() {
-            OWN_TYPE = AttachmentRegistry.<GlobalPos>builder()
-                    .copyOnDeath()
-                    .persistent(GlobalPos.CODEC)
-                    .initializer(() -> GlobalPos.create(World.OVERWORLD, BlockPos.ORIGIN))
-                    // .syncWith(BlockPos.PACKET_CODEC.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
-                    .buildAndRegister(this.id);
+            
+            OWN_TYPE = new Attachment<>() {
+                @Override
+                public Identifier identifier() {
+                    return id;
+                }
+                
+                @Override
+                public Codec<GlobalPos> persistenceCodec() {
+                    return GlobalPos.CODEC;
+                }
+                
+                @Override
+                public Supplier<GlobalPos> initializer() {
+                    return () -> GlobalPos.create(World.OVERWORLD, BlockPos.ORIGIN);
+                }
+            };
+            
+            AttachmentApi.register(OWN_TYPE);
         }
 
-        public AttachmentType<GlobalPos> getOwnType() {
+        public Attachment<GlobalPos> getOwnType() {
             return OWN_TYPE;
         }
 
         @Override
         public boolean isInstalled(PlayerEntity player) {
-            return player.hasAttached(OWN_TYPE);
+            return AttachmentApi.hasAttachment(player, OWN_TYPE);
         }
 
         @Override
         public void installToPlayer(PlayerEntity player) {
-            player.setAttached(OWN_TYPE, GlobalPos.create(
-                    player.getWorld().getRegistryKey(),
-                    player.getBlockPos()
-                )
-            );
+            AttachmentApi.setAttachment(player, OWN_TYPE, GlobalPos.create(
+              player.getWorld().getRegistryKey(),
+              player.getBlockPos()
+            ));
 
             this.onInstalled(player);
 
@@ -575,7 +580,7 @@ public class PlayerAugments {
 
         @Override
         public void removeFromPlayer(PlayerEntity player) {
-            player.removeAttached(OWN_TYPE);
+            AttachmentApi.removeAttachment(player, OWN_TYPE);
             this.onRemoved(player);
 
             if (autoSync && !player.getWorld().isClient)
@@ -594,7 +599,7 @@ public class PlayerAugments {
             var spawnToPlayer = spawnPos.subtract(player.getPos()).normalize().multiply(0.3);
             spawnPos = spawnPos.subtract(spawnToPlayer);
 
-            var targetPos = player.getAttached(OWN_TYPE);
+            var targetPos = AttachmentApi.getAttachmentValue(player, OWN_TYPE);
             if (targetPos == null) return;
 
             var portalEntity = EntitiesContent.PORTAL_ENTITY.create((ServerWorld) world, spawner -> {
