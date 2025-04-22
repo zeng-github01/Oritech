@@ -542,15 +542,15 @@ public class PlayerAugments {
 
         @Override
         public void register() {
-            OWN_TYPE = AttachmentRegistry.<BlockPos>builder()
+            OWN_TYPE = AttachmentRegistry.<GlobalPos>builder()
                     .copyOnDeath()
-                    .persistent(BlockPos.CODEC)
-                    .initializer(() -> BlockPos.ORIGIN)
+                    .persistent(GlobalPos.CODEC)
+                    .initializer(() -> GlobalPos.create(World.OVERWORLD, BlockPos.ORIGIN))
                     // .syncWith(BlockPos.PACKET_CODEC.cast(), AttachmentSyncPredicate.targetOnly())   // todo either wait for FFAPI update or manually replace this
                     .buildAndRegister(this.id);
         }
 
-        public AttachmentType<BlockPos> getOwnType() {
+        public AttachmentType<GlobalPos> getOwnType() {
             return OWN_TYPE;
         }
 
