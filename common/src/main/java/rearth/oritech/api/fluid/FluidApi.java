@@ -1,4 +1,4 @@
-package rearth.oritech.util.fluid;
+package rearth.oritech.api.fluid;
 
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.item.ItemStack;

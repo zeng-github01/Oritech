@@ -1,4 +1,4 @@
-package rearth.oritech.util.item.containers;
+package rearth.oritech.api.item.containers;
 
 import net.minecraft.item.ItemStack;
 import rearth.oritech.util.InventorySlotAssignment;

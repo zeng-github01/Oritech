@@ -1,8 +1,8 @@
-package rearth.oritech.util.fluid.containers;
+package rearth.oritech.api.fluid.containers;
 
 import dev.architectury.fluid.FluidStack;
 import net.minecraft.item.ItemStack;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.function.Consumer;
 

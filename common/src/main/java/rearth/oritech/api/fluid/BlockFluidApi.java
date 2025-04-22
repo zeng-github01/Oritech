@@ -1,4 +1,4 @@
-package rearth.oritech.util.fluid;
+package rearth.oritech.api.fluid;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

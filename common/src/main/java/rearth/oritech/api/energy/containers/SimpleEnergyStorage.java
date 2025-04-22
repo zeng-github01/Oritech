@@ -1,6 +1,6 @@
-package rearth.oritech.util.energy.containers;
+package rearth.oritech.api.energy.containers;
 
-import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi;
 
 public class SimpleEnergyStorage extends EnergyApi.EnergyStorage {
     private final long maxInsert;

@@ -1,9 +1,9 @@
-package rearth.oritech.util.fluid.containers;
+package rearth.oritech.api.fluid.containers;
 
 import dev.architectury.fluid.FluidStack;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.fluid.FluidApi;
 
 import java.util.List;
 import java.util.function.BooleanSupplier;

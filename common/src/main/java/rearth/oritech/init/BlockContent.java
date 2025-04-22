@@ -39,8 +39,8 @@ import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.FluidApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 

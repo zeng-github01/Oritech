@@ -1,12 +1,11 @@
-package rearth.oritech.util.item.containers;
+package rearth.oritech.api.item.containers;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.item.ItemApi;
 
 public class SimpleInventoryStorage implements Inventory, ItemApi.InventoryStorage {
     

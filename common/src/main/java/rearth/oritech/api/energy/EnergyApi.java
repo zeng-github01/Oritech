@@ -1,4 +1,4 @@
-package rearth.oritech.util.energy;
+package rearth.oritech.api.energy;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;

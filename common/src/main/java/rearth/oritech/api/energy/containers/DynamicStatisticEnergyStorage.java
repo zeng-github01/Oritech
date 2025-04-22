@@ -1,4 +1,4 @@
-package rearth.oritech.util.energy.containers;
+package rearth.oritech.api.energy.containers;
 
 import java.util.ArrayList;
 import java.util.Arrays;

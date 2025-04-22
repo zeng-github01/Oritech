@@ -1,7 +1,7 @@
-package rearth.oritech.util.energy.containers;
+package rearth.oritech.api.energy.containers;
 
 import net.minecraft.item.ItemStack;
-import rearth.oritech.util.energy.EnergyApi;
+import rearth.oritech.api.energy.EnergyApi;
 
 import java.util.function.Consumer;
 

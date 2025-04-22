@@ -24,9 +24,9 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
 import rearth.oritech.block.entity.storage.*;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
 import java.lang.annotation.ElementType;

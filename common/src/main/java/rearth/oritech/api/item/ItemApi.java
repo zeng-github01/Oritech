@@ -1,4 +1,4 @@
-package rearth.oritech.util.item;
+package rearth.oritech.api.item;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;

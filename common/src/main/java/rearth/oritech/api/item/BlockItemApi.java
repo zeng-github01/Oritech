@@ -1,4 +1,4 @@
-package rearth.oritech.util.energy;
+package rearth.oritech.api.item;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -10,12 +10,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-public interface BlockEnergyApi {
+public interface BlockItemApi {
     
     void registerBlockEntity(Supplier<BlockEntityType<?>> typeSupplier);
     
-    EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
+    ItemApi.InventoryStorage find(World world, BlockPos pos, @Nullable BlockState state, @Nullable BlockEntity entity, @Nullable Direction direction);
     
-    EnergyApi.EnergyStorage find(World world, BlockPos pos, @Nullable Direction direction);
-    
+    ItemApi.InventoryStorage find(World world, BlockPos pos, @Nullable Direction direction);
 }

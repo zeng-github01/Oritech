@@ -15,9 +15,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import rearth.oritech.Oritech;
-import rearth.oritech.util.energy.EnergyApi;
-import rearth.oritech.util.fluid.FluidApi;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.item.ItemApi;
 
 @Mod(Oritech.MOD_ID)
 public final class OritechModNeoForge {

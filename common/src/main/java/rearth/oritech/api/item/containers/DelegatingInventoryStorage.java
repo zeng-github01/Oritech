@@ -1,8 +1,8 @@
-package rearth.oritech.util.item.containers;
+package rearth.oritech.api.item.containers;
 
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.util.item.ItemApi;
+import rearth.oritech.api.item.ItemApi;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
