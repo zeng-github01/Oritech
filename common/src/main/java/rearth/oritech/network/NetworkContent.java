@@ -28,6 +28,7 @@ import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -606,7 +607,7 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.registerClientbound(AugmentOperationSyncPacket.class, ((message, access) -> {
             if (access != null)
-                PlayerAugments.handlePlayerAugmentOperation(message, access);   // this weird redict is need for server-only class-loading reasons?
+                PlayerAugmentsClient.handlePlayerAugmentOperation(message, access);   // this weird redict is need for server-only class-loading reasons?
             
         }));
         
