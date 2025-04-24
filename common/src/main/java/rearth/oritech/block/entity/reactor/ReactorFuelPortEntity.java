@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.reactor;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -36,7 +35,6 @@ import java.util.List;
 public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuProvider, ScreenProvider, ItemApi.BlockProvider {
     
     private final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::markDirty, new InventorySlotAssignment(0, 1, 1, 0));
-    private final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     
     public int availableFuel;
     public int currentFuelOriginalCapacity;

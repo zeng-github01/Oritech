@@ -1,10 +1,12 @@
 package rearth.oritech.fabric;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.item.tools.util.ArmorEventHandler;
 
 public final class OritechFabricMod implements ModInitializer {
     @Override
@@ -24,5 +26,11 @@ public final class OritechFabricMod implements ModInitializer {
         Oritech.runAllRegistries();
         Oritech.initialize();
         
+        registerFabricEvents();
+        
+    }
+    
+    public static void registerFabricEvents() {
+        ServerEntityEvents.EQUIPMENT_CHANGE.register(ArmorEventHandler::processEvent);
     }
 }

@@ -25,6 +25,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.network.NetworkContent;
 
 import java.util.List;
@@ -103,7 +104,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     public void finishBlockWork(BlockPos processed) {
         
         var inventoryStack = inventory.getStack(0);
-        var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.isIn(ConventionalItemTags.FERTILIZERS);
+        var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.isIn(TagContent.CONVENTIONAL_FERTILIZER);
         var fertilizerStrength = fertilizerInInventory ? 2 : 1;
         var fertilized = false;
         

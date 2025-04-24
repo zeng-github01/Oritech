@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.processing;
 
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBiomeTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -23,6 +22,7 @@ import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -51,7 +51,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
         if (!world.isClient && !initialized) {
             initialized = true;
             var biome = world.getBiome(pos);
-            inColdArea = biome.isIn(ConventionalBiomeTags.IS_COLD);
+            inColdArea = biome.isIn(TagContent.CONVENTIONAL_COLD);
         }
         
     }

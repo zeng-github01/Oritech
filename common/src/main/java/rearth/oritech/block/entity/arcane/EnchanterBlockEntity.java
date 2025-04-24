@@ -2,7 +2,6 @@ package rearth.oritech.block.entity.arcane;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.wispforest.owo.util.VectorRandomUtils;
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -67,7 +66,6 @@ public class EnchanterBlockEntity extends BlockEntity
     
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::markDirty, new InventorySlotAssignment(0, 1, 1, 1));
     
-    protected final InventoryStorage inventoryStorage = InventoryStorage.of(inventory, null);
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     public RegistryEntry<Enchantment> selectedEnchantment;
     public int progress;

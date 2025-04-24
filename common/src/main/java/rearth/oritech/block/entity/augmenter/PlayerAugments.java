@@ -2,9 +2,6 @@ package rearth.oritech.block.entity.augmenter;
 
 import com.mojang.serialization.Codec;
 import io.wispforest.owo.network.ClientAccess;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.SpawnReason;
@@ -285,7 +282,7 @@ public class PlayerAugments {
             BlockPos.iterate(target.getX() - range, target.getY() - range, target.getZ() - range, target.getX() + range, target.getY() + range, target.getZ() + range)
                     .forEach(pos -> {
                         var state = world.getBlockState(pos);
-                        var isOre = state.isIn(ConventionalBlockTags.ORES);
+                        var isOre = state.isIn(TagContent.CONVENTIONAL_ORES);
                         if (isOre) highlightPositions.add(pos.toImmutable());
                     });
 
@@ -389,7 +386,6 @@ public class PlayerAugments {
         }
     }
 
-    @Environment(EnvType.CLIENT)
     public static void handlePlayerAugmentOperation(NetworkContent.AugmentOperationSyncPacket message, ClientAccess access) {
 
         var player = access.player();
