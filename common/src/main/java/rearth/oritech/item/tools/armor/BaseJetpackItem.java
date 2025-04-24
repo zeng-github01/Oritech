@@ -13,6 +13,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
@@ -20,8 +22,6 @@ import rearth.oritech.init.FluidContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.TooltipHelper;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
 
 import java.util.List;
 

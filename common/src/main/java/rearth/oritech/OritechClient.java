@@ -28,7 +28,7 @@ public final class OritechClient {
     public static void initialize() {
         
         Oritech.LOGGER.info("Oritech client initialization");
-        ModScreens.assignScreens();
+        ModScreens.registerScreens();
         
         KeyBindingHelper.registerKeyBinding(AUGMENT_SELECTOR);
         
