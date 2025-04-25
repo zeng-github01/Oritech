@@ -12,7 +12,7 @@ public class EntitiesContent implements ArchitecturyRegistryContainer<EntityType
     
     public static final EntityType<PortalEntity> PORTAL_ENTITY = EntityType.Builder.create(PortalEntity::new, SpawnGroup.MISC)
                                                                    .dimensions(1, 2)
-                                                                   .build();
+                                                                   .build(null);
     
     @Override
     public RegistryKey<Registry<EntityType<?>>> getRegistryType() {

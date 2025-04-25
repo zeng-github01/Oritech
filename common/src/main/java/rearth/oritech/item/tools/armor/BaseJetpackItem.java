@@ -35,6 +35,8 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
     long getFuelCapacity();
     float getSpeed();
     
+    default boolean requireTakeoff() {return true;}
+    
     default void tickJetpack(ItemStack stack, Entity entity, World world) {
         
         if (!(entity instanceof PlayerEntity player)) return;
@@ -56,7 +58,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var isActive = up;
         if (!requireUpward()) isActive = up || horizontal;
         
-        if (!isJetpackStarted(player, world, up)) return;
+        if (requireTakeoff() && !isJetpackStarted(player, world, up)) return;
         
         if (!isActive || player.isOnGround() || player.isSubmergedInWater()) return;
         

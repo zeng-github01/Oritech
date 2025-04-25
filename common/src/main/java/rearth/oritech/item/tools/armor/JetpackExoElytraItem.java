@@ -33,6 +33,11 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
         }
     }
     
+    @Override
+    public boolean requireTakeoff() {
+        return false;
+    }
+    
     public boolean useCustomElytra(LivingEntity entity, ItemStack chestStack, boolean tickElytra) {
         if (!tickElytra) return true;
         

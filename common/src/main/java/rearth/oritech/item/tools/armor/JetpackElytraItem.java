@@ -42,6 +42,11 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     }
     
     @Override
+    public boolean requireTakeoff() {
+        return false;
+    }
+    
+    @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, world, entity, slot, selected);
         
