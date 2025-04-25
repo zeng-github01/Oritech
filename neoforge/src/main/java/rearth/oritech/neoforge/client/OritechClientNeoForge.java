@@ -31,10 +31,6 @@ public class OritechClientNeoForge {
         eventBus.register(new EventHandler());
         
         OritechClient.initialize();
-        
-        for (var entry : ModRenderers.RENDER_LAYERS.entrySet()) {
-            RenderLayers.setRenderLayer(entry.getKey(), entry.getValue());
-        }
     }
     
     @EventBusSubscriber(modid = Oritech.MOD_ID)
@@ -60,6 +56,10 @@ public class OritechClientNeoForge {
         public void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
             OritechClient.registerRenderers();
             event.registerEntityRenderer(EntitiesContent.PORTAL_ENTITY, PortalEntityRenderer::new);
+            
+            for (var entry : ModRenderers.RENDER_LAYERS.entrySet()) {
+                RenderLayers.setRenderLayer(entry.getKey(), entry.getValue());
+            }
         }
         
         @SubscribeEvent
