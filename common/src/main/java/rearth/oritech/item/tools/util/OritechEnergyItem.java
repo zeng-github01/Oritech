@@ -7,7 +7,9 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.random.Random;
+import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 

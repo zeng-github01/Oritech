@@ -21,6 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
@@ -43,11 +44,6 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     
     public ExoArmorItem(RegistryEntry<ArmorMaterial> material, Type type, Settings settings) {
         super(material, type, settings);
-    }
-    
-    @Override
-    public boolean allowComponentsUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
-        return super.allowComponentsUpdateAnimation(player, hand, oldStack, newStack);  // TODO make this work in neo and fabric somehow
     }
     
     @Override

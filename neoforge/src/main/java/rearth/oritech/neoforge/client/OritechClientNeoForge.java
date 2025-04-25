@@ -1,6 +1,8 @@
 package rearth.oritech.neoforge.client;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
