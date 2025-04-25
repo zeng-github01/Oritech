@@ -17,22 +17,14 @@ import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 import java.util.List;
 
 public class RecipeHelpers {
-    public static void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix, boolean grinder) {
-        addDustRecipe(exporter, ingot, dust, null, suffix, grinder);
-    }
     
     public static void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, String suffix) {
-        addDustRecipe(exporter, ingot, dust, null, suffix, true);
+        addDustRecipe(exporter, ingot, dust, null, suffix);
     }
     
     public static void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, @Nullable Item ingotSmelted, String suffix) {
-        addDustRecipe(exporter, ingot, dust, ingotSmelted, suffix, true);
-    }
-    
-    public static void addDustRecipe(RecipeExporter exporter, Ingredient ingot, Item dust, @Nullable Item ingotSmelted, String suffix, boolean grinder) {
         PulverizerRecipeBuilder.build().input(ingot).result(dust).export(exporter, suffix);
-        if (grinder)
-            GrinderRecipeBuilder.build().input(ingot).result(dust).time(140).export(exporter, suffix);
+        GrinderRecipeBuilder.build().input(ingot).result(dust).time(140).export(exporter, suffix);
         if (ingotSmelted != null) {
             RecipeProvider.offerSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 200, Oritech.MOD_ID);
             RecipeProvider.offerBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 100, Oritech.MOD_ID);

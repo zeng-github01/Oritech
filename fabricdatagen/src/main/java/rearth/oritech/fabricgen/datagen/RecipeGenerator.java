@@ -526,7 +526,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
         // fuel
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(FluidContent.STILL_OIL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel");
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(FluidContent.STILL_BIOFUEL.get()).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel_from_biofuel");
-        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
+        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS).fluidInput(Fluids.WATER, 0.25f).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
         
         // biosteel
         FoundryRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).input(ConventionalItemTags.IRON_INGOTS).result(ItemContent.BIOSTEEL_INGOT).export(exporter, "biosteel");
