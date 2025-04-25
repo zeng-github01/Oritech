@@ -60,7 +60,6 @@ public final class OritechModNeoForge {
         public static void onEquipmentChanged(LivingEquipmentChangeEvent event) {
             ArmorEventHandler.processEvent(event.getEntity(), event.getSlot(), event.getFrom(), event.getTo());
         }
-        
     }
     
     class EventHandler {
