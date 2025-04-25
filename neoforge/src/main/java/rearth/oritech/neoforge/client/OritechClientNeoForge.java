@@ -1,8 +1,7 @@
 package rearth.oritech.neoforge.client;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.render.RenderLayers;
 import net.minecraft.util.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -17,8 +16,11 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
+import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.other.OreFinderRenderer;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
+import rearth.oritech.client.renderers.PortalEntityRenderer;
+import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.FluidContent;
 
 @Mod(value = Oritech.MOD_ID, dist = Dist.CLIENT)
@@ -29,6 +31,10 @@ public class OritechClientNeoForge {
         eventBus.register(new EventHandler());
         
         OritechClient.initialize();
+        
+        for (var entry : ModRenderers.RENDER_LAYERS.entrySet()) {
+            RenderLayers.setRenderLayer(entry.getKey(), entry.getValue());
+        }
     }
     
     @EventBusSubscriber(modid = Oritech.MOD_ID)
@@ -53,6 +59,7 @@ public class OritechClientNeoForge {
         @SubscribeEvent
         public void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
             OritechClient.registerRenderers();
+            event.registerEntityRenderer(EntitiesContent.PORTAL_ENTITY, PortalEntityRenderer::new);
         }
         
         @SubscribeEvent
