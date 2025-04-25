@@ -22,6 +22,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Pair;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -49,6 +50,8 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
     
     private final VoxelShape[] HITBOXES = computeShapes();
     private final HashMap<PlayerEntity, Long> lastContact = new HashMap<>();
+    
+    public static Pair<Long, PlayerEntity> lastTeleportedPlayer;    // used to skip inv opening if a player just teleported in
     
     public AugmentApplicationBlock(Settings settings) {
         super(settings);
@@ -109,6 +112,13 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
         if (world.isClient || !state.get(ASSEMBLED)) return;
         
         if (!(entity instanceof PlayerEntity player)) return;
+        
+        if (lastTeleportedPlayer != null) {
+            var age = world.getTime() - lastTeleportedPlayer.getLeft();
+            if (age < 20) {
+                return;
+            }
+        }
         
         var centerPos = pos.toBottomCenterPos().add(0, 0.2, 0);
         
