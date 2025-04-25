@@ -249,9 +249,9 @@ public class LaserArmBlockEntity extends BlockEntity implements
     public PlayerEntity getLaserPlayerEntity() {
         if (!(world instanceof ServerWorld))
             return null;
-
+        
         if (laserPlayerEntity == null) {
-            laserPlayerEntity = FakeMachinePlayer.create((ServerWorld)world, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
+            laserPlayerEntity = FakeMachinePlayer.create((ServerWorld) world, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
         }
         
         if (hunterAddons > 0 && yieldAddons > 0) {
@@ -906,6 +906,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
         
     }
+    
     @Override
     public Text getDisplayName() {
         return Text.literal("");

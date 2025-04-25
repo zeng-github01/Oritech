@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import rearth.oritech.util.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 
 // inspired by Fabric's FakePlayer and Neoforge's FakePlayerFactory
 
