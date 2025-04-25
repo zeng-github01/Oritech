@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.init.BlockContent;
 
 import java.util.Objects;
 
@@ -21,16 +22,24 @@ public class PlayerModifierScreenHandler extends ScreenHandler {
     
     public final PlayerEntity player;
     
-    protected BlockState machineBlock;
-    public AugmentApplicationEntity blockEntity;
+    protected final BlockState machineBlock;
+    public final AugmentApplicationEntity blockEntity;
     
     public PlayerModifierScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, Objects.requireNonNull(inventory.player.getWorld().getBlockEntity(buf.readBlockPos())));
+        this(syncId, inventory, inventory.player.getWorld().getBlockEntity(buf.readBlockPos()));
     }
     
     // on server, also called from client constructor
-    public PlayerModifierScreenHandler(int syncId, PlayerInventory playerInventory, @NotNull BlockEntity blockEntity) {
+    public PlayerModifierScreenHandler(int syncId, PlayerInventory playerInventory, BlockEntity blockEntity) {
         super(ModScreens.MODIFIER_SCREEN, syncId);
+        
+        if (blockEntity == null) {
+            blockPos = BlockPos.ORIGIN;
+            player = playerInventory.player;
+            machineBlock = BlockContent.AUGMENT_APPLICATION_BLOCK.getDefaultState();
+            this.blockEntity = null;
+            return;
+        }
         
         this.blockPos = blockEntity.getPos();
         this.player = playerInventory.player;

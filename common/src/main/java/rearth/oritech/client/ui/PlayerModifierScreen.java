@@ -68,6 +68,11 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         
         root = rootComponent;
         
+        if (handler.blockEntity == null) {
+            this.close();
+            return;
+        }
+        
         dependencyLines.clear();
         shownAugments.clear();
         
@@ -127,6 +132,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     @Override
     protected void handledScreenTick() {
         super.handledScreenTick();
+        if (handler.blockEntity == null) return;
         
         // update research panels
         for (int i = 0; i < researchLabels.size(); i++) {
