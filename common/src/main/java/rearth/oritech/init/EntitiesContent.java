@@ -5,6 +5,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import rearth.oritech.Oritech;
 import rearth.oritech.util.PortalEntity;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
@@ -12,7 +13,7 @@ public class EntitiesContent implements ArchitecturyRegistryContainer<EntityType
     
     public static final EntityType<PortalEntity> PORTAL_ENTITY = EntityType.Builder.create(PortalEntity::new, SpawnGroup.MISC)
                                                                    .dimensions(1, 2)
-                                                                   .build(null);
+                                                                   .build("portal_entity");
     
     @Override
     public RegistryKey<Registry<EntityType<?>>> getRegistryType() {

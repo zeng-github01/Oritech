@@ -153,7 +153,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block BIG_SOLAR_PANEL_BLOCK = new BigSolarPanelBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque(), Oritech.CONFIG.generators.solarGeneratorData.energyPerTick());
     @UseGeoBlockItem(scale = 0.7f)
-    public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().luminance(Blocks.createLightLevelFromLitBlockState(15)));
+    public static final Block POWERED_FURNACE_BLOCK = new PoweredFurnaceBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().luminance(state -> state.get(Properties.LIT) ? 15 : 0));
     @UseGeoBlockItem(scale = 0.5f)
     public static final Block LASER_ARM_BLOCK = new LaserArmBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.25f)
@@ -170,11 +170,11 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     
     @NoAutoDrop
     @DispenserPlace
-    public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).luminance(Blocks.createLightLevelFromLitBlockState(15)));
+    public static final Block SMALL_TANK_BLOCK = new SmallFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.DESTROY).luminance(state -> state.get(Properties.LIT) ? 15 : 0));
     
     @NoAutoDrop
     @DispenserPlace
-    public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(Blocks.createLightLevelFromLitBlockState(15)).hardness(-1.0F));
+    public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(state -> state.get(Properties.LIT) ? 15 : 0).hardness(-1.0F));
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
