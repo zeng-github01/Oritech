@@ -22,12 +22,12 @@ public class OritechRecipe implements Recipe<RecipeInput> {
     
     public static final int fluidDivider = Platform.isNeoForge() ? 81 : 1;  // dirty hack because bucket amounts are 81000 in neo, and 1000 in fabric, but datagen/recipes are on fabric
     
-    private final OritechRecipeType type;
-    private final List<Ingredient> inputs;
-    private final List<ItemStack> results;
-    private final FluidStack fluidInput;
-    private final FluidStack fluidOutput;
-    private final int time;
+    protected final OritechRecipeType type;
+    protected final List<Ingredient> inputs;
+    protected final List<ItemStack> results;
+    protected final FluidStack fluidInput;
+    protected final FluidStack fluidOutput;
+    protected final int time;
 
     public static final OritechRecipe DUMMY = new OritechRecipe(-1, DefaultedList.ofSize(1, Ingredient.ofStacks(Items.IRON_INGOT.getDefaultStack())), DefaultedList.ofSize(1, Items.IRON_BLOCK.getDefaultStack()), RecipeContent.PULVERIZER, FluidStack.empty(), FluidStack.empty());
     

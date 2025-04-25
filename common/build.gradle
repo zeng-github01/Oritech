@@ -42,6 +42,16 @@ sourceSets {
     main {
         resources.srcDir "src/main/generated"
         resources.exclude ".cache"
+        // exclude compat recipes from common because they're loader specific
+        resources.exclude "**/compat"
+    }
+    fabric {
+        // make compat recipes available to fabric build
+        resources {
+            srcDir "src/main/generated"
+            include "**/compat/**"
+        }
+        output.resourcesDir = "data"
     }
 }
 
