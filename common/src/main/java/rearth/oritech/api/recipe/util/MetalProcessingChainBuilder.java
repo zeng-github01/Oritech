@@ -253,9 +253,11 @@ public class MetalProcessingChainBuilder {
                 .timeMultiplier(timeMultiplier)
                 .export(exporter, resourcePath + "raw/" + metalName);
         }
+        
+        var hasGrinderSpecialVariant = clumpItem != null || dustItem != null;
 
         // raw ores -> clumps (falling back to dusts) in grinder
-        if (clumpItem != null || dustItem != null) {
+        if (hasGrinderSpecialVariant) {
             GrinderRecipeBuilder.build()
                 .input(rawOreIngredient)
                 .result(firstNonNull(clumpItem, dustItem))
@@ -292,7 +294,7 @@ public class MetalProcessingChainBuilder {
 
         // ingots/nuggets to dust
         if (dustItem != null)
-            RecipeHelpers.addDustRecipe(exporter, ingotIngredient, dustItem, resourcePath + "dust/" + metalName);
+            RecipeHelpers.addDustRecipe(exporter, ingotIngredient, dustItem, resourcePath + "dust/" + metalName, !hasGrinderSpecialVariant);
         if (smallDustItem != null)
             RecipeHelpers.addDustRecipe(exporter, nuggetIngredient, smallDustItem, resourcePath + "smalldust/" + metalName);
         
