@@ -1,5 +1,6 @@
 Alpha Warning: This update changes a lot of internal things, and is highly experimental. Make sure to report any issues found on github. I expect there to be quite a few,
-especially regarding the new item and fluid transfer/interaction APIs. Don't go putting this version into you published modpack / long term survival world yet.
+especially regarding the new item and fluid transfer/interaction APIs. Don't go putting this version into you published modpack / long term survival world yet. The fluid stack changes
+will also cause all Oritech fluid containers to reset, so their content will sadly be lost with this update. Sorry about this.
 
 This change finally allows Oritech to move away from forgified fabric API on neoforge. While it was working great in most cases (and allowed Oritech to move to neoforge in the first place), 
 there was a lot of overlap with architectury and having one fewer dependency is always a good thing.
