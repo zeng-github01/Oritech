@@ -201,7 +201,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             if (yieldAddons > 0) {
                 dropped = getLootDrops(targetState, (ServerWorld) world, targetPosition, targetEntity, yieldAddons);
             } else if (hasSilkTouchAddon) {
-                dropped = getSilkTouchDrops(targetState, (ServerWorld) world, targetPosition, targetEntity, hasSilkTouchAddon);
+                dropped = getSilkTouchDrops(targetState, (ServerWorld) world, targetPosition, targetEntity);
             } else {
                 dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity);
             }
@@ -231,8 +231,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         return getLootDrops(state, world, pos, blockEntity, yieldAddons, null);
     }
 
-    public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, boolean hasSilkTouchAddon) {
-        return getSilkTouchDrops(state, world, pos, blockEntity, hasSilkTouchAddon, null);
+    public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity) {
+        return getSilkTouchDrops(state, world, pos, blockEntity, null);
     }
 
     public static List<ItemStack> getLootDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, int yieldAddons, @Nullable PlayerEntity entity) {
@@ -250,7 +250,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         return state.getDroppedStacks(builder);
     }
 
-    public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, boolean hasSilkTouchAddon, @Nullable PlayerEntity entity) {
+    public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable PlayerEntity entity) {
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
         sampleTool.set(DataComponentTypes.UNBREAKABLE, new UnbreakableComponent(false));
         var silkTouchEntry = world.getRegistryManager().get(RegistryKeys.ENCHANTMENT).getEntry(Enchantments.SILK_TOUCH).get();
