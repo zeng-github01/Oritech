@@ -282,6 +282,8 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
                 tooltip.add(Text.translatable("tooltip.oritech.addon_redstone_desc").formatted(Formatting.GRAY));
             if (blockType == BlockContent.MACHINE_PROCESSING_ADDON)
                 tooltip.add(Text.translatable("tooltip.oritech.processing_addon_desc").formatted(Formatting.GRAY));
+            if(blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON)
+                tooltip.add(Text.translatable("tooltip.oritech.addon_silk_touch_desc").formatted(Formatting.GRAY));
             
             if (addonSettings.extender()) {
                 tooltip.add(Text.translatable("tooltip.oritech.addon_extender_desc").formatted(Formatting.GRAY));
