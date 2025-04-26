@@ -65,6 +65,7 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
     public static VoxelShape[][] MACHINE_ULTIMATE_ADDON_SHAPE;
     public static VoxelShape[][] STEAM_BOILER_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_YIELD_ADDON_SHAPE;
+    public static VoxelShape[][] MACHINE_SILK_TOUCH_ADDON_SHAPE;
     
     // because this parameter is needed in appendProperties, but we can't initialize or pass it to that
     private static boolean constructorAssignmentSupportWorkaround = false;
@@ -307,6 +308,7 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
         MACHINE_SPEED_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         STEAM_BOILER_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         MACHINE_YIELD_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
+        MACHINE_SILK_TOUCH_ADDON_SHAPE = new VoxelShape[Direction.values().length][BlockFace.values().length];
         for (var facing : Direction.values()) {
             if (!facing.getAxis().isHorizontal()) continue;
             for (var face : BlockFace.values()) {
