@@ -1,0 +1,1 @@
+- Fix mod not loading on neoforge dedicated servers
