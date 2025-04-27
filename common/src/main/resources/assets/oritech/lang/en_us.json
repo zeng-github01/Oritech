@@ -360,7 +360,7 @@
   "tooltip.oritech.laser_arm.addon_range": "Effective beam radius",
   "title.oritech.machine.addon_fortune": "%d Fortune",
   "tooltip.oritech.machine.addon_fortune": "Yield addon count. 3 is the effective maximum",
-  "tooltip.oritech.machine.addon_silk_touch": "The fortune addon cannot installed simultaneously with silk touch",
+  "tooltip.oritech.machine.addon_silk_touch": "The fortune addon cannot installed simultaneously with silk touch addon",
   "tooltip.oritech.machine.quality": "Machine Quality: %d\n\nControls how many layers of machine\naddons can be added to this block.\n\nUse better cores to increase this\n\nCurrent quality progress: %s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
