@@ -40,8 +40,8 @@ import java.util.UUID;
 
 public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
-    public boolean hasCropFilterAddon = false;
-    public boolean hasSilkTouchAddon = false;
+    public boolean hasCropFilterAddon;
+    public boolean hasSilkTouchAddon;
     public int range = 1;
     public int yieldAddons = 0;
 
