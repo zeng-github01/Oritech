@@ -19,6 +19,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -39,8 +40,8 @@ import java.util.UUID;
 
 public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
-    public boolean hasCropFilterAddon;
-    public boolean hasSilkTouchAddon;
+    public boolean hasCropFilterAddon = false;
+    public boolean hasSilkTouchAddon = false;
     public int range = 1;
     public int yieldAddons = 0;
 
@@ -57,6 +58,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public void gatherAddonStats(List<AddonBlock> addons) {
         range = 1;
         yieldAddons = 0;
+        hasSilkTouchAddon = false;
         super.gatherAddonStats(addons);
     }
 
@@ -280,8 +282,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
-        if (range == 1 && yieldAddons == 0) return super.getExtraExtensionLabels();
-        return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", range), Text.translatable("tooltip.oritech.block_destroyer.addon_range")), new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
+        if (range == 1 && yieldAddons == 0 && !hasSilkTouchAddon) return super.getExtraExtensionLabels();
+        return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", range), Text.translatable("tooltip.oritech.block_destroyer.addon_range")), new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")), new Pair<>(Text.translatable("enchantment.minecraft.silk_touch").formatted(hasSilkTouchAddon ? Formatting.GREEN : Formatting.RED), Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
     }
 
     @Override
@@ -353,7 +355,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
 
     private void syncQuarryNetworkData() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.QuarryTargetPacket(pos, quarryTarget, range, yieldAddons, getBaseAddonData().speed()));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.QuarryTargetPacket(pos, quarryTarget, range, yieldAddons, hasSilkTouchAddon, getBaseAddonData().speed()));
     }
 
     @Override

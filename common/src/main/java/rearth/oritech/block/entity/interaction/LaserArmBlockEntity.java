@@ -32,6 +32,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
@@ -451,6 +452,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         areaSize = 1;
         yieldAddons = 0;
         hunterAddons = 0;
+        hasSilkTouchAddon = false;
         hasCropFilterAddon = false;
 
         MachineAddonController.super.gatherAddonStats(addons);
@@ -468,6 +470,8 @@ public class LaserArmBlockEntity extends BlockEntity implements
             yieldAddons++;
         if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON))
             hasCropFilterAddon = true;
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON))
+            hasSilkTouchAddon = true;
 
     }
 
@@ -482,7 +486,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
     private void updateNetwork() {
         var entityId = currentLivingTarget != null ? currentLivingTarget.getId() : -1;
         var sendTarget = currentTarget != null ? currentTarget : BlockPos.ORIGIN;
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon, entityId, redstonePowered));
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.LaserArmSyncPacket(pos, sendTarget, lastFiredAt, areaSize, yieldAddons, hunterAddons, hunterTargetMode.value, hasCropFilterAddon, hasSilkTouchAddon, entityId, redstonePowered));
         NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.GenericEnergySyncPacket(pos, energyStorage.amount, energyStorage.capacity));
         networkDirty = false;
     }
@@ -836,7 +840,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
 
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
-        if (areaSize == 1 && yieldAddons == 0 && hunterAddons == 0)
+        if (areaSize == 1 && yieldAddons == 0 && hunterAddons == 0 && !hasSilkTouchAddon)
             return ScreenProvider.super.getExtraExtensionLabels();
         if (hunterAddons > 0)
             return List.of(
@@ -845,7 +849,8 @@ public class LaserArmBlockEntity extends BlockEntity implements
                     new Pair<>(Text.translatable("title.oritech.machine.addon_looting", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_looting")));
         return List.of(
                 new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")),
-                new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
+                new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")),
+                new Pair<>(Text.translatable("enchantment.minecraft.silk_touch").formatted(hasSilkTouchAddon ? Formatting.GREEN : Formatting.RED), Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
     }
 
     @Override
