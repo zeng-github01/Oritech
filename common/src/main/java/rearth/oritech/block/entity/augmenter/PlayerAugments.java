@@ -274,7 +274,7 @@ public class PlayerAugments {
             var world = player.getWorld();
             var target = BlockPos.ofFloored(player.getEyePos());
 
-            if (world.getTime() % 20 != 0) return;
+            if (world.getTime() % 10 != 0) return;
 
             var range = 16;
 
