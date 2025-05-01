@@ -1,6 +1,0 @@
-- Add automatic cleanup / removal of augments using the old augment IDs
-- Machines now reset their internal inventory after dropping items when broken
-- Simplify particle collision logic to now always just calculate the sum of all particle speeds
-- Update translations from crowdin
-- Fix cyber augmentation toggle screen missing icons
-- Fix item extraction issues from Oritech machines on fabric
