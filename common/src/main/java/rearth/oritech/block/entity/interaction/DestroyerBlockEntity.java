@@ -191,22 +191,18 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             return;
         }
 
-        //skip break if it has both fortune and silk touch
-        if (yieldAddons > 0 && hasSilkTouchAddon) {
-            return;
-        }
-
         if (!targetState.getBlock().equals(Blocks.AIR)) {
 
             var targetEntity = world.getBlockEntity(targetPosition);
             List<ItemStack> dropped;
-            if (yieldAddons > 0) {
-                dropped = getLootDrops(targetState, (ServerWorld) world, targetPosition, targetEntity, yieldAddons);
-            } else if (hasSilkTouchAddon) {
+            if (hasSilkTouchAddon) {
                 dropped = getSilkTouchDrops(targetState, (ServerWorld) world, targetPosition, targetEntity);
+            } else if (yieldAddons > 0) {
+                dropped = getLootDrops(targetState, (ServerWorld) world, targetPosition, targetEntity, yieldAddons);
             } else {
                 dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity);
             }
+
             if (dropped.isEmpty()) {
                 // If the block doesn't drop any loot, try to break it again with shears
                 // Good for seagrass, cobwebs, vines, etc.
@@ -283,7 +279,10 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
         if (range == 1 && yieldAddons == 0 && !hasSilkTouchAddon) return super.getExtraExtensionLabels();
-        return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", range), Text.translatable("tooltip.oritech.block_destroyer.addon_range")), new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")), new Pair<>(Text.translatable("enchantment.minecraft.silk_touch").formatted(hasSilkTouchAddon ? Formatting.GREEN : Formatting.RED), Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
+        if (hasSilkTouchAddon) {
+            return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", range), Text.translatable("tooltip.oritech.block_destroyer.addon_range")), new Pair<>(Text.translatable("enchantment.minecraft.silk_touch"), Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
+        }
+        return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", range), Text.translatable("tooltip.oritech.block_destroyer.addon_range")), new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
     }
 
     @Override

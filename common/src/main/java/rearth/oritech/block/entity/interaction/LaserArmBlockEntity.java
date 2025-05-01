@@ -210,14 +210,11 @@ public class LaserArmBlockEntity extends BlockEntity implements
         // added getLaserPlayerEntity() to make ae2 certus quartz drop from certus
         // quartz clusters because it's expecting an entity in
         // LootContextParameters.THIS_ENTITY
-        if (yieldAddons > 0 && hasSilkTouchAddon) {
-            return;
-        }
 
-        if (yieldAddons > 0) {
+        if (hasSilkTouchAddon) {
+            dropped = DestroyerBlockEntity.getSilkTouchDrops(targetBlockState, ((ServerWorld) world), targetPos, targetEntity, getLaserPlayerEntity());
+        } else if (yieldAddons > 0) {
             dropped = DestroyerBlockEntity.getLootDrops(targetBlockState, (ServerWorld) world, targetPos, targetEntity, yieldAddons, getLaserPlayerEntity());
-        } else if (hasSilkTouchAddon) {
-            dropped = DestroyerBlockEntity.getSilkTouchDrops(targetBlockState, ((ServerWorld) world), targetPos, targetEntity);
         } else {
             dropped = Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity, getLaserPlayerEntity(), ItemStack.EMPTY);
         }
@@ -847,10 +844,14 @@ public class LaserArmBlockEntity extends BlockEntity implements
                     new Pair<>(Text.translatable("title.oritech.machine.addon_range", (int) hunterRange()), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_range")),
                     new Pair<>(Text.translatable("title.oritech.laser_arm.addon_hunter_damage", String.format("%.2f", getDamageTick())), Text.translatable("tooltip.oritech.laser_arm.addon_hunter_damage")),
                     new Pair<>(Text.translatable("title.oritech.machine.addon_looting", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_looting")));
+        if (hasSilkTouchAddon)
+            return List.of(
+                    new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")),
+                    new Pair<>(Text.translatable("enchantment.minecraft.silk_touch"), Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
+
         return List.of(
                 new Pair<>(Text.translatable("title.oritech.machine.addon_range", areaSize), Text.translatable("tooltip.oritech.laser_arm.addon_range")),
-                new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")),
-                new Pair<>(Text.translatable("enchantment.minecraft.silk_touch").formatted(hasSilkTouchAddon ? Formatting.GREEN : Formatting.RED), Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
+                new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
     }
 
     @Override

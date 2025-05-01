@@ -359,7 +359,7 @@
   "tooltip.oritech.laser_arm.addon_range": "有效光束半径",
   "title.oritech.machine.addon_fortune": "%d 时运",
   "tooltip.oritech.machine.addon_fortune": "产量插件数量。有效的最大值为3",
-  "tooltip.oritech.machine.addon_silk_touch": "时运插件不能同时与精准采集插件一起安装",
+  "tooltip.oritech.machine.addon_silk_touch": "当时运插件和精准采集插件同时安装时，精准采集优先",
   "tooltip.oritech.machine.quality": "机器品质：%d\n\n决定能添加到该方块的机器插件层数。\n\n用更好的核心来提升此项\n\n当前品质进度：%s",
   "tooltip.oritech.thousand_abbrev": "K",
   "tooltip.oritech.million_abbrev": "M",
