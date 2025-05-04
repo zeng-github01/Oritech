@@ -1,5 +1,6 @@
 package rearth.oritech.init.compat.jei;
 
+import dev.architectury.platform.Platform;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.gui.drawable.IDrawableAnimated;
@@ -19,7 +20,6 @@ import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.util.InventorySlotAssignment;
@@ -33,7 +33,6 @@ import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> {
     
     public final OritechRecipeType type;
-    private final Boolean isGenerator;
     private final List<ScreenProvider.GuiSlot> slots;
     private final InventorySlotAssignment slotOffsets;
     public final IDrawable icon;
@@ -48,7 +47,6 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         
         try {
             var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), machine.getDefaultState());
-            this.isGenerator = screenProvider instanceof UpgradableGeneratorBlockEntity;
             this.slots = screenProvider.getGuiSlots();
             this.slotOffsets = screenProvider.getSlotAssignments();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -70,7 +68,6 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         this.background = helper.getSlotDrawable();
         this.fluidBackground = helper.drawableBuilder(GUI_COMPONENTS, 48, 0, 14, 50).setTextureSize(98, 96).build();
         
-        this.isGenerator = isGenerator;
         this.slots = slots;
         this.slotOffsets = slotOffsets;
         
@@ -132,11 +129,14 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         if (!(recipe.getFluidInput() != null && recipe.getFluidInput().isEmpty())) {
             var fluidIngredient = recipe.getFluidInput();
             var shownAmount = Math.max(1, fluidIngredient.amount());
-            var inputSlot = builder.addInputSlot(10, 6);
-            for (var fluidStack : fluidIngredient.getFluidStacks()) {
-                inputSlot = inputSlot.addFluidStack(fluidStack.getFluid(), shownAmount);
+            
+            // no idea why this is needed, but the 'var inputSlot = ' seems to break the architectury transformer for some reason
+            if (Platform.isModLoaded("jei")) {
+                var inputSlot = builder.addInputSlot(10, 6).setBackground(fluidBackground, -2, -2).setFluidRenderer(shownAmount, false, 10, 46);
+                for (var fluidStack : fluidIngredient.getFluidStacks()) {
+                    inputSlot = inputSlot.addFluidStack(fluidStack.getFluid(), shownAmount);
             }
-            inputSlot.setBackground(fluidBackground, -2, -2).setFluidRenderer(shownAmount, false, 10, 46);
+            }
         }
         
         // results
