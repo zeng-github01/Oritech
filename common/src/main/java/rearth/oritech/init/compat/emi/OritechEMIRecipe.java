@@ -1,9 +1,16 @@
 package rearth.oritech.init.compat.emi;
 
+import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
+import dev.architectury.platform.Platform;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.render.EmiTexture;
 import dev.emi.emi.api.stack.EmiIngredient;
+import dev.emi.emi.api.stack.TagEmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.WidgetHolder;
 import net.minecraft.block.BlockState;
@@ -16,11 +23,6 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.ScreenProvider;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-
-import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
 public class OritechEMIRecipe extends BasicEmiRecipe {
     
@@ -36,10 +38,16 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
-        if (recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluid(), recipe.getFluidInput().getAmount()));
-        if (recipe.getFluidOutput() != null && recipe.getFluidOutput().getAmount() > 0)
-            this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), recipe.getFluidOutput().getAmount()));
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0) {
+            var inputAmount = Math.max(recipe.getFluidInput().amount(), 1);
+            if (recipe.getFluidInput().fluidContent().left().isPresent()) {
+                this.inputs.add(new TagEmiIngredient(recipe.getFluidInput().fluidContent().left().get(), inputAmount));
+            } else {
+                this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluidStacks().getFirst().getFluid(), inputAmount));
+            }
+        }
+        if (recipe.getFluidOutput() != null && recipe.getFluidInput().amount() > 0)
+            this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), Math.max(recipe.getFluidInput().amount(), 1)));
         
         try {
             var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(new BlockPos(0, 0, 0), machineState);
@@ -64,8 +72,14 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
         recipe.getResults().forEach(stack -> this.outputs.add(EmiStack.of(stack)));
         
-        if (recipe.getFluidInput() != null && recipe.getFluidInput().getAmount() > 0)
-            this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluid(), recipe.getFluidInput().getAmount()));
+        if (recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0) {
+            var inputAmount = Math.max(recipe.getFluidInput().amount(), 1);
+            if (recipe.getFluidInput().hasTag()) {
+                this.inputs.add(new TagEmiIngredient(recipe.getFluidInput().getTag(), inputAmount));
+            } else {
+                this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluid(), inputAmount));
+            }
+        }
         if (recipe.getFluidOutput() != null && recipe.getFluidOutput().getAmount() > 0)
             this.outputs.add(EmiStack.of(recipe.getFluidOutput().getFluid(), recipe.getFluidOutput().getAmount()));
             
