@@ -30,7 +30,7 @@ import java.util.List;
 
 import static rearth.oritech.client.ui.BasicMachineScreen.GUI_COMPONENTS;
 
-public class OritechRecipeCategory implements IRecipeCategory<OritechRecipe> {
+public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> {
     
     public final OritechRecipeType type;
     private final Boolean isGenerator;
@@ -42,7 +42,7 @@ public class OritechRecipeCategory implements IRecipeCategory<OritechRecipe> {
     public final IDrawableStatic fluidBackground;
     
     // JEI really feels like the worst of the 3 recipe viewers here
-    public OritechRecipeCategory(OritechRecipeType type, Class<? extends MachineBlockEntity> screenProviderSource, Block machine, IGuiHelper helper) {
+    public OritechJeiRecipeCategory(OritechRecipeType type, Class<? extends MachineBlockEntity> screenProviderSource, Block machine, IGuiHelper helper) {
         this.type = type;
         this.icon = helper.createDrawableItemStack(new ItemStack(machine.asItem()));
         
@@ -62,7 +62,7 @@ public class OritechRecipeCategory implements IRecipeCategory<OritechRecipe> {
         
     }
     
-    public OritechRecipeCategory(OritechRecipeType type, Block machine, IGuiHelper helper, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment slotOffsets) {
+    public OritechJeiRecipeCategory(OritechRecipeType type, Block machine, IGuiHelper helper, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, InventorySlotAssignment slotOffsets) {
         this.type = type;
         this.icon = helper.createDrawableItemStack(new ItemStack(machine.asItem()));
         
