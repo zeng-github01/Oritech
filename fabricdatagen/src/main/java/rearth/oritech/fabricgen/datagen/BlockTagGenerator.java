@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-import static rearth.oritech.init.TagContent.cBlockTag;
+import static rearth.oritech.util.TagUtils.cBlockTag;
 
 public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
     
