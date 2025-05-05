@@ -131,6 +131,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     private void tickSlave() {
         // check if master is actually working
         var masterStats = master.clientStats;
+        if (masterStats == null) return;
         var wasWorking = master.isActivelyWorking();
         var speed = masterStats.speed();
         
