@@ -1,6 +1,10 @@
 package rearth.oritech;
 
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.common.EntityEvent;
+import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
@@ -10,13 +14,17 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
+import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.util.Helpers;
+import rearth.oritech.network.NetworkContent;
 
 public final class OritechClient {
     
     public static final KeyBinding AUGMENT_SELECTOR = new KeyBinding("key.oritech.augment_screen", GLFW.GLFW_KEY_G, "key.categories.misc");
     
     public static AugmentSelectionScreen activeScreen = null;
+    
+    private static boolean laserActive = false;
     
     public static void initialize() {
         
@@ -41,6 +49,25 @@ public final class OritechClient {
         ClientTickEvent.CLIENT_PRE.register(client -> {
             if (client.player != null)
                 PlayerAugments.clientTickAugments(client.player);
+        });
+        
+        // send mining laser use events to server
+        ClientTickEvent.CLIENT_PRE.register(client -> {
+            if (client.player != null && client.player.getMainHandStack().getItem() instanceof PortableLaserItem && laserActive) {
+                NetworkContent.MACHINE_CHANNEL.clientHandle().send(new NetworkContent.LaserPlayerUsePacket());
+            } else {
+                laserActive = false;
+            }
+        });
+        
+        // interrupt left mouse for portable lasers
+        ClientRawInputEvent.MOUSE_CLICKED_PRE.register((client, button, action, mods) -> {
+            if (client.player != null && client.player.getMainHandStack().getItem() instanceof PortableLaserItem && button == 0 && client.currentScreen == null) {
+                laserActive = action == 1; // activate laser on mouse down
+                if (action == 1)
+                    return EventResult.interrupt(true);
+            }
+            return EventResult.pass();
         });
         
         Oritech.LOGGER.info("Oritech client initialization done");
