@@ -120,7 +120,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
         if (targetInv == null) return;
         
         var firstItem = inventory.heldStacks.getFirst();
-        var inserted = targetInv.insert(firstItem, false);
+        var inserted = targetInv.insert(firstItem.copy(), false);
         firstItem.decrement(inserted);
         
     }
