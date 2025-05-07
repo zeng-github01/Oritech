@@ -8,9 +8,11 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
@@ -24,10 +26,14 @@ import net.minecraft.util.Pair;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.ExplosionBehavior;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -79,15 +85,23 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         var stack = player.getStackInHand(hand);
         
-        if (world.isClient) return TypedActionResult.fail(stack);
+        if (world.isClient) return TypedActionResult.consume(stack);
         
         if (player.getItemCooldownManager().isCoolingDown(this)) return TypedActionResult.fail(stack);
         player.getItemCooldownManager().set(this, ACTION_COOLDOWN);
         
+        var hit = getPlayerTargetRay(player);
+        if (hit != null) {
+            world.createExplosion(null, new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.LIGHTNING_BOLT), player),
+              null, hit.getPos(), 6, false, World.ExplosionSourceType.MOB);
+        }
+        
+        // todo custom entity damage
+        
         System.out.println("used!");
         triggerAnim(player, GeoItem.getId(stack), "laser", "singleshot");
         
-        return TypedActionResult.fail(stack);   // fail to cancel animation
+        return TypedActionResult.consume(stack);
     }
     
     public static void onUseTick(PlayerEntity player) {
@@ -96,25 +110,57 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (!(stack.getItem() instanceof PortableLaserItem laserItem) || world == null) return;
         
-        // todo config value for range
-        var hit = player.raycast(128, 0, true);
-        
         // todo energy consumption / availability checks
         var energyUsed = 512;
         
+        // todo config value for range
+        var finalHit = getPlayerTargetRay(player);
+        
         laserItem.triggerAnim(player, GeoItem.getId(stack), "laser", "shooting");
         
-        if (hit instanceof BlockHitResult blockHitResult) {
+        if (finalHit instanceof BlockHitResult blockHitResult) {
             var blockPos = blockHitResult.getBlockPos();
             var blockState = world.getBlockState(blockPos);
             if (blockState.isAir() || blockState.isIn(TagContent.LASER_PASSTHROUGH)) return;
             processBlockBreaking(blockPos, blockState, world, player, stack, energyUsed);
-        } else if (hit instanceof EntityHitResult entityHitResult) {
+        } else if (finalHit instanceof EntityHitResult entityHitResult) {
             var target = entityHitResult.getEntity();
-            if (!(target instanceof LivingEntity livingEntity) || !target.isAlive() || !target.isAttackable()) return;
+            if (!(target instanceof LivingEntity livingEntity)) return;
             processEntityTarget(player, livingEntity, energyUsed, stack, world);
         }
         
+    }
+    
+    private static @Nullable HitResult getPlayerTargetRay(PlayerEntity player) {
+        
+        // block raycast
+        var blockHit = player.raycast(128, 0, true);
+        
+        // entity raycast
+        // possible idea for future optimization: do a custom raycast here with slightly inflated bounding boxes to make aiming easier
+        var startPos = player.getEyePos();
+        var lookVec = player.getRotationVec(0F);
+        var endPos = startPos.add(lookVec.multiply(128));
+        var entityHit = ProjectileUtil.raycast(
+          player,
+          startPos,
+          endPos,
+          new Box(startPos, endPos),
+          entity -> !entity.isSpectator() && entity.isAttackable() && entity.isAlive() && entity != player,
+          128 * 128
+        );
+        
+        // Determine the closest hit
+        HitResult finalHit = null;
+        var blockDistance = blockHit.getType() == HitResult.Type.BLOCK ? startPos.squaredDistanceTo(blockHit.getPos()) : Double.MAX_VALUE;
+        var entityDistance = entityHit != null ? startPos.squaredDistanceTo(entityHit.getPos()) : Double.MAX_VALUE;
+        
+        if (blockDistance < entityDistance) {
+            finalHit = blockHit;
+        } else if (entityHit != null) {
+            finalHit = entityHit;
+        }
+        return finalHit;
     }
     
     private static void processBlockBreaking(BlockPos blockPos, BlockState blockState, World world, PlayerEntity player, ItemStack tool, int energyUsed) {
@@ -199,10 +245,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     
     private static void processEntityTarget(PlayerEntity player, LivingEntity target, int usedEnergy, ItemStack tool, World world) {
         
-        if (world.getTime() % 10 != 0) return; // entities can only be damaged twice per second?
-        
         // make creepers charged
-        if (target.getType().equals(EntityType.CREEPER)) {
+        if (target.getType().equals(EntityType.CREEPER) && !target.getDataTracker().get(CreeperEntity.CHARGED)) {
             target.getDataTracker().set(CreeperEntity.CHARGED, true);
             return;
         }

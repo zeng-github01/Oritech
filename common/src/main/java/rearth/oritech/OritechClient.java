@@ -24,7 +24,7 @@ public final class OritechClient {
     
     public static AugmentSelectionScreen activeScreen = null;
     
-    private static boolean laserActive = false;
+    public static boolean laserActive = false;
     
     public static void initialize() {
         
@@ -60,17 +60,20 @@ public final class OritechClient {
             }
         });
         
-        // interrupt left mouse for portable lasers
-        ClientRawInputEvent.MOUSE_CLICKED_PRE.register((client, button, action, mods) -> {
-            if (client.player != null && client.player.getMainHandStack().getItem() instanceof PortableLaserItem && button == 0 && client.currentScreen == null) {
-                laserActive = action == 1; // activate laser on mouse down
-                if (action == 1)
-                    return EventResult.interrupt(true);
-            }
-            return EventResult.pass();
-        });
+        // interrupt left mouse for portable lasers (only seems to work on neoforge)
+        ClientRawInputEvent.MOUSE_CLICKED_PRE.register((client, button, action, mods) ->
+                                                         handleMouseClicked(client, button, action, mods) ? EventResult.interruptTrue() : EventResult.pass());
         
         Oritech.LOGGER.info("Oritech client initialization done");
+    }
+    
+    // returns true if the event is cancelled
+    public static boolean handleMouseClicked(MinecraftClient  client, int button, int action, int mods) {
+        if (client.player != null && client.player.getMainHandStack().getItem() instanceof PortableLaserItem && button == 0 && client.currentScreen == null) {
+            laserActive = action == 1; // activate laser on mouse down
+            return action == 1;
+        }
+        return false;
     }
     
     public static void registerRenderers() {
