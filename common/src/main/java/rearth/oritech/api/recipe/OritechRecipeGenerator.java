@@ -158,8 +158,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         FuelGeneratorRecipeBuilder.build().fluidInput(cFluidTag("oil"), 0.1f).timeInSeconds(3).export(exporter, "crude");
         FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.TURBOFUEL, 0.1f).timeInSeconds(12).export(exporter, "fuel");
         //steam
-        // 0.000396 buckets is 32 (fabric) droplets
-        SteamGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_STEAM.get(), 0.000396f).time(1).export(exporter, "steameng");
+        // 32 fabric droplets / 32 neoforge mb (yes this will works, as we produce 2 millis per RF in the generator boilers, and then consume it at a 1:1 ratio)
+        SteamGeneratorRecipeBuilder.build().specificFluidInput(FluidContent.STILL_STEAM.get(), 32).time(1).export(exporter, "steameng");
     }
     
     private void addBiomass(RecipeExporter exporter) {
