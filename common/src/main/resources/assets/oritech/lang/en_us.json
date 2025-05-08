@@ -294,6 +294,7 @@
   "tooltip.oritech.reactor_redstone_port.4": "Right-Click the block to change output modes.",
   "tooltip.oritech.weed_killer": "Removes all grass and plants in a wide radius",
   "tooltip.oritech.cooler_block": "Works twice as fast (and efficient) in cold biomes.",
+  "tooltip.oritech.motor": "Right click an item pipe extraction interface to upgrade it to extract from all slots.",
   "tooltip.oritech.intelligence_item": [
     {
       "text": "Gained by capturing a viable entity with the ",
