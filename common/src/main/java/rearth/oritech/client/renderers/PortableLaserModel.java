@@ -1,6 +1,8 @@
 package rearth.oritech.client.renderers;
 
 import net.minecraft.util.Identifier;
+import rearth.oritech.Oritech;
+import rearth.oritech.OritechClient;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import software.bernie.geckolib.model.DefaultedItemGeoModel;

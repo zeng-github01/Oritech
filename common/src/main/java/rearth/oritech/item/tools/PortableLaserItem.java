@@ -48,6 +48,7 @@ import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PortableLaserRenderer;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
+import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
@@ -71,6 +72,8 @@ import static rearth.oritech.block.entity.interaction.LaserArmBlockEntity.BLOCK_
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
 // todo tooltip about enchantability (power, unbreaking, anything of a pickaxe)
+// todo name, recipe
+// todo safe mode?
 public class PortableLaserItem extends Item implements OritechEnergyItem, GeoItem {
     
     public static final int ACTION_COOLDOWN = 16;
@@ -100,13 +103,23 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var energyUsed = 50_000;
         
         if (world.isClient) {
-            if (getStoredEnergy(stack) > energyUsed)
+            if (getStoredEnergy(stack) > energyUsed && !player.isSneaking())
                 lastSingleShot = world.getTime();
                 
             return TypedActionResult.consume(stack);
         }
         
         if (!(stack.getItem() instanceof PortableLaserItem laserItem)) return TypedActionResult.consume(stack);
+        
+        if (player.isSneaking()) {
+            
+            var lastMode = isMiningEnabled(stack);
+            setMiningEnabled(stack, !lastMode);
+            
+            player.sendMessage(Text.translatable("tooltip.oritech.portable_laser.status.begin").append(Text.literal(String.valueOf(!lastMode))));
+            
+            return TypedActionResult.consume(stack);
+        }
         
         if (!laserItem.tryUseEnergy(stack, energyUsed, player)) {
             return TypedActionResult.pass(stack);
@@ -164,7 +177,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         laserItem.triggerAnim(player, GeoItem.getId(stack), "laser", "shooting");
         
-        if (finalHit instanceof BlockHitResult blockHitResult) {
+        if (finalHit instanceof BlockHitResult blockHitResult && laserItem.isMiningEnabled(stack)) {
             var blockPos = blockHitResult.getBlockPos();
             var blockState = world.getBlockState(blockPos);
             if (blockState.isAir() || blockState.isIn(TagContent.LASER_PASSTHROUGH)) return;
@@ -175,7 +188,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             processEntityTarget(player, livingEntity, 6, stack, world);
         }
         
-        if (finalHit != null && finalHit.getType() != HitResult.Type.MISS) {
+        if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
             ParticleContent.LASER_BEAM_EFFECT.spawn(world, finalHit.getPos());
         }
         
@@ -347,6 +360,11 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var capacity = TooltipHelper.getEnergyText(this.getEnergyCapacity(stack));
         var text = Text.translatable("tooltip.oritech.energy_indicator", storedEnergy, capacity);
         tooltip.add(text.formatted(Formatting.GOLD));
+        
+        var miningText = Text.translatable("tooltip.oritech.portable_laser.status.begin").formatted(Formatting.GRAY)
+                           .append(Text.literal(String.valueOf(isMiningEnabled(stack))).formatted(Formatting.GOLD))
+                           .append(Text.translatable("tooltip.oritech.portable_laser.status.hint").formatted(Formatting.GRAY, Formatting.ITALIC));
+        tooltip.add(miningText);
     }
     
     @Override
@@ -357,6 +375,14 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     @Override
     public int getEnchantability() {
         return 10;
+    }
+    
+    public boolean isMiningEnabled(ItemStack stack) {
+        return stack.getOrDefault(ComponentContent.IS_AOE_ACTIVE.get(), false);
+    }
+    
+    public void setMiningEnabled(ItemStack stack, boolean status) {
+        stack.set(ComponentContent.IS_AOE_ACTIVE.get(), status);
     }
     
     @Override

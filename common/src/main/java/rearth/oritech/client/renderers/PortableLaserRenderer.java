@@ -34,6 +34,8 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         var heldStack = client.player.getMainHandStack();
         var world = client.world;
         
+        if (isReRender || !this.renderPerspective.isFirstPerson()) return;
+        
         var singleShotAge = world.getTime() - PortableLaserItem.lastSingleShot;
         
         if (!OritechClient.laserActive && singleShotAge > 10) return;
@@ -56,7 +58,7 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         matrices.push();
         
         var lineConsumer = bufferSource.getBuffer(LaserArmRenderer.CUSTOM_LINES);
-        RenderSystem.lineWidth((float) (3 + Math.sin((world.getTime() + partialTick) * 0.3) * 1));
+        RenderSystem.lineWidth((float) (3 + Math.sin((world.getTime() + partialTick) * 1.1f) * 1));
         
         var startOffset = new Vector3f(0, 0.05f, 0);
         var endOffset = new Vector3f(0, 0, -dist);
