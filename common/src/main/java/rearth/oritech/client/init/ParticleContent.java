@@ -40,6 +40,7 @@ public class ParticleContent {
     
     public static final ParticleSystem<Vec3d> LASER_BOOM = PARTICLE_CONTROLLER.register(Vec3d.class, (world, pos, data) -> {
         var count = (int) (pos.distanceTo(data) * 0.6f + 1);
+        count = Math.min(count, 12);
         spawnLineInnerStaggered(ParticleTypes.SONIC_BOOM, world, pos, data, count, 20);
     });
     

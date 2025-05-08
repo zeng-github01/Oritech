@@ -46,9 +46,11 @@ import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.renderers.PortableLaserRenderer;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
+import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.TooltipHelper;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.SingletonGeoAnimatable;
@@ -71,12 +73,16 @@ import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 // todo tooltip about enchantability (power, unbreaking, anything of a pickaxe)
 public class PortableLaserItem extends Item implements OritechEnergyItem, GeoItem {
     
-    public static int ACTION_COOLDOWN = 16;
-    public static float MINING_SPEED_MULTIPLIER = 0.25f;
+    public static final int ACTION_COOLDOWN = 16;
+    public static final float MINING_SPEED_MULTIPLIER = 0.25f;
+    public static final int USAGE_RF = 2048;
     
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation SHOOTING = RawAnimation.begin().thenPlay("shooting");
     private static final RawAnimation SINGLE_SHOT = RawAnimation.begin().thenPlay("singleshot");
+    
+    // client only
+    public static long lastSingleShot = 0;
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
@@ -91,10 +97,17 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         
         var stack = player.getStackInHand(hand);
-        
-        if (world.isClient || !(stack.getItem() instanceof PortableLaserItem laserItem)) return TypedActionResult.consume(stack);
-        
         var energyUsed = 50_000;
+        
+        if (world.isClient) {
+            if (getStoredEnergy(stack) > energyUsed)
+                lastSingleShot = world.getTime();
+                
+            return TypedActionResult.consume(stack);
+        }
+        
+        if (!(stack.getItem() instanceof PortableLaserItem laserItem)) return TypedActionResult.consume(stack);
+        
         if (!laserItem.tryUseEnergy(stack, energyUsed, player)) {
             return TypedActionResult.pass(stack);
         }
@@ -143,12 +156,10 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (!(stack.getItem() instanceof PortableLaserItem laserItem) || world == null) return;
         
-        var energyUsed = 2048;
-        if (!laserItem.tryUseEnergy(stack, energyUsed, player)) {
+        if (!laserItem.tryUseEnergy(stack, USAGE_RF, player)) {
             return;
         }
         
-        // todo config value for range
         var finalHit = getPlayerTargetRay(player);
         
         laserItem.triggerAnim(player, GeoItem.getId(stack), "laser", "shooting");
@@ -157,7 +168,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var blockPos = blockHitResult.getBlockPos();
             var blockState = world.getBlockState(blockPos);
             if (blockState.isAir() || blockState.isIn(TagContent.LASER_PASSTHROUGH)) return;
-            processBlockBreaking(blockPos, blockState, world, player, stack, energyUsed);
+            processBlockBreaking(blockPos, blockState, world, player, stack, USAGE_RF);
         } else if (finalHit instanceof EntityHitResult entityHitResult) {
             var target = entityHitResult.getEntity();
             if (!(target instanceof LivingEntity livingEntity)) return;
@@ -170,7 +181,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
     }
     
-    private static @Nullable HitResult getPlayerTargetRay(PlayerEntity player) {
+    public static @Nullable HitResult getPlayerTargetRay(PlayerEntity player) {
         
         // block raycast
         var blockHit = player.raycast(128, 0, true);
@@ -391,18 +402,18 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
           })
                           .triggerableAnim("idle", IDLE)
                           .triggerableAnim("singleshot", SINGLE_SHOT)
-                          .triggerableAnim("shooting", SHOOTING));
+                          .triggerableAnim("shooting", SHOOTING).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
     }
     
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
-            private PromethiumToolRenderer renderer;
+            private PortableLaserRenderer renderer;
             
             @Override
             public @NotNull BuiltinModelItemRenderer getGeoItemRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new PromethiumToolRenderer("portable_laser", true);
+                    this.renderer = new PortableLaserRenderer("portable_laser");
                 return renderer;
             }
         });
