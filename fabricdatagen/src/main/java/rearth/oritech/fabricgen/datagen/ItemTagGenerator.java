@@ -261,7 +261,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(ItemTags.SWORDS)
           .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE, ToolsContent.PORTABLE_LASER);
         getOrCreateTagBuilder(ItemTags.AXES)
-          .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE);
+          .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE, ToolsContent.PORTABLE_LASER);
         
         getOrCreateTagBuilder(ItemTags.PICKAXES)
           .add(ToolsContent.HAND_DRILL, ToolsContent.PROMETHIUM_PICKAXE, ToolsContent.PORTABLE_LASER);

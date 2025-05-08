@@ -3,6 +3,7 @@ package rearth.oritech.item.tools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
@@ -71,14 +72,10 @@ import java.util.function.Consumer;
 import static rearth.oritech.block.entity.interaction.LaserArmBlockEntity.BLOCK_BREAK_ENERGY;
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
-// todo tooltip about enchantability (power, unbreaking, anything of a pickaxe)
-// todo name, recipe
-// todo safe mode?
+// todo recipe
 public class PortableLaserItem extends Item implements OritechEnergyItem, GeoItem {
     
-    public static final int ACTION_COOLDOWN = 16;
-    public static final float MINING_SPEED_MULTIPLIER = 0.25f;
-    public static final int USAGE_RF = 2048;
+    public static final int ACTION_COOLDOWN = 24;
     
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation SHOOTING = RawAnimation.begin().thenPlay("shooting");
@@ -100,7 +97,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         
         var stack = player.getStackInHand(hand);
-        var energyUsed = 50_000;
+        var energyUsed = Oritech.CONFIG.portableLaserConfig.energyPerBoom();
         
         if (world.isClient) {
             if (getStoredEnergy(stack) > energyUsed && !player.isSneaking())
@@ -169,7 +166,9 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         if (!(stack.getItem() instanceof PortableLaserItem laserItem) || world == null) return;
         
-        if (!laserItem.tryUseEnergy(stack, USAGE_RF, player)) {
+        var rfUsage = Oritech.CONFIG.portableLaserConfig.energyPerTick();
+        
+        if (!laserItem.tryUseEnergy(stack, rfUsage, player)) {
             return;
         }
         
@@ -181,11 +180,11 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var blockPos = blockHitResult.getBlockPos();
             var blockState = world.getBlockState(blockPos);
             if (blockState.isAir() || blockState.isIn(TagContent.LASER_PASSTHROUGH)) return;
-            processBlockBreaking(blockPos, blockState, world, player, stack, USAGE_RF);
+            processBlockBreaking(blockPos, blockState, world, player, stack, rfUsage);
         } else if (finalHit instanceof EntityHitResult entityHitResult) {
             var target = entityHitResult.getEntity();
             if (!(target instanceof LivingEntity livingEntity)) return;
-            processEntityTarget(player, livingEntity, 6, stack, world);
+            processEntityTarget(player, livingEntity, Oritech.CONFIG.portableLaserConfig.damageBase(), stack, world);
         }
         
         if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
@@ -267,7 +266,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         var currentInvestedEnergy = stats.getRight();
-        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getHardness(world, blockPos)) * BLOCK_BREAK_ENERGY / MINING_SPEED_MULTIPLIER);
+        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getHardness(world, blockPos)) * BLOCK_BREAK_ENERGY / Oritech.CONFIG.portableLaserConfig.blockBreakSpeed());
         var efficiencyLevel = getEnchantmentLevel(tool, Enchantments.EFFICIENCY);
         if (efficiencyLevel > 0) requiredBreakingEnergy = requiredBreakingEnergy / (efficiencyLevel + 1);
         if (currentInvestedEnergy > requiredBreakingEnergy) {
@@ -365,6 +364,16 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
                            .append(Text.literal(String.valueOf(isMiningEnabled(stack))).formatted(Formatting.GOLD))
                            .append(Text.translatable("tooltip.oritech.portable_laser.status.hint").formatted(Formatting.GRAY, Formatting.ITALIC));
         tooltip.add(miningText);
+        
+        var showExtra = Screen.hasControlDown();
+        
+        if (showExtra) {
+            for (int i = 1; i <= 5; i++) {
+                tooltip.add(Text.translatable("tooltip.oritech.portable_laser." + i).formatted(Formatting.GRAY));
+            }
+        } else {
+            tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+        }
     }
     
     @Override
@@ -402,17 +411,17 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return 5_000_000L;  // todo config settings
+        return Oritech.CONFIG.portableLaserConfig.energyCapacity();
     }
     
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
-        return 500_000L;
+        return Oritech.CONFIG.portableLaserConfig.energyCapacity() / 80;
     }
     
     @Override
     public long getEnergyMaxOutput(ItemStack stack) {
-        return 500_000L;
+        return Oritech.CONFIG.portableLaserConfig.energyCapacity() / 80;
     }
     
     @Override
