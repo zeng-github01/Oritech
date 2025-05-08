@@ -2,7 +2,10 @@ package rearth.oritech.block.blocks.pipes;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -11,6 +14,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.block.entity.pipes.ExtractablePipeInterfaceEntity;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.SoundContent;
 
 import java.util.HashSet;
 
@@ -42,6 +46,8 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
         var property = directionToProperty(interactDir);
         var connection = state.get(property);
         world.setBlockState(pos, state.with(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.FORCE_STATE, 0);
+        
+        world.playSound(null, pos, SoundEvents.BLOCK_BAMBOO_WOOD_BUTTON_CLICK_ON, SoundCategory.BLOCKS, 0.9f, 1.2f);
         
         // Invalidate cache
         invalidateTargetCache(world, pos);

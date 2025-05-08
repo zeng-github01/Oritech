@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.Hand;
@@ -26,6 +27,7 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.SoundContent;
 
 import static rearth.oritech.block.blocks.pipes.item.ItemPipeBlock.ITEM_PIPE_DATA;
 
@@ -54,6 +56,7 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
         if (ownEntity instanceof ItemPipeInterfaceEntity && stack.getItem().equals(ItemContent.MOTOR)) {
             world.setBlockState(pos, state.with(HAS_MOTOR, true), Block.FORCE_STATE, 0);
             stack.decrement(1);
+            world.playSound(null, pos, SoundContent.SHORT_SERVO, SoundCategory.BLOCKS, 0.9f, 1.2f);
             return ItemActionResult.CONSUME;
         }
         
