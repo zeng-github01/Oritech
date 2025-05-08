@@ -93,12 +93,13 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var hit = getPlayerTargetRay(player);
         if (hit != null) {
             world.createExplosion(null, new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.LIGHTNING_BOLT), player),
-              null, hit.getPos(), 6, false, World.ExplosionSourceType.MOB);
+              null, hit.getPos(), 4, false, World.ExplosionSourceType.MOB);
         }
         
-        // todo custom entity damage
+        if (hit instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
+            processEntityTarget(player, livingEntity,  20, stack, world);
+        }
         
-        System.out.println("used!");
         triggerAnim(player, GeoItem.getId(stack), "laser", "singleshot");
         
         return TypedActionResult.consume(stack);
@@ -126,7 +127,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         } else if (finalHit instanceof EntityHitResult entityHitResult) {
             var target = entityHitResult.getEntity();
             if (!(target instanceof LivingEntity livingEntity)) return;
-            processEntityTarget(player, livingEntity, energyUsed, stack, world);
+            processEntityTarget(player, livingEntity, 6, stack, world);
         }
         
     }
@@ -243,16 +244,13 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         world.breakBlock(targetPos, false);
     }
     
-    private static void processEntityTarget(PlayerEntity player, LivingEntity target, int usedEnergy, ItemStack tool, World world) {
+    private static void processEntityTarget(PlayerEntity player, LivingEntity target, int damage, ItemStack tool, World world) {
         
         // make creepers charged
         if (target.getType().equals(EntityType.CREEPER) && !target.getDataTracker().get(CreeperEntity.CHARGED)) {
             target.getDataTracker().set(CreeperEntity.CHARGED, true);
             return;
         }
-        
-        // todo config
-        var damage = 6;
         
         target.damage(
           new DamageSource(world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.LIGHTNING_BOLT), player),

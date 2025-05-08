@@ -54,20 +54,6 @@ public class OritechClientNeoForge {
             BlockOutlineRenderer.render(MinecraftClient.getInstance().world, event.getCamera(), event.getPoseStack(), event.getMultiBufferSource());
         }
         
-//        @SubscribeEvent
-//        public static void onLeftClick(InputEvent.InteractionKeyMappingTriggered event) {
-//            var mc = MinecraftClient.getInstance();
-//            if (event.getHand().equals(Hand.MAIN_HAND)) {
-//                var player = mc.player;
-//                if (player != null && player.getMainHandStack().getItem() instanceof PortableLaserItem) {
-//                    // Cancel the action and animations
-//                    event.setSwingHand(false);
-//                    event.setCanceled(true);
-//                    OritechClient.laserActive = true;
-//                }
-//            }
-//        }
-        
         @SubscribeEvent
         public static void onMouseLaserInput(InputEvent.MouseButton.Pre event) {
             var client = MinecraftClient.getInstance();
