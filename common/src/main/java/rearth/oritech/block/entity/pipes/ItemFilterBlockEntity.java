@@ -153,7 +153,7 @@ public class ItemFilterBlockEntity extends BlockEntity implements ItemApi.BlockP
         
         @Override
         public boolean supportsExtraction() {
-            return false;
+            return true;
         }
         
         public boolean canInsert(ItemStack stack) {

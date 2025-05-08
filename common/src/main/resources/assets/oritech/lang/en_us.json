@@ -418,7 +418,12 @@
   "tooltip.oritech.laser_arm.addon_hunter_damage": "Effective Beam Damage",
   "tooltip.oritech.item_pipe.1": "Right-click to toggle extraction.",
   "tooltip.oritech.item_pipe.2": "Only extracts from the first non-empty slot.",
-  "tooltip.oritech.item_pipe.3": "Deposits into the closest available inventory.",
+  "tooltip.oritech.item_pipe.3": [
+    "Click it with a ",
+    { "text":  "motor item", "color":  "#ff830e"},
+    " to upgrade the pipe to extract from all slots."
+  ],
+  "tooltip.oritech.item_pipe.4": "Deposits into the closest available inventory.",
   "title.oritech.machine.addon_looting": "%d Looting",
   "tooltip.oritech.machine.addon_looting": "Yield addon count. 3 is the effective maximum",
   "title.oritech.item_filter.toggle_energy_statistics": "Show Output",
