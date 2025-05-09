@@ -90,9 +90,11 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                     stackToMove = slotStack.copyWithCount(canTake);
                     moveFromInventory = inventory;
                     takenFrom = sourcePos;
+                } else {
+                    stackToMove = ItemStack.EMPTY;
                 }
                 
-                if (stackToMove.isEmpty()) return;
+                if (stackToMove.isEmpty()) continue;
                 
                 var targets = findNetworkTargets(pos, data);
                 if (targets == null) {
