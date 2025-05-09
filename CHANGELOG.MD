@@ -1,7 +1,0 @@
-- Fix item pipes not extracting from processing machines
-- Fix portable laser destroying indestructible blocks
-- Fix JEI integration not working
-- Fix copper/iron/gold compacting recipes
-- Fix EMI not displaying fluids on some recipes
-- Fix uranium clump fluid centrifuging recipe using wrong recipe type on Neoforge
-- Update EMI default recipes / fix emi default recipes no longer being loaded
