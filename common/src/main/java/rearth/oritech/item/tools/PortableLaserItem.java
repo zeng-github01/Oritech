@@ -2,6 +2,7 @@ package rearth.oritech.item.tools;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
@@ -226,6 +227,9 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     }
     
     private static void processBlockBreaking(BlockPos blockPos, BlockState blockState, World world, PlayerEntity player, ItemStack tool, int energyUsed) {
+        
+        // skip unbreakable blocks
+        if (blockState.getHardness(world, blockPos) < 0) return;
         
         var stats = blockBreakStats.getOrDefault(player, new Pair<>(BlockPos.ORIGIN, 0));
         if (!blockPos.equals(stats.getLeft())) {
