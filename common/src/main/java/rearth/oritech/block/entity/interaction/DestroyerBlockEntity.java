@@ -196,9 +196,9 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             var targetEntity = world.getBlockEntity(targetPosition);
             List<ItemStack> dropped;
             if (hasSilkTouchAddon) {
-                dropped = getSilkTouchDrops(targetState, (ServerWorld) world, targetPosition, targetEntity);
+                dropped = getSilkTouchDrops(targetState, (ServerWorld) world, targetPosition, targetEntity, getDestroyerPlayerEntity());
             } else if (yieldAddons > 0) {
-                dropped = getLootDrops(targetState, (ServerWorld) world, targetPosition, targetEntity, yieldAddons);
+                dropped = getLootDrops(targetState, (ServerWorld) world, targetPosition, targetEntity, yieldAddons, getDestroyerPlayerEntity());
             } else {
                 dropped = Block.getDroppedStacks(targetState, (ServerWorld) world, targetPosition, targetEntity);
             }
@@ -223,14 +223,6 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             world.breakBlock(targetPosition, false);
             super.finishBlockWork(processed);
         }
-    }
-
-    public static List<ItemStack> getLootDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, int yieldAddons) {
-        return getLootDrops(state, world, pos, blockEntity, yieldAddons, null);
-    }
-
-    public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity) {
-        return getSilkTouchDrops(state, world, pos, blockEntity, null);
     }
 
     public static List<ItemStack> getLootDrops(BlockState state, ServerWorld world, BlockPos pos, @Nullable BlockEntity blockEntity, int yieldAddons, @Nullable PlayerEntity entity) {
@@ -280,7 +272,11 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public List<Pair<Text, Text>> getExtraExtensionLabels() {
         if (range == 1 && yieldAddons == 0 && !hasSilkTouchAddon) return super.getExtraExtensionLabels();
         if (hasSilkTouchAddon) {
-            return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", range), Text.translatable("tooltip.oritech.block_destroyer.addon_range")), new Pair<>(Text.translatable("enchantment.minecraft.silk_touch"), Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
+            return List.of(new Pair<>(
+              Text.translatable("title.oritech.machine.addon_range", range),
+              Text.translatable("tooltip.oritech.block_destroyer.addon_range")),
+              new Pair<>(Text.translatable("enchantment.minecraft.silk_touch"),
+                Text.translatable("tooltip.oritech.machine.addon_silk_touch")));
         }
         return List.of(new Pair<>(Text.translatable("title.oritech.machine.addon_range", range), Text.translatable("tooltip.oritech.block_destroyer.addon_range")), new Pair<>(Text.translatable("title.oritech.machine.addon_fortune", yieldAddons), Text.translatable("tooltip.oritech.machine.addon_fortune")));
     }
