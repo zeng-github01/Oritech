@@ -212,7 +212,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
             dropped = net.minecraft.block.Block.getDroppedStacks(targetBlockState, (ServerWorld) world, targetPos, targetEntity, getLaserPlayerEntity(), ItemStack.EMPTY);
         }
         
-        var blockRecipe = tryGetLaserRecipe(targetBlockState, world);
+        var blockRecipe = tryGetRecipeOfBlock(targetBlockState);
         if (blockRecipe != null) {
             var recipe = blockRecipe.value();
             var farmedCount = 1 + yieldAddons;
@@ -237,7 +237,7 @@ public class LaserArmBlockEntity extends BlockEntity implements
         findNextBlockBreakTarget();
     }
     
-    public static RecipeEntry<OritechRecipe> tryGetLaserRecipe(BlockState destroyed, World world) {
+    private RecipeEntry<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed) {
         var inputItem = destroyed.getBlock().asItem();
         var inputInv = new SimpleCraftingInventory(new ItemStack(inputItem));
         var candidate = world.getRecipeManager().getFirstMatch(RecipeContent.LASER, inputInv, world);
