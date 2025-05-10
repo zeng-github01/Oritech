@@ -30,8 +30,11 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
+import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.addons.EnergyAcceptorAddonBlockEntity;
+import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MachineAddonController;
@@ -107,6 +110,14 @@ public class MachineAddonBlock extends WallMountedBlock implements BlockEntityPr
             var checkEntity = world.getBlockEntity(checkPos);
             if (checkEntity instanceof MachineAddonController machineEntity) {
                 AddonBlockEntity.pendingInits.add(machineEntity);
+                break;
+            } else if (checkEntity instanceof ItemEnergyFrameInteractionBlockEntity machineEntity) {
+                AddonBlockEntity.pendingInits.add(machineEntity);
+                break;
+            } else if (checkEntity instanceof MachineCoreEntity machineEntity) {
+                if (machineEntity.isEnabled() && machineEntity.getCachedController() instanceof MachineAddonController addonController) {
+                    AddonBlockEntity.pendingInits.add(addonController);
+                }
                 break;
             } else if (checkEntity instanceof AddonBlockEntity addonEntity) {
                 var addonState = addonEntity.getCachedState();
