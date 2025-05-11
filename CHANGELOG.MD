@@ -1,0 +1,10 @@
+- Add Silk Touch addon for enderic laser and destroyer block (@zeng-github & @jshipley)
+- Change promethium pickaxe working area to 3x3
+- Add wiki entries for unstable container and enderic railgun
+- Minor energy api improvements on Neoforge
+- Fix energy storage statistics screen not always updating
+- Fix crash with drone ports on Neoforge
+- Fix coal dust not being tagged properly
+- Fix fluid tanks being stackable when having the same fluid amounts
+- Fix machine addons not always initializing
+- Fix dubious container able to capture mobs during death animation
