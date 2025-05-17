@@ -402,6 +402,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.IRON_AXE)
           .add(Items.IRON_BOOTS)
           .add(Items.IRON_CHESTPLATE)
+          .add(Items.IRON_HELMET)
           .add(Items.IRON_DOOR)
           .add(Items.IRON_HOE)
           .add(Items.IRON_HORSE_ARMOR)
