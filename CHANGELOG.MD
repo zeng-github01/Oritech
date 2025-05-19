@@ -10,3 +10,4 @@ to be made) (@jshipley)
 - Fix crash with fluid pipes inserting into machine cores in some edge cases
 - Fix iron helmet missing recyclable tag
 - Fix gravel -> sand recipe
+- Update translations from crowdin
