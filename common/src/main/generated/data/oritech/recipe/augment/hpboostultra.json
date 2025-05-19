@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 64,
@@ -14,6 +14,11 @@
       }
     }
   ],
+  "modifierDefinition": {
+    "amount": 10.0,
+    "attributeId": "minecraft:generic.max_health",
+    "operation": 0
+  },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [
     "oritech:augment/ultimatearmor"
@@ -39,6 +44,7 @@
   ],
   "rfCost": 200000000,
   "time": 1600,
+  "toggleable": false,
   "uiX": 165,
   "uiY": 70
 }

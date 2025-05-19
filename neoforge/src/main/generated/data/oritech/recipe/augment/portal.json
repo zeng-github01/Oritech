@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 8,
@@ -14,6 +14,18 @@
       }
     }
   ],
+  "customAugmentDefinition": {
+    "customAugmentId": "oritech:augment/portal"
+  },
+  "effectDefinition": {
+    "amplifier": -1,
+    "effectId": "minecraft:"
+  },
+  "modifierDefinition": {
+    "amount": -1.0,
+    "attributeId": "minecraft:",
+    "operation": -1
+  },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [],
   "researchCost": [
@@ -43,6 +55,7 @@
   ],
   "rfCost": 250000000,
   "time": 3000,
+  "toggleable": true,
   "uiX": 130,
   "uiY": 30
 }

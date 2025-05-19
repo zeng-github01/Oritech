@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 8,
@@ -14,6 +14,18 @@
       }
     }
   ],
+  "customAugmentDefinition": {
+    "customAugmentId": "minecraft:"
+  },
+  "effectDefinition": {
+    "amplifier": -1,
+    "effectId": "minecraft:"
+  },
+  "modifierDefinition": {
+    "amount": 4.0,
+    "attributeId": "minecraft:generic.max_health",
+    "operation": 0
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [
     "oritech:augment/armor"
@@ -40,6 +52,7 @@
   ],
   "rfCost": 50000000,
   "time": 800,
+  "toggleable": false,
   "uiX": 80,
   "uiY": 70
 }

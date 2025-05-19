@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -14,6 +14,18 @@
       }
     }
   ],
+  "customAugmentDefinition": {
+    "customAugmentId": "oritech:augment/flight"
+  },
+  "effectDefinition": {
+    "amplifier": -1,
+    "effectId": "minecraft:"
+  },
+  "modifierDefinition": {
+    "amount": -1.0,
+    "attributeId": "minecraft:",
+    "operation": -1
+  },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [
     "oritech:augment/betterarmor",
@@ -47,6 +59,7 @@
   ],
   "rfCost": 500000000,
   "time": 3600,
+  "toggleable": true,
   "uiX": 155,
   "uiY": 30
 }

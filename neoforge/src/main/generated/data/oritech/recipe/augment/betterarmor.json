@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 16,
@@ -19,6 +19,18 @@
       }
     }
   ],
+  "customAugmentDefinition": {
+    "customAugmentId": "minecraft:"
+  },
+  "effectDefinition": {
+    "amplifier": -1,
+    "effectId": "minecraft:"
+  },
+  "modifierDefinition": {
+    "amount": 6.0,
+    "attributeId": "minecraft:generic.armor",
+    "operation": 0
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [
     "oritech:augment/autofeeder"
@@ -45,6 +57,7 @@
   ],
   "rfCost": 280000000,
   "time": 1600,
+  "toggleable": false,
   "uiX": 105,
   "uiY": 50
 }

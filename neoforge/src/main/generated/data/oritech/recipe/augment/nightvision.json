@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 4,
@@ -20,6 +20,18 @@
       }
     }
   ],
+  "customAugmentDefinition": {
+    "customAugmentId": "minecraft:"
+  },
+  "effectDefinition": {
+    "amplifier": 0,
+    "effectId": "minecraft:night_vision"
+  },
+  "modifierDefinition": {
+    "amount": -1.0,
+    "attributeId": "minecraft:",
+    "operation": -1
+  },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [],
   "researchCost": [
@@ -44,6 +56,7 @@
   ],
   "rfCost": 50000000,
   "time": 2400,
+  "toggleable": true,
   "uiX": 105,
   "uiY": 30
 }

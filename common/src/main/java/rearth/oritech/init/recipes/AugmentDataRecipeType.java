@@ -1,0 +1,43 @@
+package rearth.oritech.init.recipes;
+
+import io.wispforest.endec.Endec;
+import io.wispforest.endec.StructEndec;
+import io.wispforest.endec.impl.StructEndecBuilder;
+import io.wispforest.owo.serialization.CodecUtils;
+import io.wispforest.owo.serialization.EndecRecipeSerializer;
+import io.wispforest.owo.serialization.endec.MinecraftEndecs;
+import net.minecraft.recipe.RecipeType;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
+import rearth.oritech.util.SizedIngredient;
+
+public class AugmentDataRecipeType extends EndecRecipeSerializer<AugmentDataRecipe> implements RecipeType<AugmentDataRecipe> {
+    
+    public static final Endec<AugmentDataRecipe> AUGMENT_DATA_RECIPE_ENDEC = StructEndecBuilder.of(
+      MinecraftEndecs.IDENTIFIER.xmap(identifier1 -> (AugmentDataRecipeType) Registries.RECIPE_TYPE.get(identifier1), AugmentDataRecipeType::getIdentifier).fieldOf("type", AugmentDataRecipe::getOriType),
+      Endec.BOOLEAN.fieldOf("toggleable", AugmentDataRecipe::isToggleable),
+      CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("researchCost", AugmentDataRecipe::getResearchCost),
+      CodecUtils.toEndec(SizedIngredient.CODEC.codec()).listOf().fieldOf("applyCost", AugmentDataRecipe::getApplyCost),
+      MinecraftEndecs.IDENTIFIER.listOf().fieldOf("requirements", AugmentDataRecipe::getRequirements),
+      MinecraftEndecs.IDENTIFIER.fieldOf("requiredStation", AugmentDataRecipe::getRequiredStation),
+      Endec.INT.fieldOf("uiX", AugmentDataRecipe::getUiX),
+      Endec.INT.fieldOf("uiY", AugmentDataRecipe::getUiY),
+      Endec.INT.fieldOf("time", AugmentDataRecipe::getTime),
+      Endec.LONG.fieldOf("rfCost", AugmentDataRecipe::getRfCost),
+      AugmentDataRecipe.EffectDefinition.ENDEC.optionalFieldOf("effectDefinition", AugmentDataRecipe::getEffectDefinition, () -> null),
+      AugmentDataRecipe.ModifierDefinition.ENDEC.optionalFieldOf("modifierDefinition", AugmentDataRecipe::getModifierDefinition, () -> null),
+      AugmentDataRecipe.CustomAugmentDefinition.ENDEC.optionalFieldOf("customAugmentDefinition", AugmentDataRecipe::getCustomAugmentDefinition, () -> null),
+      AugmentDataRecipe::new
+    );
+    
+    private final Identifier identifier;
+    
+    public Identifier getIdentifier() {
+        return identifier;
+    }
+    
+    public AugmentDataRecipeType(Identifier identifier) {
+        super((StructEndec<AugmentDataRecipe>) AUGMENT_DATA_RECIPE_ENDEC);
+        this.identifier = identifier;
+    }
+}

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:augment",
+  "type": "oritech:augment_data",
   "applyCost": [
     {
       "count": 32,
@@ -13,6 +13,18 @@
       }
     }
   ],
+  "customAugmentDefinition": {
+    "customAugmentId": "minecraft:"
+  },
+  "effectDefinition": {
+    "amplifier": 0,
+    "effectId": "minecraft:water_breathing"
+  },
+  "modifierDefinition": {
+    "amount": -1.0,
+    "attributeId": "minecraft:",
+    "operation": -1
+  },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],
   "researchCost": [
@@ -36,6 +48,7 @@
   ],
   "rfCost": 50000000,
   "time": 800,
+  "toggleable": false,
   "uiX": 5,
   "uiY": 90
 }
