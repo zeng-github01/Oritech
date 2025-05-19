@@ -78,8 +78,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AtomicForgeRecipeBuilder.build().input(Items.DEEPSLATE).input(ItemContent.DURATIUM_INGOT).input(ItemContent.DURATIUM_INGOT).result(Items.REINFORCED_DEEPSLATE).time(100).export(exporter, "reinfdeepslate");
         // cobblestone to gravel
         PulverizerRecipeBuilder.build().input(cItemTag("cobblestones")).result(Items.GRAVEL).addToGrinder().export(exporter, "gravel");
-        // gravel to sand
-        PulverizerRecipeBuilder.build().input(cItemTag("gravels")).result(Items.SAND).addToGrinder().export(exporter, "sand_from_gravel");
         // sandstone to sand
         PulverizerRecipeBuilder.build().input(cItemTag("sandstone/blocks")).result(Items.SAND).addToGrinder().export(exporter, "sand_from_sandstone");
         // red sandstone to red sand

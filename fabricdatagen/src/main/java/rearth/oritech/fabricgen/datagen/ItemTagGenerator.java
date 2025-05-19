@@ -493,6 +493,7 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(Items.STONE_BRICKS).add(Items.STONE_BRICK_STAIRS).add(Items.STONE_BRICK_WALL);
         getOrCreateTagBuilder(TagContent.RECYCLES_TO_SAND)
           .add(Items.SANDSTONE_STAIRS).add(Items.SANDSTONE_WALL)
+          .add(Items.GRAVEL)
           .add(Items.SMOOTH_SANDSTONE_STAIRS);
         getOrCreateTagBuilder(TagContent.RECYCLES_TO_RED_SAND)
           .add(Items.RED_SANDSTONE_STAIRS).add(Items.RED_SANDSTONE_WALL)
