@@ -19,10 +19,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": 6.0,
-    "attributeId": "minecraft:generic.armor",
-    "operation": 0
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.armor"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [

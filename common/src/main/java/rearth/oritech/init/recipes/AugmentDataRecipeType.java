@@ -24,9 +24,7 @@ public class AugmentDataRecipeType extends EndecRecipeSerializer<AugmentDataReci
       Endec.INT.fieldOf("uiY", AugmentDataRecipe::getUiY),
       Endec.INT.fieldOf("time", AugmentDataRecipe::getTime),
       Endec.LONG.fieldOf("rfCost", AugmentDataRecipe::getRfCost),
-      AugmentDataRecipe.EffectDefinition.ENDEC.optionalFieldOf("effectDefinition", AugmentDataRecipe::getEffectDefinition, () -> null),
-      AugmentDataRecipe.ModifierDefinition.ENDEC.optionalFieldOf("modifierDefinition", AugmentDataRecipe::getModifierDefinition, () -> null),
-      AugmentDataRecipe.CustomAugmentDefinition.ENDEC.optionalFieldOf("customAugmentDefinition", AugmentDataRecipe::getCustomAugmentDefinition, () -> null),
+      CodecUtils.eitherEndec(CodecUtils.eitherEndec(AugmentDataRecipe.EffectDefinition.ENDEC, AugmentDataRecipe.ModifierDefinition.ENDEC), AugmentDataRecipe.CustomAugmentDefinition.ENDEC).fieldOf("effect", AugmentDataRecipe::getDefinition),
       AugmentDataRecipe::new
     );
     

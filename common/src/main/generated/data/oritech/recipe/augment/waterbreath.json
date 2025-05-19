@@ -13,9 +13,9 @@
       }
     }
   ],
-  "effectDefinition": {
-    "amplifier": 0,
-    "effectId": "minecraft:water_breathing"
+  "effect": {
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:water_breathing"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],

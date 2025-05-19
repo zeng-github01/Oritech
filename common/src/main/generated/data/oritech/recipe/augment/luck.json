@@ -14,10 +14,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": 100.0,
-    "attributeId": "minecraft:generic.luck",
-    "operation": 0
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.luck"
   },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [],

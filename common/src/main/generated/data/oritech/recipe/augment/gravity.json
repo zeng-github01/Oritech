@@ -14,10 +14,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": -0.5,
-    "attributeId": "minecraft:generic.gravity",
-    "operation": 1
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:generic.gravity"
   },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [

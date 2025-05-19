@@ -20,8 +20,8 @@
       }
     }
   ],
-  "customAugmentDefinition": {
-    "customAugmentId": "oritech:augment/feeder"
+  "effect": {
+    "customAugmentId": "oritech:augment/autofeeder"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [

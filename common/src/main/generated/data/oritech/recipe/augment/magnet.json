@@ -14,7 +14,7 @@
       }
     }
   ],
-  "customAugmentDefinition": {
+  "effect": {
     "customAugmentId": "oritech:augment/magnet"
   },
   "requiredStation": "oritech:simple_augment_station",

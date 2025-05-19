@@ -13,17 +13,9 @@
       }
     }
   ],
-  "customAugmentDefinition": {
-    "customAugmentId": "minecraft:"
-  },
-  "effectDefinition": {
-    "amplifier": 0,
-    "effectId": "minecraft:water_breathing"
-  },
-  "modifierDefinition": {
-    "amount": -1.0,
-    "attributeId": "minecraft:",
-    "operation": -1
+  "effect": {
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:water_breathing"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],

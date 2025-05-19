@@ -19,17 +19,10 @@
       }
     }
   ],
-  "customAugmentDefinition": {
-    "customAugmentId": "minecraft:"
-  },
-  "effectDefinition": {
-    "amplifier": -1,
-    "effectId": "minecraft:"
-  },
-  "modifierDefinition": {
+  "effect": {
     "amount": 0.25,
-    "attributeId": "minecraft:generic.movement_speed",
-    "operation": 0
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.movement_speed"
   },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [

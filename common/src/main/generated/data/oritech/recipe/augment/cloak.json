@@ -14,9 +14,9 @@
       }
     }
   ],
-  "effectDefinition": {
-    "amplifier": 0,
-    "effectId": "minecraft:invisibility"
+  "effect": {
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:invisibility"
   },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [

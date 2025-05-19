@@ -14,17 +14,10 @@
       }
     }
   ],
-  "customAugmentDefinition": {
-    "customAugmentId": "minecraft:"
-  },
-  "effectDefinition": {
-    "amplifier": -1,
-    "effectId": "minecraft:"
-  },
-  "modifierDefinition": {
+  "effect": {
     "amount": 6.0,
-    "attributeId": "minecraft:generic.max_health",
-    "operation": 0
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.max_health"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],

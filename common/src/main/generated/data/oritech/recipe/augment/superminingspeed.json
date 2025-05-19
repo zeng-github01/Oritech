@@ -14,10 +14,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": 1.0,
-    "attributeId": "minecraft:player.block_break_speed",
-    "operation": 2
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:player.block_break_speed"
   },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [

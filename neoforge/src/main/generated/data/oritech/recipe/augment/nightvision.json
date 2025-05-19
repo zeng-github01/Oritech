@@ -20,17 +20,9 @@
       }
     }
   ],
-  "customAugmentDefinition": {
-    "customAugmentId": "minecraft:"
-  },
-  "effectDefinition": {
-    "amplifier": 0,
-    "effectId": "minecraft:night_vision"
-  },
-  "modifierDefinition": {
-    "amount": -1.0,
-    "attributeId": "minecraft:",
-    "operation": -1
+  "effect": {
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:night_vision"
   },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [],

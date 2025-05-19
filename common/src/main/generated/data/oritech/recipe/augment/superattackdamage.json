@@ -14,10 +14,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": 6.0,
-    "attributeId": "minecraft:generic.attack_damage",
-    "operation": 0
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.attack_damage"
   },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [

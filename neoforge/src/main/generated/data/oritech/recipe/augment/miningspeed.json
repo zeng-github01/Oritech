@@ -14,17 +14,10 @@
       }
     }
   ],
-  "customAugmentDefinition": {
-    "customAugmentId": "minecraft:"
-  },
-  "effectDefinition": {
-    "amplifier": -1,
-    "effectId": "minecraft:"
-  },
-  "modifierDefinition": {
+  "effect": {
     "amount": 1.0,
-    "attributeId": "minecraft:player.block_break_speed",
-    "operation": 2
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:player.block_break_speed"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [

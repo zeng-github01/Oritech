@@ -14,10 +14,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": 0.25,
-    "attributeId": "minecraft:generic.movement_speed",
-    "operation": 1
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:generic.movement_speed"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [],

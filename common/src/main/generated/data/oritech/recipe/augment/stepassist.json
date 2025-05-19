@@ -14,10 +14,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": 0.6,
-    "attributeId": "minecraft:generic.step_height",
-    "operation": 0
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.step_height"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [

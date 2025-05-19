@@ -14,17 +14,8 @@
       }
     }
   ],
-  "customAugmentDefinition": {
+  "effect": {
     "customAugmentId": "oritech:augment/portal"
-  },
-  "effectDefinition": {
-    "amplifier": -1,
-    "effectId": "minecraft:"
-  },
-  "modifierDefinition": {
-    "amount": -1.0,
-    "attributeId": "minecraft:",
-    "operation": -1
   },
   "requiredStation": "oritech:arcane_augment_station",
   "requirements": [],

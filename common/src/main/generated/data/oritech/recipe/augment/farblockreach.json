@@ -14,10 +14,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": 1.0,
-    "attributeId": "minecraft:player.block_interaction_range",
-    "operation": 2
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:player.block_interaction_range"
   },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [

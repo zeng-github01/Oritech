@@ -14,17 +14,10 @@
       }
     }
   ],
-  "customAugmentDefinition": {
-    "customAugmentId": "minecraft:"
-  },
-  "effectDefinition": {
-    "amplifier": -1,
-    "effectId": "minecraft:"
-  },
-  "modifierDefinition": {
+  "effect": {
     "amount": 1.0,
-    "attributeId": "minecraft:generic.scale",
-    "operation": 1
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:generic.scale"
   },
   "requiredStation": "oritech:simple_augment_station",
   "requirements": [

@@ -14,7 +14,7 @@
       }
     }
   ],
-  "customAugmentDefinition": {
+  "effect": {
     "customAugmentId": "oritech:augment/portal"
   },
   "requiredStation": "oritech:arcane_augment_station",

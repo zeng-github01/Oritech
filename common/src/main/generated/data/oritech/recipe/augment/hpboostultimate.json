@@ -19,10 +19,10 @@
       }
     }
   ],
-  "modifierDefinition": {
+  "effect": {
     "amount": 10.0,
-    "attributeId": "minecraft:generic.max_health",
-    "operation": 0
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:generic.max_health"
   },
   "requiredStation": "oritech:advanced_augment_station",
   "requirements": [
