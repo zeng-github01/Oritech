@@ -1,3 +1,4 @@
+With this release, the planned breaking changes have all been completed for now. The mod is in beta state again and the version are not marked as experimental alpha again.
 - Complete rework of the cybernetical augmentation backend. Is much more robust now, and fully data driven. This means modpack makers can add their own augments now!
 - Add enderic railgun explosion power config option
 - Reduce resource boulder spawn amounts
