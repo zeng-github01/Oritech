@@ -90,6 +90,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         PulverizerRecipeBuilder.build().input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
         AssemblerRecipeBuilder.build().input(ItemTags.LOGS).input(Items.GLOWSTONE).input(Items.GLOWSTONE).input(Items.GLOWSTONE).result(Items.SHROOMLIGHT).timeMultiplier(0.8f).export(exporter, "shroomlight");
+        // prismarine shards to crystals
+        PulverizerRecipeBuilder.build().input(Items.PRISMARINE_SHARD).result(Items.PRISMARINE_CRYSTALS, 2).addToGrinder().export(exporter, "prismarine");
+        
         // recyclables
         PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_NETHERITE_SCRAP).result(Items.NETHERITE_SCRAP).addToGrinder().export(exporter, "recycle/netherite_scrap");
         PulverizerRecipeBuilder.build().input(TagContent.RECYCLES_TO_DIAMOND).result(Items.DIAMOND).addToGrinder().export(exporter, "recycle/diamond");
@@ -844,7 +847,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.RAW_BIOPOLYMER, 64)
-          .researchCost(ItemContent.SMALL_URANIUM_DUST, 32)
+          .researchCost(ItemContent.SMALL_URANIUM_DUST, 4)
           .researchCost(TagContent.BIOMATTER, 64)
           .applyCost(ItemContent.RAW_BIOPOLYMER, 32)
           .applyCost(cItemTag("ingots/iron"), 64)
@@ -971,9 +974,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENDERIC_COMPOUND, 64)
           .researchCost(ItemContent.FLUXITE, 64)
-          .researchCost(cItemTag("rods/blaze"), 64)
+          .researchCost(cItemTag("rods/blaze"), 32)
           .applyCost(ItemContent.ENDERIC_COMPOUND, 32)
-          .applyCost(cItemTag("storage_blocks/gold"), 64)
+          .applyCost(cItemTag("storage_blocks/gold"), 32)
           .requirement(Oritech.id("augment/hpboostultra"))
           .requirement(Oritech.id("augment/ultimatearmor"))
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
@@ -983,10 +986,10 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         AugmentRecipeBuilder.build()
           .researchCost(TagContent.ELECTRUM_INGOTS, 64)
-          .researchCost(cItemTag("storage_blocks/lapis"), 48)
-          .researchCost(cItemTag("storage_blocks/gold"), 32)
-          .applyCost(cItemTag("storage_blocks/lapis"), 32)
-          .applyCost(cItemTag("storage_blocks/redstone"), 64)
+          .researchCost(cItemTag("storage_blocks/lapis"), 32)
+          .researchCost(cItemTag("storage_blocks/gold"), 24)
+          .applyCost(cItemTag("storage_blocks/lapis"), 24)
+          .applyCost(cItemTag("storage_blocks/redstone"), 24)
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
           .uiX(55).uiY(30).time(1800).rfCost(200_000_000)
           .modifierDefinition(EntityAttributes.GENERIC_LUCK, 100, EntityAttributeModifier.Operation.ADD_VALUE)
@@ -1021,8 +1024,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "flight");
         
         AugmentRecipeBuilder.build()
-          .researchCost(Items.ENDER_EYE, 64)
-          .researchCost(ItemContent.ENDERIC_LENS, 48)
+          .researchCost(Items.ENDER_EYE, 32)
+          .researchCost(ItemContent.ENDERIC_LENS, 8)
           .researchCost(cItemTag("gems/diamond"), 8)
           .applyCost(ItemContent.ENDERIC_LENS, 32)
           .applyCost(Items.GLOWSTONE, 64)
@@ -1064,7 +1067,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .researchCost(ItemContent.BIOSTEEL_INGOT, 48)
           .researchCost(Items.HEART_OF_THE_SEA)
           .applyCost(ItemContent.BIOSTEEL_INGOT, 32)
-          .applyCost(Items.CONDUIT)
+          .applyCost(ItemTags.FISHES)
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
           .uiX(5).uiY(90).time(800).rfCost(50_000_000)
           .effectDefinition(StatusEffects.WATER_BREATHING, 0)
@@ -1099,11 +1102,11 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "magnet");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.ENDERIC_LENS, 64)
-          .researchCost(Items.AMETHYST_BLOCK, 48)
+          .researchCost(ItemContent.ENDERIC_LENS, 32)
+          .researchCost(Items.SPYGLASS, 1)
           .researchCost(ItemContent.OVERCHARGED_CRYSTAL)
-          .researchCost(ItemContent.PROMETHEUM_INGOT, 8)
-          .researchCost(Items.SCULK_SENSOR, 4)
+          .researchCost(ItemContent.PROMETHEUM_INGOT, 2)
+          .researchCost(Items.SCULK_SENSOR, 1)
           .applyCost(ItemContent.ENDERIC_LENS, 32)
           .applyCost(Items.REDSTONE_TORCH, 64)
           .requirement(Oritech.id("augment/nightvision"))
