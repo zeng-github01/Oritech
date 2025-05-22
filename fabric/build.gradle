@@ -79,7 +79,7 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:11.0.3"
 
     // oracle index
-    modRuntimeOnly "curse.maven:oracle-index-1206582:6300146"
+    modRuntimeOnly "curse.maven:oracle-index-1206582:6538216"
     implementation "org.jsoup:jsoup:1.17.2"
 
     // compat mods for testing
