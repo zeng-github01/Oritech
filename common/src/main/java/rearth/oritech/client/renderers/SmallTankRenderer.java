@@ -49,7 +49,7 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity> {
         
     }
     
-    private void drawQuad(Direction direction, VertexConsumer consumer, Matrix4f modelMatrix, MatrixStack.Entry normalMatrix, Sprite sprite, int color, int light, int overlay) {
+    public static void drawQuad(Direction direction, VertexConsumer consumer, Matrix4f modelMatrix, MatrixStack.Entry normalMatrix, Sprite sprite, int color, int light, int overlay) {
         // Define the vertices of the quad based on the direction it's facing
         
         var normal = direction.getUnitVector();

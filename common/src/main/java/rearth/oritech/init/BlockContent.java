@@ -40,6 +40,7 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeDuctBlock;
 import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
+import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.ItemContent.Compostable;
 import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
@@ -106,6 +107,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block BLOCK_FERTILIZER_HEAD = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque());
     @NoBlockItem
     public static final Block PUMP_TRUNK_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque());
+    @NoBlockItem
+    public static final Block TANK_ITEM_MODEL = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque());   // workaround because I don't understand how to properly get the model to load
+    @NoBlockItem
+    public static final Block CREATIVE_TANK_ITEM_MODEL = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque());   // workaround because I don't understand how to properly get the model to load
     @NoBlockItem
     public static final Block QUARRY_BEAM_INNER = new Block(AbstractBlock.Settings.copy(Blocks.CHAIN).nonOpaque().luminance(item -> 5));
     @NoBlockItem
@@ -177,6 +182,9 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoAutoDrop
     @DispenserPlace
     public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(state -> state.get(Properties.LIT) ? 15 : 0).hardness(-1.0F));
+    
+    public static final Item SMALL_TANK_ITEM = new SmallFluidTankBlockItem(SMALL_TANK_BLOCK, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
+    public static final Item CREATIVE_TANK_ITEM = new SmallFluidTankBlockItem(CREATIVE_TANK_BLOCK, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
@@ -418,8 +426,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
         
         if (field.isAnnotationPresent(UseGeoBlockItem.class)) {
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), getGeoBlockItem(value, identifier, field.getAnnotation(UseGeoBlockItem.class).scale()));
-        } else if ((value.equals(BlockContent.SMALL_TANK_BLOCK) || value.equals(BlockContent.CREATIVE_TANK_BLOCK)) && FluidApi.ITEM != null) {
-            var item = new SmallFluidTankBlockItem(value, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
+        } else if (FluidApi.ITEM != null && (value instanceof SmallFluidTank)) {
+            var item = value.equals(BlockContent.SMALL_TANK_BLOCK) ? SMALL_TANK_ITEM : CREATIVE_TANK_ITEM;
             Registry.register(Registries.ITEM, Identifier.of(namespace, identifier), item);
             FluidApi.ITEM.registerForItem(() -> item);
         } else if (value.equals(BlockContent.SMALL_STORAGE_BLOCK) && EnergyApi.ITEM != null) {
