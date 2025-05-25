@@ -9,6 +9,7 @@ public class RecipeContent implements ArchitecturyRecipeRegistryContainer {
     public static final OritechRecipeType GRINDER = new OritechRecipeType(Oritech.id("grinder"));
     public static final OritechRecipeType ASSEMBLER = new OritechRecipeType(Oritech.id("assembler"));
     public static final OritechRecipeType FOUNDRY = new OritechRecipeType(Oritech.id("foundry"));
+    public static final OritechRecipeType REFINERY = new OritechRecipeType(Oritech.id("refinery"));
     public static final OritechRecipeType CENTRIFUGE = new OritechRecipeType(Oritech.id("centrifuge"));
     public static final OritechRecipeType CENTRIFUGE_FLUID = new OritechRecipeType(Oritech.id("centrifuge_fluid"));
     public static final OritechRecipeType ATOMIC_FORGE = new OritechRecipeType(Oritech.id("atomic_forge"));

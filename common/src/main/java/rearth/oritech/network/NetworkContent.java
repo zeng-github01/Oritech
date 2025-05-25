@@ -241,7 +241,7 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof MultiblockMachineController machine) {
-                System.out.println("playing setup on client!");
+                Oritech.LOGGER.debug("playing setup on client!");
                 machine.playSetupAnimation();
             }
             

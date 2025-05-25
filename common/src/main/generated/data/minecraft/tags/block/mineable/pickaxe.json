@@ -113,6 +113,8 @@
     "oritech:reactor_rod",
     "oritech:reactor_vent",
     "oritech:reactor_wall",
+    "oritech:refinery_block",
+    "oritech:refinery_module_block",
     "oritech:silicon_block",
     "oritech:simple_augment_station",
     "oritech:spawner_cage_block",

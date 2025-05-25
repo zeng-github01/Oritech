@@ -147,6 +147,10 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block CENTRIFUGE_BLOCK = new CentrifugeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block ATOMIC_FORGE_BLOCK = new AtomicForgeBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.3f)
+    public static final Block REFINERY_BLOCK = new RefineryBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    @UseGeoBlockItem(scale = 0.3f)
+    public static final Block REFINERY_MODULE_BLOCK = new RefineryModuleBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block BIO_GENERATOR_BLOCK = new BioGeneratorBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
     @UseGeoBlockItem(scale = 0.7f)
