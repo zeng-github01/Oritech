@@ -375,14 +375,14 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, AbstractBlock.Settings.copy(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block METAL_BEAM_BLOCK = new MetalBeamBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
+    public static final Block METAL_BEAM_BLOCK = new MetalBeamBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().solid());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block INDUSTRIAL_GLASS_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.GLASS).requiresTool().strength(7.0F, 8.0F).nonOpaque());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     @UseGeoBlockItem(scale = 0.5f)
-    public static final Block TECH_DOOR = new TechDoorBlock(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f));
+    public static final Block TECH_DOOR = new TechDoorBlock(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f).solid());
     @NoBlockItem
-    public static final Block TECH_DOOR_HINGE = new TechDoorBlockHinge(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f));
+    public static final Block TECH_DOOR_HINGE = new TechDoorBlockHinge(AbstractBlock.Settings.copy(Blocks.IRON_DOOR).strength(8f).solid());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block STEEL_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
