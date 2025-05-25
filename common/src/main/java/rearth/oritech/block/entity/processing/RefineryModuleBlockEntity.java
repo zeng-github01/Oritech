@@ -12,8 +12,8 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
 import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.MultiblockMachineController;
@@ -39,6 +39,15 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<RefineryModuleBlockEntity> animationController = getAnimationController();
     
+    // this field is updated by a refinery when checking for modules
+    private RefineryBlockEntity owningRefinery;
+    
+    // fluid delegator
+    private final DelegatingFluidStorage fluidStorage = new DelegatingFluidStorage(
+      () -> owningRefinery.getFluidStorageForModule(pos),
+      () -> isActive(getCachedState()) && owningRefinery != null);
+    
+    
     public RefineryModuleBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.REFINERY_MODULE_ENTITY, pos, state);
     }
@@ -58,11 +67,11 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0,-1),    // right
-          new Vec3i(1, 0,-1),    // back right
+          new Vec3i(0, 0, -1),    // right
+          new Vec3i(1, 0, -1),    // back right
           new Vec3i(1, 0, 0),    // back middle
           new Vec3i(2, 0, -1),    // backer right
-          new Vec3i(2, 0,0)
+          new Vec3i(2, 0, 0)
         );
     }
     
@@ -109,7 +118,7 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
     
     @Override
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
-        return null;    // todo
+        return fluidStorage;
     }
     
     @Override
@@ -140,14 +149,18 @@ public class RefineryModuleBlockEntity extends BlockEntity implements Multiblock
             }
             
             if (isActive(getCachedState())) {
-                    return state.setAndContinue(IDLE);
+                return state.setAndContinue(IDLE);
             } else {
                 return state.setAndContinue(PACKAGED);
             }
         }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
     }
     
-    private boolean isActive(BlockState state) {
+    public boolean isActive(BlockState state) {
         return state.get(ASSEMBLED);
+    }
+    
+    public void setOwningRefinery(RefineryBlockEntity owner) {
+        this.owningRefinery = owner;
     }
 }
