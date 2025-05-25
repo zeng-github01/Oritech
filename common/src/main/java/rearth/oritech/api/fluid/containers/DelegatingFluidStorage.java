@@ -50,9 +50,10 @@ public class DelegatingFluidStorage extends FluidApi.FluidStorage {
             var targetStorage = backingStorage.get();
             if (targetStorage instanceof FluidApi.SingleSlotStorage singleSlotContainer && content.size() == 1) {
                 singleSlotContainer.setStack(content.getFirst());
-            } else if (targetStorage instanceof FluidApi.InOutSlotStorage dualSlotContainer && content.size() == 2) {
-                dualSlotContainer.setInStack(content.getFirst());
-                dualSlotContainer.setOutStack(content.getLast());
+            } else if (targetStorage instanceof FluidApi.MultiSlotStorage multiSlotContainer && content.size() == multiSlotContainer.getSlotCount()) {
+                for (int i = 0; i < multiSlotContainer.getSlotCount(); i++) {
+                    multiSlotContainer.setStack(i, content.get(i));
+                }
             } else {
                 Oritech.LOGGER.error("Using invalid container / snapshot for Delegating Fluid Storage");
             }

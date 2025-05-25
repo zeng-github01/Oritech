@@ -414,11 +414,11 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             
             if (entity instanceof SteamEngineEntity steamEngine) {  // water and steam amounts are mixed up in steam engine
-                steamEngine.boilerStorage.setOutStack(FluidStack.create(Fluids.WATER, message.steamAmount));
-                steamEngine.boilerStorage.setInStack(FluidStack.create(FluidContent.STILL_STEAM.get(), message.waterAmount));
+                steamEngine.boilerStorage.setStack(1, FluidStack.create(Fluids.WATER, message.steamAmount));
+                steamEngine.boilerStorage.setStack(0, FluidStack.create(FluidContent.STILL_STEAM.get(), message.waterAmount));
             } else if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
-                generatorBlock.boilerStorage.setInStack(FluidStack.create(Fluids.WATER, message.waterAmount));
-                generatorBlock.boilerStorage.setOutStack(FluidStack.create(FluidContent.STILL_STEAM.get(), message.steamAmount));
+                generatorBlock.boilerStorage.setStack(0, FluidStack.create(Fluids.WATER, message.waterAmount));
+                generatorBlock.boilerStorage.setStack(1, FluidStack.create(FluidContent.STILL_STEAM.get(), message.steamAmount));
             }
             
         }));
@@ -473,8 +473,8 @@ public class NetworkContent {
                 centrifuge.hasFluidAddon = message.fluidAddon;
                 var inStack = FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidTypeIn)), message.amountIn);
                 var outStack = FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidTypeOut)), message.amountOut);
-                centrifuge.fluidContainer.setInStack(inStack);
-                centrifuge.fluidContainer.setOutStack(outStack);
+                centrifuge.fluidContainer.setStack(0, inStack);
+                centrifuge.fluidContainer.setStack(1, outStack);
             }
             
         }));

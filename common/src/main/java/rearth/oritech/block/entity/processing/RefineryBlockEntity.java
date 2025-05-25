@@ -1,9 +1,8 @@
 package rearth.oritech.block.entity.processing;
 
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -12,21 +11,25 @@ import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
+    
+    // todo persistence, networking for those
+    private final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
+    private final FluidApi.SingleSlotStorage nodeA = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
+    private final FluidApi.SingleSlotStorage nodeB = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.fragmentForgeData.energyPerTick());
@@ -119,4 +122,6 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         return null;
     }
+    }
+    
 }

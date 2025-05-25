@@ -81,15 +81,14 @@ public class FluidApi {
         
     }
     
-    // used for things like the centrifuge or steam engine
-    public static abstract class InOutSlotStorage extends FluidStorage {
+    public static abstract class MultiSlotStorage extends FluidStorage {
         
-        public abstract void setInStack(FluidStack stack);
-        public abstract FluidStack getInStack();
-        
-        public abstract void setOutStack(FluidStack stack);
-        public abstract FluidStack getOutStack();
         public abstract FluidStorage getStorageForDirection(Direction direction);
         
+        public abstract void setStack(int slot, FluidStack stack);
+        public abstract FluidStack getStack(int slot);
+        public abstract int getSlotCount();
+        
     }
+    
 }
