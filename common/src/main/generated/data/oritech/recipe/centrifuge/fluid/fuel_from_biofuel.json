@@ -4,7 +4,7 @@
     "amount": 81000,
     "fluid": "#oritech:biofuel"
   },
-  "fluidOutput": {
+  "fluidOutputs": {
     "amount": 81000,
     "fluid": "oritech:still_fuel"
   },

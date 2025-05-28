@@ -4,10 +4,7 @@
     "amount": 100,
     "fluid": "#c:oil"
   },
-  "fluidOutput": {
-    "amount": 0,
-    "fluid": "minecraft:empty"
-  },
+  "fluidOutputs": [],
   "ingredients": [],
   "results": [],
   "time": 60

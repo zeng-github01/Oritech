@@ -159,13 +159,13 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             root.child(foreGround);
         }
         
-        if (display.entry.value().getFluidOutput() != null && display.entry.value().getFluidOutput().getAmount() > 0) {
-            var amount = display.entry.value().getFluidOutput().getAmount();
+        if (display.entry.value().getFluidOutputs().getFirst() != null && display.entry.value().getFluidOutputs().getFirst().getAmount() > 0) {
+            var amount = display.entry.value().getFluidOutputs().getFirst().getAmount();
             
-            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidOutput(), new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
+            root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidOutputs().getFirst(), new ScreenProvider.BarConfiguration(123, 5, 16, 50)));
             
             var text = amount > 0
-                ? Text.translatable("tooltip.oritech.fluid_content", amount, FluidStackHooks.getName(display.entry.value().getFluidOutput()).getString())
+                ? Text.translatable("tooltip.oritech.fluid_content", amount, FluidStackHooks.getName(display.entry.value().getFluidOutputs().getFirst()).getString())
                 : Text.translatable("tooltip.oritech.fluid_empty");
             var foreGround = Components.texture(GUI_COMPONENTS, 48, 0, 14, 50, 98, 96);
             foreGround.sizing(Sizing.fixed(18), Sizing.fixed(52));
