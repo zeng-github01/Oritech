@@ -166,7 +166,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         water + solid biofuel -> liquid biofuel
         something involving uranium
         heavy oil residue + logs -> charcoal
-        // ore washing recipes?
+        // ore washing recipes? with water or sulfuric acid?
         // something with potatoes / yeast?
         // something resulting in rubber as quartz alt
          */
@@ -176,6 +176,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(Fluids.WATER, 2f)
           .fluidOutput(FluidContent.STILL_BIOFUEL.get(), 1f)
           .fluidOutput(FluidContent.STILL_FUEL.get(), 1f)
+          .input(of(ItemTags.SAND))
+          .result(ItemContent.PLASTIC_SHEET, 2)
           .timeInSeconds(8)
           .export(exporter, "refinerytest");
     }
