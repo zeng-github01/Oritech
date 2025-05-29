@@ -46,7 +46,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
                 this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluidStacks().getFirst().getFluid(), inputAmount));
             }
         }
-        if (recipe.getFluidOutputs().getFirst() != null && recipe.getFluidInput().amount() > 0)
+        if (!recipe.getFluidOutputs().isEmpty() && recipe.getFluidInput().amount() > 0)
             this.outputs.add(EmiStack.of(recipe.getFluidOutputs().getFirst().getFluid(), Math.max(recipe.getFluidInput().amount(), 1)));
         
         try {
@@ -80,7 +80,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
                 this.inputs.add(EmiStack.of(recipe.getFluidInput().getFluid(), inputAmount));
             }
         }
-        if (recipe.getFluidOutputs().getFirst() != null && recipe.getFluidOutputs().getFirst().getAmount() > 0)
+        if (!recipe.getFluidOutputs().isEmpty() && recipe.getFluidOutputs().getFirst().getAmount() > 0)
             this.outputs.add(EmiStack.of(recipe.getFluidOutputs().getFirst().getFluid(), recipe.getFluidOutputs().getFirst().getAmount()));
             
     }

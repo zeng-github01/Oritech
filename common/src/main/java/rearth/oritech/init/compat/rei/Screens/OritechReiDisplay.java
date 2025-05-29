@@ -159,7 +159,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             root.child(foreGround);
         }
         
-        if (display.entry.value().getFluidOutputs().getFirst() != null && display.entry.value().getFluidOutputs().getFirst().getAmount() > 0) {
+        if (!display.entry.value().getFluidOutputs().isEmpty() && display.entry.value().getFluidOutputs().getFirst() != null && display.entry.value().getFluidOutputs().getFirst().getAmount() > 0) {
             var amount = display.entry.value().getFluidOutputs().getFirst().getAmount();
             
             root.child(rearth.oritech.client.ui.BasicMachineScreen.createFluidRenderer(display.entry.value().getFluidOutputs().getFirst(), new ScreenProvider.BarConfiguration(123, 5, 16, 50)));

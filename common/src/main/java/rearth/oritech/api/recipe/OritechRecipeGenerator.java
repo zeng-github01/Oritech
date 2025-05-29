@@ -157,6 +157,27 @@ public class OritechRecipeGenerator extends RecipeProvider {
         //steam
         // 32 fabric droplets / 32 neoforge mb (yes this will works, as we produce 2 millis per RF in the generator boilers, and then consume it at a 1:1 ratio)
         SteamGeneratorRecipeBuilder.build().specificFluidInput(FluidContent.STILL_STEAM.get(), 32).time(1).export(exporter, "steameng");
+        
+        // refinery ideas:
+        /*
+        
+        lava -> lots of steam, sheol fire (better lava in magma gen), todo
+        crude oil -> heavy oil residue, polymer resin, todo
+        water + solid biofuel -> liquid biofuel
+        something involving uranium
+        heavy oil residue + logs -> charcoal
+        // ore washing recipes?
+        // something with potatoes / yeast?
+        // something resulting in rubber as quartz alt
+         */
+        
+        RefineryRecipeBuilder.build()
+          .fluidInput(cFluidTag("oil"))
+          .fluidOutput(Fluids.WATER, 2f)
+          .fluidOutput(FluidContent.STILL_BIOFUEL.get(), 1f)
+          .fluidOutput(FluidContent.STILL_FUEL.get(), 1f)
+          .timeInSeconds(8)
+          .export(exporter, "refinerytest");
     }
     
     private void addBiomass(RecipeExporter exporter) {

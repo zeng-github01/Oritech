@@ -5,9 +5,10 @@ import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
@@ -26,13 +27,12 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.client.ui.CentrifugeScreenHandler;
 import rearth.oritech.client.ui.RefineryScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
@@ -40,14 +40,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-// todo possibly decouple this from multiblockmachineentity?
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
-    // todo persistence, networking for those
+    // todo recipe viewer display of all outputs
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
-    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
-    public final FluidApi.SingleSlotStorage nodeA = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
-    public final FluidApi.SingleSlotStorage nodeB = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
+    public final SimpleFluidStorage nodeB = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     private int moduleCount;    // range 0-2
     
@@ -59,17 +58,25 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
         super.tick(world, pos, state, blockEntity);
         
-        if (world.isClient) {
-            ownStorage.setStack(0, FluidStack.create(Fluids.FLOWING_WATER, 4 * FluidStackHooks.bucketAmount()));
-            ownStorage.setStack(1, FluidStack.create(Fluids.WATER, 6 * FluidStackHooks.bucketAmount()));
-            nodeA.setStack(FluidStack.create(Fluids.FLOWING_LAVA, 6 * FluidStackHooks.bucketAmount()));
-            nodeB.setStack(FluidStack.create(FluidContent.FLOWING_FUEL.get(), 6 * FluidStackHooks.bucketAmount()));
-            return;
-        }
-        
         if (world.getTime() % 25 == 0) {
             refreshModules();
         }
+    }
+    
+    @Override
+    protected void writeNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.writeNbt(nbt, registryLookup);
+        ownStorage.writeNbt(nbt, "main");
+        nodeA.writeNbt(nbt, "a");
+        nodeB.writeNbt(nbt, "b");
+    }
+    
+    @Override
+    protected void readNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+        super.readNbt(nbt, registryLookup);
+        ownStorage.readNbt(nbt, "main");
+        nodeA.readNbt(nbt, "a");
+        nodeB.readNbt(nbt, "b");
     }
     
     private void refreshModules() {
@@ -110,6 +117,13 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         craftFluids(activeRecipe);
     }
     
+    @Override
+    public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
+        var results = activeRecipe.getResults();
+        if (results.isEmpty()) return List.of();
+        return List.of(results.getFirst().copyWithCount(results.getFirst().getCount() * getItemOutputMultiplier()));
+    }
+    
     private void craftFluids(OritechRecipe activeRecipe) {
         // create outputs, remove inputs
         
@@ -143,8 +157,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         };
     }
     
-    private boolean getItemOutputMultiplier() {
-        return getModuleCount() == 0;
+    private int getItemOutputMultiplier() {
+        return getModuleCount() == 0 ? 2 : 1;
     }
     
     @Override
@@ -163,6 +177,12 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         }
         
         return super.canOutputRecipe(recipe);
+    }
+    
+    @Override
+    protected void sendNetworkEntry() {
+        super.sendNetworkEntry();
+        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.RefinerySyncPacket(getPos(), ownStorage.getInStack(), ownStorage.getOutStack(), nodeA.getStack(), nodeB.getStack(), moduleCount));
     }
     
     @Nullable
@@ -198,11 +218,11 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         if (world.random.nextFloat() > 0.8) return;
         // emit particles
         var facing = getFacing();
-        var offsetLocal = Geometry.rotatePosition(new Vec3d(0.4, 0.6, 0.5), facing);
+        var offsetLocal = Geometry.rotatePosition(new Vec3d(0.3, 0.5, 0.3), facing);
         var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
         
         // todo
-        ParticleContent.GRINDER_WORKING.spawn(world, emitPosition, 1);
+        ParticleContent.COOLER_WORKING.spawn(world, emitPosition, 1);
         
     }
     
@@ -252,6 +272,14 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         );
     }
     
+    @Override
+    public ArrowConfiguration getIndicatorConfiguration() {
+        return new ArrowConfiguration(
+          Oritech.id("textures/gui/modular/arrow_empty.png"),
+          Oritech.id("textures/gui/modular/arrow_full.png"),
+          54, 35, 29, 16, true);
+    }
+    
     // x = back, // z = left
     @Override
     public List<Vec3i> getAddonSlots() {
@@ -275,7 +303,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         return List.of(new Pair<>(Text.literal("\uD83D\uDCE6: " + moduleCount), Text.translatable("tooltip.oritech.refinery_module_count")));
     }
     
-    private FluidApi.SingleSlotStorage getOutputStorage(int i) {
+    public FluidApi.SingleSlotStorage getOutputStorage(int i) {
         if (i == 0) return ownStorage.getOutputContainer();
         if (i == 1) return nodeA;
         if (i == 2) return nodeB;

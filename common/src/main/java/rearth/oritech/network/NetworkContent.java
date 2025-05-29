@@ -3,6 +3,7 @@ package rearth.oritech.network;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.MenuRegistry;
 import io.wispforest.owo.network.OwoNetChannel;
+import io.wispforest.owo.serialization.CodecUtils;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
@@ -35,6 +36,7 @@ import rearth.oritech.block.entity.interaction.*;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
+import rearth.oritech.block.entity.processing.RefineryBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
@@ -159,6 +161,9 @@ public class NetworkContent {
                                      int maxSouls) {
     }
     
+    public record RefinerySyncPacket(BlockPos position, FluidStack mainIn, FluidStack mainOut, FluidStack nodeA, FluidStack nodeB, int moduleCount) {
+    }
+    
     public record GeneratorSteamSyncPacket(BlockPos position, long waterAmount, long steamAmount) {
     }
     
@@ -224,6 +229,7 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.builder().register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
+        MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FluidStack.CODEC, FluidStack.STREAM_CODEC), FluidStack.class);
         
         
         MACHINE_CHANNEL.registerClientbound(MachineSyncPacket.class, ((message, access) -> {
@@ -461,6 +467,19 @@ public class NetworkContent {
                 var variant = Registries.FLUID.get(Identifier.of(message.fluidType));
                 pump.setLastPumpedVariant(variant);
                 pump.setLastPumpTime(message.workedAt);
+            }
+            
+        }));
+        
+        MACHINE_CHANNEL.registerClientbound(RefinerySyncPacket.class, ((message, access) -> {
+            
+            var entity = access.player().clientWorld.getBlockEntity(message.position);
+            
+            if (entity instanceof RefineryBlockEntity refinery) {
+                refinery.ownStorage.setStack(0, message.mainIn);
+                refinery.ownStorage.setStack(1, message.mainOut);
+                refinery.nodeA.setStack(message.nodeA);
+                refinery.nodeB.setStack(message.nodeB);
             }
             
         }));

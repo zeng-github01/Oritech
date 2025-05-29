@@ -150,7 +150,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         }
         
         // fluid outputs
-        if (!(recipe.getFluidOutputs().getFirst() != null && recipe.getFluidOutputs().getFirst().isEmpty())) {
+        if (!(!recipe.getFluidOutputs().isEmpty() && recipe.getFluidOutputs().getFirst() != null && recipe.getFluidOutputs().getFirst().isEmpty())) {
             var stack = recipe.getFluidOutputs().getFirst();
             builder.addOutputSlot(120, 6).addFluidStack(stack.getFluid(), stack.getAmount()).setBackground(fluidBackground, -2, -2).setFluidRenderer(stack.getAmount(), false, 10, 46);
         }

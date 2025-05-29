@@ -1,0 +1,24 @@
+{
+  "type": "oritech:refinery",
+  "fluidInput": {
+    "amount": 81000,
+    "fluid": "#c:oil"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 162000,
+      "fluid": "minecraft:water"
+    },
+    {
+      "amount": 162000,
+      "fluid": "oritech:still_biofuel"
+    },
+    {
+      "amount": 162000,
+      "fluid": "oritech:still_fuel"
+    }
+  ],
+  "ingredients": [],
+  "results": [],
+  "time": 160
+}
