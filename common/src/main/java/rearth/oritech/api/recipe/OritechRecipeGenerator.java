@@ -166,7 +166,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         water + solid biofuel -> liquid biofuel
         something involving uranium
         heavy oil residue + logs -> charcoal
-        // ore washing recipes? with water or sulfuric acid?
+        // ore washing recipes? with water or sulfuric acid as better variant?
         // something with potatoes / yeast?
         // something resulting in rubber as quartz alt
          */
@@ -180,6 +180,14 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .result(ItemContent.PLASTIC_SHEET, 2)
           .timeInSeconds(8)
           .export(exporter, "refinerytest");
+        
+        RefineryRecipeBuilder.build()
+          .fluidInput(cFluidTag("oil"))
+          .fluidOutput(Fluids.WATER, 2f)
+          .fluidOutput(FluidContent.STILL_BIOFUEL.get(), 1f)
+          .fluidOutput(FluidContent.STILL_FUEL.get(), 1f)
+          .timeInSeconds(8)
+          .export(exporter, "refineryfluidonly");
     }
     
     private void addBiomass(RecipeExporter exporter) {
