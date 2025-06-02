@@ -157,6 +157,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         //steam
         // 32 fabric droplets / 32 neoforge mb (yes this will works, as we produce 2 millis per RF in the generator boilers, and then consume it at a 1:1 ratio)
         SteamGeneratorRecipeBuilder.build().specificFluidInput(FluidContent.STILL_STEAM.get(), 32).time(1).export(exporter, "steameng");
+    }
+    
+    private void addRefineryProcessing(RecipeExporter exporter) {
         
         // refinery ideas:
         /*
@@ -166,6 +169,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         water + solid biofuel -> liquid biofuel
         something involving uranium
         heavy oil residue + logs -> charcoal
+        ore washing in centrifuge that results in dirty water?
         // ore washing recipes? with water or sulfuric acid as better variant?
         // something with potatoes / yeast?
         // something resulting in rubber as quartz alt

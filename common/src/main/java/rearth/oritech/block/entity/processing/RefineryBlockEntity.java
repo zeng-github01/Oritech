@@ -43,7 +43,12 @@ import java.util.Optional;
 
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
-    // todo block GUI tanks if module is not installed
+    // todo config settings
+    // todo tooltips / translations
+    // todo crafting recipe for the block/addon
+    // todo wiki entry
+    // todo recipes
+    // todo new fluids
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
     public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::markDirty);
     public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
