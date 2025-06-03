@@ -55,7 +55,7 @@ public class FluidContent {
       - used in refinery to produce silicon (combined with sand)
     - mineral slurry:
       - used in centrifuge to create quartz
-      - used as fertilizer (told via tooltip todo)
+      - used as fertilizer
     - sheol fire:
       - burns in lava generator for a very long time
       - used in refinery with raw ores to process into very high yielded clumps
@@ -78,8 +78,6 @@ public class FluidContent {
     // open concepts:
     - processing involving uranium
     - something with yeast / potatoes?
-    
-    // todo update recipes in compat mods
      
      */
     

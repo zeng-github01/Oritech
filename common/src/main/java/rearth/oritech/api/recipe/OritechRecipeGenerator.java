@@ -407,6 +407,11 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER_BLOCK.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembleralt");
         // foundry
         offerGeneratorRecipe(exporter, BlockContent.FOUNDRY_BLOCK.asItem(), of(Blocks.CAULDRON.asItem()), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "foundry");
+        // refinery
+        offerParticleMotorRecipe(exporter, BlockContent.REFINERY_BLOCK.asItem(), of(BlockContent.REFINERY_MODULE_BLOCK.asItem()), of(ItemContent.MOTOR), of(Items.CAULDRON), of(cItemTag("ingots/steel")), "refinery");
+        // refinery module
+        offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(Items.SLIME_BALL), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/iron")), "refinerymodule");
+        offerGeneratorRecipe(exporter, BlockContent.REFINERY_MODULE_BLOCK.asItem(), of(BlockContent.SMALL_TANK_BLOCK.asItem()), of(ItemContent.SILICON), of(BlockContent.METAL_BEAM_BLOCK), of(cItemTag("ingots/iron")), "refinerymodulealt");
         // cooler
         offerGeneratorRecipe(exporter, BlockContent.COOLER_BLOCK.asItem(), of(Blocks.CAULDRON.asItem()), of(Blocks.ICE.asItem()), of(ItemContent.MOTOR), of(cItemTag("ingots/iron")), "cooler");
         // centrifuge

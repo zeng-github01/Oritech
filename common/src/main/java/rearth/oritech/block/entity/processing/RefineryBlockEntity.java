@@ -43,12 +43,7 @@ import java.util.Optional;
 
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
-    // todo config settings
-    // todo tooltips / translations
-    // todo crafting recipe for the block/addon
     // todo wiki entry
-    // todo recipes
-    // todo new fluids
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
     public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::markDirty);
     public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
@@ -57,7 +52,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     private int moduleCount;    // range 0-2
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.fragmentForgeData.energyPerTick());
+        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, Oritech.CONFIG.processingMachines.refineryData.energyPerTick());
     }
     
     @Override
@@ -156,7 +151,10 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         // if both are installed, output all as normal
         // todo add gui tooltip for this behaviour
         
+        if (recipe.getFluidOutputs().isEmpty()) return List.of();
         var outA = recipe.getFluidOutputs().get(0);
+        
+        if (recipe.getFluidOutputs().size() == 1) return List.of(outA);
         var outB = recipe.getFluidOutputs().get(1);
         
         return switch (moduleCount) {
@@ -208,12 +206,12 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Override
     public long getDefaultCapacity() {
-        return Oritech.CONFIG.processingMachines.fragmentForgeData.energyCapacity();
+        return Oritech.CONFIG.processingMachines.refineryData.energyCapacity();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return Oritech.CONFIG.processingMachines.fragmentForgeData.maxEnergyInsertion();
+        return Oritech.CONFIG.processingMachines.refineryData.maxEnergyInsertion();
     }
     
     @Override
