@@ -141,6 +141,8 @@
     "oritech:framed_superconductor_connection",
     "oritech:framed_fluid_pipe_connection",
     "oritech:framed_item_pipe_connection",
+    "oritech:transparent_item_pipe",
+    "oritech:transparent_item_pipe_connection",
     "oritech:small_tank_block",
     "oritech:small_storage_block",
     "oritech:pump_trunk_block",
