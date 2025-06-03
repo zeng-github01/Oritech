@@ -35,8 +35,6 @@ public class FluidContent {
     
     biofuel + clay catalyst beads -> diesel, light naphtha
     
-    light naphtha + raw silicon (centrifuge) -> silicon wash
-    
     new fluids:
     - crude oil (existing oil):
       - burns very shortly in fuel generator
@@ -47,7 +45,7 @@ public class FluidContent {
       - can be augmented to turbofuel
     - light naphtha:
       - fuel generator fuel
-      - used with clay catalyst in centrifuge for plastic
+      - used with clay catalyst in centrifuge for polymer resin (or as inefficient alt in crafting table)
       - used in centrifuge with raw silicon for silicon wash fluid
     - sulfuric acid:
       - used in centrifuge for high yield ore washing. Results in Mineral Slurry fluid
@@ -57,11 +55,11 @@ public class FluidContent {
       - used in refinery to produce silicon (combined with sand)
     - mineral slurry:
       - used in centrifuge to create quartz
-      - used as fertilizer (told via tooltip)
+      - used as fertilizer (told via tooltip todo)
     - sheol fire:
       - burns in lava generator for a very long time
-      - used in centrifuge with raw ores to process into very high yielded clumps
-      - used in item creation?
+      - used in refinery with raw ores to process into very high yielded clumps
+      - used in item creation? todo
     - strange matter:
       - used to "fill" dubious containers in centrifuge
       
@@ -71,10 +69,16 @@ public class FluidContent {
     - ion thruster: used in particle accelerator motor, jetpacks, augments?
     - clay catalyst beads: used to augment refinery recipes in some cases
     
-    new crafts:
+    new crafts: todo
     - clay catalyst beads: crafted/assembled. Made from sand and clay, high result counts
     - battery / adv battery in centrifuge with sulfuric acid.
-    - reinforced carbon plating: made in refinery from light naphtha
+    - reinforced carbon plating: made in refinery from light naphtha. Used as netherite replacement in some stuff?
+    
+    // open concepts:
+    - processing involving uranium
+    - something with yeast / potatoes?
+    
+    // todo update recipes in compat mods
      
      */
     
@@ -130,9 +134,9 @@ public class FluidContent {
     public static final ArchitecturyFluidAttributes SULFURIC_ACID_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_SULFURIC_ACID, () -> FluidContent.STILL_SULFURIC_ACID)
                                                                                  .blockSupplier(() -> FluidContent.STILL_SULFURIC_ACID_BLOCK)
                                                                                  .bucketItemSupplier(() -> FluidContent.STILL_SULFURIC_ACID_BUCKET)
-                                                                                 .sourceTexture(Oritech.id("block/fluid/fluid_molten_colorshifting"))
-                                                                                 .flowingTexture(Oritech.id("block/fluid/fluid_molten_colorshifting"))
-                                                                                 .color(new Color(0.398f, 1, 0.5f).argb());
+                                                                                 .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
+                                                                                 .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
+                                                                                 .color(new Color(0.398f, 1, 0.3f).argb());
     
     public static final ArchitecturyFluidAttributes SILICON_WASH_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_SILICON_WASH, () -> FluidContent.STILL_SILICON_WASH)
                                                                                 .blockSupplier(() -> FluidContent.STILL_SILICON_WASH_BLOCK)

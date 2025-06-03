@@ -1,5 +1,6 @@
 package rearth.oritech.api.recipe;
 
+import dev.architectury.fluid.FluidStack;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.DataOutput;
 import net.minecraft.data.server.recipe.*;
@@ -39,6 +40,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         addDeepDrillOres(exporter);
         addFuels(exporter);
+        addFluidProcessing(exporter);
         addBiomass(exporter);
         addEquipment(exporter);
         addMachines(exporter);
@@ -150,48 +152,159 @@ public class OritechRecipeGenerator extends RecipeProvider {
         BioGeneratorRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).timeInSeconds(300).export(exporter, "polymer");
         BioGeneratorRecipeBuilder.build().input(ItemContent.UNHOLY_INTELLIGENCE).timeInSeconds(3000).export(exporter, "vex");
         // lava
-        LavaGeneratorRecipeBuilder.build().fluidInput(Fluids.LAVA, 0.1f).timeInSeconds(12).export(exporter, "lava");
+        LavaGeneratorRecipeBuilder.build().fluidInput(Fluids.LAVA, 0.1f).timeInSeconds(6).export(exporter, "lava");
+        LavaGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_SHEOL_FIRE.get(), 0.1f).timeInSeconds(40).export(exporter, "sheolfire");
         // fuel
-        FuelGeneratorRecipeBuilder.build().fluidInput(cFluidTag("oil"), 0.1f).timeInSeconds(3).export(exporter, "crude");
-        FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.TURBOFUEL, 0.1f).timeInSeconds(12).export(exporter, "fuel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(cFluidTag("oil"), 0.1f).timeInSeconds(1).export(exporter, "crude");
+        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_HEAVY_OIL.get(), 0.1f).timeInSeconds(2).export(exporter, "heavyoil");
+        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_DIESEL.get(), 0.1f).timeInSeconds(4).export(exporter, "diesel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.1f).timeInSeconds(2).export(exporter, "naptha");
+        FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.TURBOFUEL, 0.1f).timeInSeconds(16).export(exporter, "fuel");
         //steam
         // 32 fabric droplets / 32 neoforge mb (yes this will works, as we produce 2 millis per RF in the generator boilers, and then consume it at a 1:1 ratio)
         SteamGeneratorRecipeBuilder.build().specificFluidInput(FluidContent.STILL_STEAM.get(), 32).time(1).export(exporter, "steameng");
     }
     
-    private void addRefineryProcessing(RecipeExporter exporter) {
+    private void addFluidProcessing(RecipeExporter exporter) {
         
-        // refinery ideas:
-        /*
-        
-        lava -> lots of steam, sheol fire (better lava in magma gen), todo
-        crude oil -> heavy oil residue, polymer resin, todo
-        water + solid biofuel -> liquid biofuel
-        something involving uranium
-        heavy oil residue + logs -> charcoal
-        ore washing in centrifuge that results in dirty water?
-        // ore washing recipes? with water or sulfuric acid as better variant?
-        // something with potatoes / yeast?
-        // something resulting in rubber as quartz alt
-         */
-        
+        // crude oil processing
         RefineryRecipeBuilder.build()
           .fluidInput(cFluidTag("oil"))
-          .fluidOutput(Fluids.WATER, 2f)
-          .fluidOutput(FluidContent.STILL_BIOFUEL.get(), 1f)
-          .fluidOutput(FluidContent.STILL_FUEL.get(), 1f)
-          .input(of(ItemTags.SAND))
-          .result(ItemContent.PLASTIC_SHEET, 2)
-          .timeInSeconds(8)
-          .export(exporter, "refinerytest");
+          .fluidOutput(FluidContent.STILL_HEAVY_OIL.get(), 0.5f)
+          .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.25f)
+          .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.25f)
+          .timeInSeconds(6)
+          .export(exporter, "oilbase");
         
         RefineryRecipeBuilder.build()
+          .input(ItemContent.CLAY_CATALYST_BEADS)
           .fluidInput(cFluidTag("oil"))
-          .fluidOutput(Fluids.WATER, 2f)
-          .fluidOutput(FluidContent.STILL_BIOFUEL.get(), 1f)
-          .fluidOutput(FluidContent.STILL_FUEL.get(), 1f)
-          .timeInSeconds(8)
-          .export(exporter, "refineryfluidonly");
+          .fluidOutput(FluidContent.STILL_DIESEL.get(), 0.5f)
+          .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.5f)
+          .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.5f)
+          .timeInSeconds(6)
+          .export(exporter, "oilalt");
+        
+        // heavy oil
+        RefineryRecipeBuilder.build()
+          .input(ItemTags.SAND)
+          .fluidInput(FluidContent.STILL_HEAVY_OIL.get())
+          .fluidOutput(FluidContent.STILL_DIESEL.get(), 1f)
+          .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.25f)
+          .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.25f)
+          .timeInSeconds(6)
+          .export(exporter, "heavyoil");
+        
+        // lava
+        RefineryRecipeBuilder.build()
+          .fluidInput(Fluids.LAVA)
+          .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 64_000))
+          .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
+          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
+          .timeInSeconds(6)
+          .export(exporter, "lava");
+        
+        RefineryRecipeBuilder.build()
+          .input(ItemContent.ENDERIC_COMPOUND)
+          .fluidInput(Fluids.LAVA)
+          .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 1f)
+          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 1f)
+          .fluidOutput(FluidContent.STILL_STRANGE_MATTER.get(), 0.2f)
+          .timeInSeconds(6)
+          .export(exporter, "lavaalt");
+        
+        // biodiesel
+        RefineryRecipeBuilder.build()
+          .input(ItemContent.CLAY_CATALYST_BEADS)
+          .fluidInput(FluidContent.STILL_BIOFUEL.get())
+          .fluidOutput(FluidContent.STILL_DIESEL.get(), 0.5f)
+          .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.2f)
+          .timeInSeconds(6)
+          .export(exporter, "biodiesel");
+        
+        // centrifuge turbofuel
+        CentrifugeFluidRecipeBuilder
+          .build()
+          .input(ItemContent.FLUXITE)
+          .fluidInput(FluidContent.STILL_DIESEL.get())
+          .fluidOutput(FluidContent.STILL_FUEL.get())
+          .export(exporter, "fuel");
+        
+        // centrifuge biofuel
+        CentrifugeFluidRecipeBuilder
+          .build()
+          .input(TagContent.BIOMASS)
+          .fluidInput(Fluids.WATER, 0.25f)
+          .fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f)
+          .timeMultiplier(0.2f)
+          .export(exporter, "biofuel");
+        
+        // silicon wash from naphtha in centrifuge
+        CentrifugeFluidRecipeBuilder.build()
+          .input(TagContent.QUARTZ_DUSTS)
+          .fluidInput(FluidContent.STILL_NAPHTHA.get())
+          .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 1f)
+          .timeMultiplier(0.5f)
+          .export(exporter, "siliconwash");
+        
+        CentrifugeFluidRecipeBuilder.build()
+          .input(Items.GRAVEL)
+          .fluidInput(FluidContent.STILL_NAPHTHA.get())
+          .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 0.05f)
+          .timeMultiplier(0.5f)
+          .export(exporter, "siliconwashbad");
+        
+        // polymer resin from naphtha (manual) todo check if bucket remainder works
+        offerManualFluidApplication(exporter, ItemContent.POLYMER_RESIN, of(FluidContent.STILL_NAPHTHA_BUCKET.get()), of(ItemTags.SAND), "manualresin");
+        
+        // polymer resin from naphtha in centrifuge
+        CentrifugeFluidRecipeBuilder.build()
+          .input(ItemTags.SAND)
+          .fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.1f)
+          .result(ItemContent.POLYMER_RESIN, 2)
+          .export(exporter, "naptharesin");
+        
+        // basic battery in centrifuge with sulfuric acid
+        CentrifugeFluidRecipeBuilder.build()
+          .input(TagContent.STEEL_INGOTS)
+          .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
+          .result(ItemContent.BASIC_BATTERY, 2)
+          .export(exporter, "batteryacid");
+        
+        // adv battery in centrifuge with sulfuric acid
+        CentrifugeFluidRecipeBuilder.build()
+          .input(ItemContent.DUBIOS_CONTAINER)
+          .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
+          .result(ItemContent.ADVANCED_BATTERY, 8)
+          .export(exporter, "advbatteryacid");
+        
+        // silicon from silicon wash + sand in refinery
+        RefineryRecipeBuilder.build()
+          .input(ItemTags.SAND)
+          .fluidInput(FluidContent.STILL_SILICON_WASH.get())
+          .result(ItemContent.SILICON, 4)
+          .export(exporter, "siliconwashing");
+        
+        // silicon wafer in centrifuge
+        CentrifugeFluidRecipeBuilder.build()
+          .input(ItemContent.CARBON_FIBRE_STRANDS)
+          .fluidInput(FluidContent.STILL_SILICON_WASH.get())
+          .result(ItemContent.SILICON_WAFER, 4)
+          .export(exporter, "siliconwafers");
+        
+        // quartz from mineral wash in refinery
+        RefineryRecipeBuilder.build()
+          .input(ItemContent.CLAY_CATALYST_BEADS)
+          .fluidInput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f)
+          .result(Items.QUARTZ)
+          .export(exporter, "quartz");
+        
+        // dubious container and strange matter in centrifuge
+        CentrifugeFluidRecipeBuilder.build()
+          .input(ItemContent.DUBIOS_CONTAINER)
+          .fluidInput(FluidContent.STILL_STRANGE_MATTER.get())
+          .result(ItemContent.UNHOLY_INTELLIGENCE, 1)
+          .export(exporter, "unholyai");
     }
     
     private void addBiomass(RecipeExporter exporter) {
@@ -502,8 +615,12 @@ public class OritechRecipeGenerator extends RecipeProvider {
         CentrifugeFluidRecipeBuilder.build().input(ItemContent.SOLID_BIOFUEL).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_biomass");
         CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS_BLOCK).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_bioblock");
         CentrifugeFluidRecipeBuilder.build().input(ItemTags.SAND).result(ItemContent.POLYMER_RESIN).fluidInput(cFluidTag("biodiesel"), 0.1f).time(100).export(exporter, "polymerresin");
-        CentrifugeFluidRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).export(exporter, "plasticoil");
-        CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET).fluidInput(Fluids.WATER, 0.5f).time(66).export(exporter, "plasticbio");
+        CentrifugeFluidRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET, 1).fluidInput(Fluids.WATER, 0.5f).time(120).export(exporter, "plasticoil");
+        CentrifugeFluidRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET, 2).fluidInput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f).time(120).export(exporter, "plasticoilbetter");
+        CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET, 2).fluidInput(Fluids.WATER, 0.5f).time(40).export(exporter, "plasticbio");
+        CentrifugeFluidRecipeBuilder.build().input(ItemContent.POLYMER_RESIN).result(ItemContent.PLASTIC_SHEET, 4).fluidInput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f).time(40).export(exporter, "plasticbiobetter");
+        offerSmelting(exporter, List.of(ItemContent.POLYMER_RESIN), RecipeCategory.MISC, ItemContent.PLASTIC_SHEET, 0.5f, 10, "plastic_manual");
+        offerBlasting(exporter, List.of(ItemContent.POLYMER_RESIN), RecipeCategory.MISC, ItemContent.PLASTIC_SHEET, 0.5f, 10, "plastic_manual_blast");
         
         // processing unit
         AssemblerRecipeBuilder.build().input(TagContent.PLASTIC_PLATES).input(TagContent.CARBON_FIBRE).input(TagContent.ELECTRUM_INGOTS).input(cItemTag("dusts/redstone")).result(ItemContent.PROCESSING_UNIT).timeMultiplier(0.8f).export(exporter, "processingunit");
@@ -521,11 +638,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerMotorRecipe(exporter, ItemContent.DUBIOS_CONTAINER, of(TagContent.PLASTIC_PLATES), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ENDERIC_COMPOUND), "dubios");
         // adv battery
         offerMotorRecipe(exporter, ItemContent.ADVANCED_BATTERY, of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENERGITE_INGOT), of(TagContent.STEEL_INGOTS), "advbattery");
-        
-        // fuel
-        CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(cFluidTag("oil")).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel");
-        CentrifugeFluidRecipeBuilder.build().input(ItemContent.FLUXITE).fluidInput(TagContent.BIOFUEL).fluidOutput(FluidContent.STILL_FUEL.get()).export(exporter, "fuel_from_biofuel");
-        CentrifugeFluidRecipeBuilder.build().input(TagContent.BIOMASS).fluidInput(Fluids.WATER, 0.25f).fluidOutput(FluidContent.STILL_BIOFUEL.get(), 0.1f).timeMultiplier(0.2f).export(exporter, "biofuel");
         
         // biosteel
         FoundryRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).input(cItemTag("ingots/iron")).result(ItemContent.BIOSTEEL_INGOT).export(exporter, "biosteel");
@@ -1332,6 +1444,14 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("sss")
                         .pattern("scs")
                         .pattern("sss");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+    }
+    
+    public void offerManualFluidApplication(RecipeExporter exporter, Item output, Ingredient fluid, Ingredient base, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('f', fluid).input('b', base)
+                        .pattern("bb ")
+                        .pattern("bf ")
+                        .pattern("   ");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     

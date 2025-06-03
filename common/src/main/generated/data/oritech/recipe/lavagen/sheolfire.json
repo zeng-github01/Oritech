@@ -2,10 +2,10 @@
   "type": "oritech:lava_generator",
   "fluidInput": {
     "amount": 8100,
-    "fluid": "minecraft:lava"
+    "fluid": "oritech:still_sheol_fire"
   },
   "fluidOutputs": [],
   "ingredients": [],
   "results": [],
-  "time": 120
+  "time": 800
 }

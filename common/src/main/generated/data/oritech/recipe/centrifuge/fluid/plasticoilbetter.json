@@ -1,8 +1,8 @@
 {
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 40500,
-    "fluid": "minecraft:water"
+    "amount": 20250,
+    "fluid": "oritech:still_mineral_slurry"
   },
   "fluidOutputs": [],
   "ingredients": [
@@ -12,7 +12,7 @@
   ],
   "results": [
     {
-      "count": 1,
+      "count": 2,
       "id": "oritech:plastic_sheet"
     }
   ],

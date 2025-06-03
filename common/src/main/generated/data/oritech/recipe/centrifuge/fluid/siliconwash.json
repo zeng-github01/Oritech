@@ -2,19 +2,19 @@
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 81000,
-    "fluid": "#oritech:biofuel"
+    "fluid": "oritech:still_naphtha"
   },
   "fluidOutputs": [
     {
       "amount": 81000,
-      "fluid": "oritech:still_fuel"
+      "fluid": "oritech:still_silicon_wash"
     }
   ],
   "ingredients": [
     {
-      "item": "oritech:fluxite"
+      "tag": "c:dusts/quartz"
     }
   ],
   "results": [],
-  "time": 200
+  "time": 100
 }
