@@ -69,10 +69,11 @@ public class FluidContent {
     - ion thruster: used in particle accelerator motor, jetpacks, augments?
     - clay catalyst beads: used to augment refinery recipes in some cases
     
-    new crafts: todo
-    - clay catalyst beads: crafted/assembled. Made from sand and clay, high result counts
-    - battery / adv battery in centrifuge with sulfuric acid.
-    - reinforced carbon plating: made in refinery from light naphtha. Used as netherite replacement in some stuff?
+    new crafts:
+    - clay catalyst beads: crafted/assembled. Made from sand and clay, high result counts. done
+    - battery / adv battery in centrifuge with sulfuric acid. done
+    - reinforced carbon plating: made in refinery from light naphtha. Used as netherite replacement in some stuff? Used for carbon plating block. done
+    - ion thruster from reinforced carbon sheeting, advanced battery and flux gate. done.
     
     // open concepts:
     - processing involving uranium

@@ -111,7 +111,6 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     public static final Item PLASTIC_SHEET = new Item(new Item.Settings());
     public static final Item PROCESSING_UNIT = new Item(new Item.Settings());
     public static final Item REINFORCED_CARBON_SHEET = new Item(new Item.Settings());
-    public static final Item HYPER_TENSILE_FILAMENT = new Item(new Item.Settings());
     public static final Item ION_THRUSTER = new Item(new Item.Settings());
     public static final Item ADVANCED_COMPUTING_ENGINE = new Item(new Item.Settings());
     public static final Item SILICON_WAFER = new Item(new Item.Settings());

@@ -80,6 +80,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AtomicForgeRecipeBuilder.build().input(Items.DEEPSLATE).input(ItemContent.DURATIUM_INGOT).input(ItemContent.DURATIUM_INGOT).result(Items.REINFORCED_DEEPSLATE).time(100).export(exporter, "reinfdeepslate");
         // cobblestone to gravel
         PulverizerRecipeBuilder.build().input(cItemTag("cobblestones")).result(Items.GRAVEL).addToGrinder().export(exporter, "gravel");
+        // gravel to sand
+        PulverizerRecipeBuilder.build().input(Items.GRAVEL).result(Items.SAND).addToGrinder().export(exporter, "sand");
         // sandstone to sand
         PulverizerRecipeBuilder.build().input(cItemTag("sandstone/blocks")).result(Items.SAND).addToGrinder().export(exporter, "sand_from_sandstone");
         // red sandstone to red sand
@@ -299,6 +301,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .result(Items.QUARTZ)
           .export(exporter, "quartz");
         
+        // reinforced carbon sheeting
+        RefineryRecipeBuilder.build()
+          .input(ItemContent.CARBON_FIBRE_STRANDS)
+          .fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.5f)
+          .result(ItemContent.REINFORCED_CARBON_SHEET)
+          .export(exporter, "carbonsheet");
+        
         // dubious container and strange matter in centrifuge
         CentrifugeFluidRecipeBuilder.build()
           .input(ItemContent.DUBIOS_CONTAINER)
@@ -345,13 +354,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // jetpack alt
         offerParticleMotorRecipe(exporter, ToolsContent.JETPACK, of(TagContent.STEEL_INGOTS), of(cItemTag("leathers")), of(Items.REDSTONE_BLOCK), of(Items.BLAZE_POWDER), "basicjetpackalt");
         // exo jetpack
-        offerGeneratorRecipe(exporter, ToolsContent.EXO_JETPACK, of(ToolsContent.JETPACK), of(BlockContent.SMALL_TANK_BLOCK), of(ToolsContent.EXO_CHESTPLATE), of(TagContent.PLASTIC_PLATES), "exojetpack");
+        offerGeneratorRecipe(exporter, ToolsContent.EXO_JETPACK, of(ToolsContent.JETPACK), of(BlockContent.SMALL_TANK_BLOCK), of(ToolsContent.EXO_CHESTPLATE), of(ItemContent.ION_THRUSTER), "exojetpack");
         // boosted elytra
         offerGeneratorRecipe(exporter, ToolsContent.JETPACK_ELYTRA, of(Items.ELYTRA), of(ItemContent.PROCESSING_UNIT), of(ToolsContent.JETPACK), of(Items.GUNPOWDER), "boostedelytra");
         // exo elytra (exo jetpack + elytra)
         offerGeneratorRecipe(exporter, ToolsContent.JETPACK_EXO_ELYTRA, of(ToolsContent.EXO_JETPACK), of(ItemContent.PROCESSING_UNIT), of(Items.ELYTRA), of(Items.GUNPOWDER), "exoboostedelytra");
         // exo elytra (boosted elytra + exo chestplate)
-        offerGeneratorRecipe(exporter, ToolsContent.JETPACK_EXO_ELYTRA, of(ToolsContent.EXO_CHESTPLATE), of(BlockContent.SMALL_TANK_BLOCK), of(ToolsContent.JETPACK_ELYTRA), of(TagContent.PLASTIC_PLATES), "exoboostedelytraalt");
+        offerGeneratorRecipe(exporter, ToolsContent.JETPACK_EXO_ELYTRA, of(ToolsContent.EXO_CHESTPLATE), of(BlockContent.SMALL_TANK_BLOCK), of(ToolsContent.JETPACK_ELYTRA), of(ItemContent.ION_THRUSTER), "exoboostedelytraalt");
         
     }
     
@@ -509,7 +518,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         // particle accelerator
         // motor
-        offerParticleMotorRecipe(exporter, BlockContent.ACCELERATOR_MOTOR.asItem(), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.SUPERCONDUCTOR.asItem()), of(ItemContent.DURATIUM_INGOT), of(ItemContent.ADVANCED_BATTERY), "particlemotor");
+        offerParticleMotorRecipe(exporter, BlockContent.ACCELERATOR_MOTOR.asItem(), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.SUPERCONDUCTOR.asItem()), of(ItemContent.DURATIUM_INGOT), of(ItemContent.ION_THRUSTER), "particlemotor");
         // ring
         offerDrillRecipe(exporter, BlockContent.ACCELERATOR_RING.asItem(), of(BlockContent.INDUSTRIAL_GLASS_BLOCK.asItem()), of(BlockContent.SUPERCONDUCTOR.asItem()), of(TagContent.STEEL_INGOTS), of(Items.REDSTONE_TORCH), "acceleratorring");
         // controller
@@ -518,7 +527,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerTwoComponentRecipe(exporter, BlockContent.ACCELERATOR_SENSOR.asItem(), of(BlockContent.ACCELERATOR_RING.asItem()), of(Items.OBSERVER), "particlesensor");
         // collector
         offerTankRecipe(exporter, BlockContent.PARTICLE_COLLECTOR_BLOCK.asItem(), of(BlockContent.SUPERCONDUCTOR.asItem()), of(BlockContent.BIG_SOLAR_PANEL_BLOCK.asItem()), of(ItemContent.HEISENBERG_COMPENSATOR), "particlecollector");
-        
         
         // addons
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_SPEED_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.MAGNETIC_COIL), of(ItemContent.BIOSTEEL_INGOT), of(TagContent.PLASTIC_PLATES), "addon/speed");
@@ -580,6 +588,10 @@ public class OritechRecipeGenerator extends RecipeProvider {
         GrinderRecipeBuilder.build().input(cItemTag("ender_pearls")).result(ItemContent.ENDERIC_COMPOUND, 12).export(exporter, "pearl_enderic");
         GrinderRecipeBuilder.build().input(Blocks.END_STONE).result(ItemContent.ENDERIC_COMPOUND).export(exporter, "stone_enderic");
         
+        // clay beads
+        offerBeadsRecipe(exporter,ItemContent.CLAY_CATALYST_BEADS, 8, of(Items.CLAY_BALL), of(ItemTags.SAND), of(Items.REDSTONE), "claybeads");
+        AssemblerRecipeBuilder.build().input(Items.CLAY_BALL).input(Items.CLAY_BALL).input(ItemTags.SAND).input(Items.REDSTONE).result(ItemContent.CLAY_CATALYST_BEADS, 32).timeMultiplier(1f).export(exporter, "claybeads");
+        
         // fine wires
         offerCableRecipe(exporter, new ItemStack(ItemContent.INSULATED_WIRE, 4), of(TagContent.NICKEL_INGOTS), "insulatedwire");
         AssemblerRecipeBuilder.build().input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(cItemTag("ingots/copper")).result(ItemContent.INSULATED_WIRE, 12).timeMultiplier(0.4f).export(exporter, "fwire");
@@ -599,6 +611,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(cItemTag("ingots/iron")).input(TagContent.PLASTIC_PLATES).result(BlockContent.IRON_PLATING_BLOCK.asItem(), 8).timeMultiplier(0.8f).export(exporter, "platingiron");
         offerMachinePlatingRecipe(exporter, BlockContent.NICKEL_PLATING_BLOCK.asItem(), of(TagContent.STEEL_INGOTS), of(Blocks.STONE.asItem()), of(TagContent.NICKEL_INGOTS), 2, "nickel");
         AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.PLASTIC_PLATES).result(BlockContent.NICKEL_PLATING_BLOCK.asItem(), 8).timeMultiplier(0.8f).export(exporter, "platingnickel");
+        offerMachinePlatingRecipe(exporter, BlockContent.CARBON_PLATING_BLOCK.asItem(), of(TagContent.STEEL_INGOTS), of(Blocks.STONE.asItem()), of(ItemContent.REINFORCED_CARBON_SHEET), 2, "carbon");
+        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.STEEL_INGOTS).input(ItemContent.REINFORCED_CARBON_SHEET).input(TagContent.PLASTIC_PLATES).result(BlockContent.CARBON_PLATING_BLOCK.asItem(), 8).timeMultiplier(0.8f).export(exporter, "platingcarbon");
         
         // basic battery
         offerMotorRecipe(exporter, ItemContent.BASIC_BATTERY, of(TagContent.STEEL_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(TagContent.PLASTIC_PLATES), "manualbattery");
@@ -638,6 +652,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerMotorRecipe(exporter, ItemContent.DUBIOS_CONTAINER, of(TagContent.PLASTIC_PLATES), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ENDERIC_COMPOUND), "dubios");
         // adv battery
         offerMotorRecipe(exporter, ItemContent.ADVANCED_BATTERY, of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENERGITE_INGOT), of(TagContent.STEEL_INGOTS), "advbattery");
+        
+        // ion thruster
+        AssemblerRecipeBuilder.build().input(ItemContent.REINFORCED_CARBON_SHEET).input(ItemContent.REINFORCED_CARBON_SHEET).input(ItemContent.ADVANCED_BATTERY).input(ItemContent.FLUX_GATE).result(ItemContent.ION_THRUSTER, 2).timeMultiplier(2f).export(exporter, "ionthruster");
         
         // biosteel
         FoundryRecipeBuilder.build().input(ItemContent.RAW_BIOPOLYMER).input(cItemTag("ingots/iron")).result(ItemContent.BIOSTEEL_INGOT).export(exporter, "biosteel");
@@ -688,12 +705,10 @@ public class OritechRecipeGenerator extends RecipeProvider {
     }
 
     public static <T extends AbstractCookingRecipe> void offerMultipleOptions(RecipeExporter exporter, RecipeSerializer<T> serializer, AbstractCookingRecipe.RecipeFactory<T> recipeFactory, List<ItemConvertible> inputs, RecipeCategory category, ItemConvertible output, float experience, int cookingTime, String group, String suffix) {
-      Iterator<ItemConvertible> var10 = inputs.iterator();
-
-      while(var10.hasNext()) {
-         ItemConvertible itemConvertible = (ItemConvertible)var10.next();
-         CookingRecipeJsonBuilder.create(Ingredient.ofItems(new ItemConvertible[]{itemConvertible}), category, output, experience, cookingTime, serializer, recipeFactory).group(group).criterion(hasItem(itemConvertible), conditionsFromItem(itemConvertible)).offerTo(exporter, Oritech.id(getItemPath(output) + suffix + "_" + getItemPath(itemConvertible)));
-      }
+        
+        for (var itemConvertible : inputs) {
+            CookingRecipeJsonBuilder.create(Ingredient.ofItems(itemConvertible), category, output, experience, cookingTime, serializer, recipeFactory).group(group).criterion(hasItem(itemConvertible), conditionsFromItem(itemConvertible)).offerTo(exporter, Oritech.id(getItemPath(output) + suffix + "_" + getItemPath(itemConvertible)));
+        }
     }
     
     private void addOreChains(RecipeExporter exporter) {
@@ -769,6 +784,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         FoundryRecipeBuilder.build().input(cItemTag("gems/diamond")).input(TagContent.NICKEL_INGOTS).result(ItemContent.ADAMANT_INGOT).export(exporter, "adamant");
         FoundryRecipeBuilder.build().input(TagContent.NICKEL_INGOTS).input(ItemContent.FLUXITE).result(ItemContent.ENERGITE_INGOT).export(exporter, "energite");
         FoundryRecipeBuilder.build().input(cItemTag("ingots/iron")).input(TagContent.COAL_DUSTS).result(ItemContent.STEEL_INGOT).timeMultiplier(0.3333f).export(exporter, "steel");
+        AtomicForgeRecipeBuilder.build().input(TagContent.PLATINUM_INGOTS).input(ItemContent.REINFORCED_CARBON_SHEET).input(ItemContent.REINFORCED_CARBON_SHEET).result(ItemContent.DURATIUM_INGOT).export(exporter, "duratium");
     }
     
     private void addParticleCollisions(RecipeExporter exporter) {
@@ -915,7 +931,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENERGITE_INGOT, 64)
-          .researchCost(ItemContent.DURATIUM_INGOT, 32)
+          .researchCost(ItemContent.REINFORCED_CARBON_SHEET, 32)
           .researchCost(Items.NETHER_STAR)
           .applyCost(ItemContent.DURATIUM_DUST, 64)
           .applyCost(cItemTag("storage_blocks/redstone"), 64)
@@ -953,7 +969,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         AugmentRecipeBuilder.build()
           .researchCost(ItemContent.ENERGITE_INGOT, 64)
-          .researchCost(ItemContent.MAGNETIC_COIL, 32)
+          .researchCost(ItemContent.ION_THRUSTER, 32)
           .researchCost(ItemContent.FLUX_GATE, 16)
           .applyCost(ItemContent.MAGNETIC_COIL, 32)
           .applyCost(ItemContent.OVERCHARGED_CRYSTAL)
@@ -1156,7 +1172,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "gravity");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.FLUX_GATE, 64)
+          .researchCost(ItemContent.ION_THRUSTER, 64)
           .researchCost(Items.WIND_CHARGE, 16)
           .researchCost(ItemContent.PROMETHEUM_INGOT, 16)
           .researchCost(ItemContent.PLUTONIUM_PELLET, 32)
@@ -1448,9 +1464,21 @@ public class OritechRecipeGenerator extends RecipeProvider {
     }
     
     public void offerManualFluidApplication(RecipeExporter exporter, Item output, Ingredient fluid, Ingredient base, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('f', fluid).input('b', base)
+        offerManualFluidApplication(exporter, output, 1, fluid, base, suffix);
+    }
+    
+    public void offerManualFluidApplication(RecipeExporter exporter, Item output, int count, Ingredient fluid, Ingredient base, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('f', fluid).input('b', base)
                         .pattern("bb ")
                         .pattern("bf ")
+                        .pattern("   ");
+        builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+    }
+    
+    public void offerBeadsRecipe(RecipeExporter exporter, Item output, int count, Ingredient fluid, Ingredient base, Ingredient catalyst, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, count).input('f', fluid).input('b', base).input('c', catalyst)
+                        .pattern("bb ")
+                        .pattern("cf ")
                         .pattern("   ");
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
