@@ -618,7 +618,7 @@
   "block.oritech.machine_acceptor_addon": "Acceptor Addon",
   "block.oritech.machine_inventory_proxy_addon": "Inventory Proxy Addon",
   "block.oritech.machine_redstone_addon": "Control Unit Addon",
-  "block.oritech.machine_extender": "Machine Extender",
+  "block.oritech.machine_extender": "Machine Addon Extender",
   "block.oritech.still_oil_block": "Crude Oil",
   "block.oritech.still_fuel_block": "Turbofuel",
   "block.oritech.still_steam_block": "Steam",
