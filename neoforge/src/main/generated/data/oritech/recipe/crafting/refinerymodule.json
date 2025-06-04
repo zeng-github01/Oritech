@@ -3,16 +3,16 @@
   "category": "misc",
   "key": {
     "b": {
-      "item": "oritech:jetpack"
+      "item": "oritech:small_tank_block"
     },
     "c": {
-      "item": "oritech:exo_chestplate"
+      "item": "oritech:metal_beam_block"
     },
     "f": {
-      "item": "oritech:ion_thruster"
+      "tag": "c:ingots/iron"
     },
     "s": {
-      "item": "oritech:small_tank_block"
+      "item": "minecraft:slime_ball"
     }
   },
   "pattern": [
@@ -22,6 +22,6 @@
   ],
   "result": {
     "count": 1,
-    "id": "oritech:exo_jetpack"
+    "id": "oritech:refinery_module_block"
   }
 }

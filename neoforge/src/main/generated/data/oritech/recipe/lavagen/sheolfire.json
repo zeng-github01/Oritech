@@ -1,11 +1,11 @@
 {
-  "type": "oritech:fuel_generator",
+  "type": "oritech:lava_generator",
   "fluidInput": {
     "amount": 100,
-    "fluid": "#oritech:turbofuel"
+    "fluid": "oritech:still_sheol_fire"
   },
   "fluidOutputs": [],
   "ingredients": [],
   "results": [],
-  "time": 320
+  "time": 800
 }

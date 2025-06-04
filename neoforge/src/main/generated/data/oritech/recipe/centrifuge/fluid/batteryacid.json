@@ -1,20 +1,20 @@
 {
   "type": "oritech:centrifuge_fluid",
   "fluidInput": {
-    "amount": 500,
-    "fluid": "minecraft:water"
+    "amount": 1000,
+    "fluid": "oritech:still_sulfuric_acid"
   },
   "fluidOutputs": [],
   "ingredients": [
     {
-      "item": "oritech:polymer_resin"
+      "tag": "c:ingots/steel"
     }
   ],
   "results": [
     {
       "count": 2,
-      "id": "oritech:plastic_sheet"
+      "id": "oritech:basic_battery"
     }
   ],
-  "time": 40
+  "time": 200
 }
