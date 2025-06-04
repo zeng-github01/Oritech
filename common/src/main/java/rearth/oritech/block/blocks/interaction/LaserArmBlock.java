@@ -49,7 +49,7 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
     
     public LaserArmBlock(Settings settings) {
         super(settings);
-        setDefaultState(getDefaultState().with(ASSEMBLED, false).with(Properties.FACING, Direction.NORTH));
+        setDefaultState(getDefaultState().with(ASSEMBLED, false).with(Properties.FACING, Direction.UP));
         LaserArmBlockBehavior.registerDefaults();
         LaserArmEntityBehavior.registerDefaults();
     }

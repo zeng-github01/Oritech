@@ -3,6 +3,7 @@ package rearth.oritech.neoforge;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import dev.architectury.fluid.FluidStack;
+import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraft.component.ComponentType;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.RegistryKeys;
@@ -22,6 +23,7 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
+import rearth.oritech.network.NetworkContent;
 
 @Mod(Oritech.MOD_ID)
 public final class OritechModNeoForge {
@@ -47,6 +49,9 @@ public final class OritechModNeoForge {
         energyApiInstance = new NeoforgeEnergyApiImpl();
         EnergyApi.BLOCK = energyApiInstance;
         EnergyApi.ITEM = energyApiInstance;
+        
+        NetworkContent.FLUID_STACK_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
+        NetworkContent.FLUID_STACK_STREAM_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_STREAM_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
         
         Oritech.initialize();
         
