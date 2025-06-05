@@ -26,6 +26,7 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
+import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
@@ -63,6 +64,7 @@ public final class Oritech {
         // for particle collisions
         TickEvent.SERVER_POST.register(elem -> AcceleratorParticleLogic.onTickEnd());
         TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
+        TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.getOverworld()));
         
         // for player augment modifiers
         PlayerEvent.PLAYER_JOIN.register(PlayerAugments::refreshPlayerAugments);
