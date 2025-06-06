@@ -1,0 +1,18 @@
+- Add refinery block
+- Add refinery tank module block
+- Add electric mace item
+- Add new processing fluids
+- Add new processing items, mostly as alternative ways to get to existing things
+- Add empty animation to arcane catalysts
+- Add wall-mounted enderic laser ability
+- Improve pipe collision performance by caching shapes (@ChiefArug)
+- Update recipe format to support multiple fluid outputs (sorry modpack devs, custom recipes need to be adjusted for this change).
+- Update some ore assets (@Crazyminer34)
+- Update some existing recipes
+- Fix energy api item extraction on fabric (@zeng-github01)
+- Fix resource node type "other" not being generated on NF
+- Fix enderic laser chestplate charging not working
+- Fix transparent item pipes not being broken by pickaxes
+- Fix dedicated server on Neoforge spamming massive log amounts
+- Fix duplicate create compat recipes for basic metals
+- Fix industrial doorts / metal beams being destroyed by water
