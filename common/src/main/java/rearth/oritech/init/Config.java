@@ -61,6 +61,8 @@ public class Config {
     @Nest
     public ToolData chainSaw = new ToolData(10_000, 10, 512);
     @Nest
+    public ElectricMaceData electricMace = new ElectricMaceData();
+    @Nest
     public PortableLaserConfig portableLaserConfig = new PortableLaserConfig();
     public boolean chainsawTreeCutting = true;
     
@@ -186,6 +188,14 @@ public class Config {
         public float blockBreakSpeed = 0.125f; // multiplied by block hardness
         public int damageBase = 4;
         public int explosionStrength = 6;
+    }
+    
+    public static class ElectricMaceData {
+        public long energyCapacity = 500_000;
+        public int energyUsage = 2048;
+        public int chargeSpeed = 50_000;
+        public int baseDamage = 8;
+        public int lightningCostMultiplier = 8;
     }
     
     public static class DeepDrillConfig {

@@ -149,7 +149,6 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         // if no modules are installed, output twice the resulting items and fluids
         // if one module is installed, output twice the output A
         // if both are installed, output all as normal
-        // todo add gui tooltip for this behaviour
         
         if (recipe.getFluidOutputs().isEmpty()) return List.of();
         var outA = recipe.getFluidOutputs().get(0);
@@ -229,7 +228,6 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         var offsetLocal = Geometry.rotatePosition(new Vec3d(0.3, 0.5, 0.3), facing);
         var emitPosition = Vec3d.ofCenter(pos).add(offsetLocal);
         
-        // todo
         ParticleContent.COOLER_WORKING.spawn(world, emitPosition, 1);
         
     }

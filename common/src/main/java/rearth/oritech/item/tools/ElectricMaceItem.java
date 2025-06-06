@@ -1,5 +1,6 @@
 package rearth.oritech.item.tools;
 
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -18,9 +19,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
@@ -30,17 +29,17 @@ import rearth.oritech.Oritech;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.item.tools.harvesting.ChainsawItem;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
+import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// todo tooltip, recipe,
 public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
-    private static final int BASE_ATTACK_DAMAGE = 8;
-    private static final int RF_USAGE = 2048;
+    private static final int BASE_ATTACK_DAMAGE = Oritech.CONFIG.electricMace.baseDamage();
+    private static final int RF_USAGE = Oritech.CONFIG.electricMace.energyUsage();
     
     public static final Map<Long, Runnable> PENDING_LIGHTNING_HITS = new HashMap<>();
     
@@ -82,7 +81,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     private void createLightningAttack(ServerWorld world, PlayerEntity attacker, LivingEntity target, ItemStack stack, int damage) {
         
-        var usedEnergy = tryUseEnergy(stack, RF_USAGE * 8, null);
+        var usedEnergy = tryUseEnergy(stack, RF_USAGE * Oritech.CONFIG.electricMace.lightningCostMultiplier(), null);
         if (usedEnergy && attacker.getWorld() instanceof ServerWorld serverWorld) {
             
             var playerPos = attacker.getEyePos();
@@ -96,10 +95,10 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
             
             for (int i = 1; i <= 5; i++) {
                 final var ownPos = targetPos.add(cross.rotateY(i * 90).multiply(14)).addRandom(serverWorld.random, 5).add(0, 7, 0);
-                PENDING_LIGHTNING_HITS.put(serverWorld.getTime() + 8 * i, () -> {
+                PENDING_LIGHTNING_HITS.put(serverWorld.getTime() + 10 * i, () -> {
                     createLightningBolt(serverWorld, ownPos, target.getEyePos().addRandom(serverWorld.random, 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
-                    target.hurtTime = -1;
-                    target.damage(new DamageSource(serverWorld.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.THORNS), attacker), damage);
+                    target.hurtTime = 0;
+                    target.damage(new DamageSource(serverWorld.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(DamageTypes.LIGHTNING_BOLT), attacker), damage);
                 });
             }
         }
@@ -151,8 +150,17 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        var text = Text.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(stack), this.getEnergyCapacity(stack));
+        var text = Text.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
         tooltip.add(text.formatted(Formatting.GOLD));
+        
+        var showExtra = Screen.hasControlDown();
+        
+        if (showExtra) {
+            tooltip.add(Text.translatable("tooltip.oritech.electric_mace").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+            tooltip.add(Text.translatable("tooltip.oritech.electric_mace.1").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+        } else {
+            tooltip.add(Text.translatable("tooltip.oritech.item_extra_info").formatted(Formatting.GRAY).formatted(Formatting.ITALIC));
+        }
     }
     
     @Override
@@ -182,7 +190,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     @Override
     public long getEnergyCapacity(ItemStack stack) {
-        return 500_000L;
+        return Oritech.CONFIG.electricMace.energyCapacity();
     }
     
     @Override

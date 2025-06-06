@@ -256,7 +256,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .timeMultiplier(0.5f)
           .export(exporter, "siliconwashbad");
         
-        // polymer resin from naphtha (manual) todo check if bucket remainder works
+        // polymer resin from naphtha (manual)
         offerManualFluidApplication(exporter, ItemContent.POLYMER_RESIN, of(FluidContent.STILL_NAPHTHA_BUCKET.get()), of(ItemTags.SAND), "manualresin");
         
         // polymer resin from naphtha in centrifuge
@@ -332,6 +332,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
         // enderic laser / portable laser
         offerChainsawRecipe(exporter, ToolsContent.PORTABLE_LASER, of(ItemContent.ADVANCED_BATTERY), of(BlockContent.ACCELERATOR_MOTOR), of(ItemContent.ADAMANT_INGOT), of(BlockContent.LASER_ARM_BLOCK), "portablelaser");
+        
+        // electric mace
+        offerDrillRecipe(exporter, ToolsContent.ELECTRIC_MACE, of(ItemContent.ADVANCED_BATTERY), of(ItemContent.CARBON_FIBRE_STRANDS), of(ItemContent.ADAMANT_INGOT), of(Items.HEAVY_CORE), "_emace");
         
         // designator
         offerDrillRecipe(exporter, ItemContent.TARGET_DESIGNATOR, of(TagContent.STEEL_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.PROCESSING_UNIT), of(TagContent.PLASTIC_PLATES), "designator");
@@ -1488,8 +1491,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         builder.criterion(hasItem(output), conditionsFromItem(output)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
-    public void offerDrillRecipe(RecipeExporter exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
-        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', core).input('m', motor).input('a', center).input('e', head)
+    public void offerDrillRecipe(RecipeExporter exporter, Item output, Ingredient doubleBase, Ingredient motor, Ingredient outer, Ingredient head, String suffix) {
+        var builder = ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, output, 1).input('s', doubleBase).input('m', motor).input('a', outer).input('e', head)
                         .pattern(" a ")
                         .pattern("aea")
                         .pattern("mss");
