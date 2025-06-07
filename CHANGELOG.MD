@@ -1,3 +1,0 @@
-- Nerf sheol fire output in refinery
-- Nerf mineral output in centrifuge mineral acid ore processing
-- Fix crash when processing some recipes in centrifuge
