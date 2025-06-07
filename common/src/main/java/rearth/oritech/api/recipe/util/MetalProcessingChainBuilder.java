@@ -296,7 +296,7 @@ public class MetalProcessingChainBuilder {
             CentrifugeFluidRecipeBuilder.build()
               .input(clumpIngredient)
               .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
-              .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount * 4 : 4)
+              .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount * 3 : 3)
               .fluidOutput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f)
               .time(300).timeMultiplier(timeMultiplier)
               .export(exporter, resourcePath + "clumpacid/" + metalName);

@@ -210,7 +210,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.ENDERIC_COMPOUND)
           .fluidInput(Fluids.LAVA)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 1f)
-          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 1f)
+          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_STRANGE_MATTER.get(), 0.2f)
           .timeInSeconds(6)
           .export(exporter, "lavaalt");
