@@ -1,7 +1,6 @@
 package rearth.oritech.api.energy.containers;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import rearth.oritech.api.energy.EnergyApi;
@@ -116,8 +115,18 @@ public class DynamicEnergyStorage extends EnergyApi.EnergyStorage implements Upd
     }
     
     @Override
+    public DynamicEnergyStorage getFullData() {
+        return this;
+    }
+    
+    @Override
     public PacketCodec<? extends ByteBuf, Long> getDeltaCodec() {
         return PacketCodecs.VAR_LONG;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, DynamicEnergyStorage> getFullCodec() {
+        return PACKET_CODEC;
     }
     
     @Override

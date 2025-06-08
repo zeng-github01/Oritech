@@ -181,8 +181,18 @@ public class SimpleInventoryStorage implements Inventory, ItemApi.InventoryStora
     }
     
     @Override
+    public Void getFullData() {
+        return null;
+    }
+    
+    @Override
     public PacketCodec<? extends ByteBuf, List<ItemStack>> getDeltaCodec() {
         return ItemStack.OPTIONAL_LIST_PACKET_CODEC;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, Void> getFullCodec() {
+        return null;
     }
     
     @Override

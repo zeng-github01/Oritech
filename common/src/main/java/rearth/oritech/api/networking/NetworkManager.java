@@ -4,6 +4,7 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
@@ -11,6 +12,7 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -19,7 +21,6 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.network.NetworkContent;
 
@@ -71,7 +72,7 @@ public class NetworkManager {
         registerCodec(Identifier.PACKET_CODEC, Identifier.class);
         registerCodec(BlockPos.PACKET_CODEC, BlockPos.class);
         registerCodec(ItemStack.PACKET_CODEC, ItemStack.class);
-        registerCodec(DynamicEnergyStorage.PACKET_CODEC, DynamicEnergyStorage.class);
+        registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
         registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         
@@ -116,7 +117,7 @@ public class NetworkManager {
                     var fieldInstance = ((UpdatableField) field.get(target));
                     var deltaOnly = fieldInstance.useDeltaOnly(type);
                     var dataToSend = deltaOnly ? fieldInstance.getDeltaData() : fieldInstance;
-                    var codec = deltaOnly ? fieldInstance.getDeltaCodec() : getAutoCodec(field);
+                    var codec = deltaOnly ? fieldInstance.getDeltaCodec() : fieldInstance.getFullCodec();
                     codec.encode(byteBuf, dataToSend);
                 } else {
                     var codec = getAutoCodec(field);
@@ -143,8 +144,7 @@ public class NetworkManager {
                 if (UpdatableField.class.isAssignableFrom(field.getType())) {
                     var fieldInstance = ((UpdatableField) field.get(target));
                     var deltaOnly = fieldInstance.useDeltaOnly(type);
-                    
-                    var codec = deltaOnly ? fieldInstance.getDeltaCodec() : getAutoCodec(field);
+                    var codec = deltaOnly ? fieldInstance.getDeltaCodec() : fieldInstance.getFullCodec();
                     var value = codec.decode(byteBuf);
                     if (deltaOnly) {
                         fieldInstance.handleDeltaUpdate(value);
@@ -201,6 +201,10 @@ public class NetworkManager {
             return computedCodec;
         }
         
+        if (!AUTO_CODECS.containsKey(field.getType())) {
+            Oritech.LOGGER.error("No codec defined for: " + field.getName());
+        }
+        
         return AUTO_CODECS.get(field.getType());
     }
     
@@ -248,5 +252,18 @@ public class NetworkManager {
             }
         };
     }
+    
+    // transmits only the block type, with the default block state. Custom properties are not sent.
+    public static PacketCodec<RegistryByteBuf, BlockState> SIMPLE_BLOCK_STATE_PACKET_CODEC = new PacketCodec<>() {
+        @Override
+        public BlockState decode(RegistryByteBuf buf) {
+            return Registries.BLOCK.get(Identifier.PACKET_CODEC.decode(buf)).getDefaultState();
+        }
+        
+        @Override
+        public void encode(RegistryByteBuf buf, BlockState value) {
+            Identifier.PACKET_CODEC.encode(buf, Registries.BLOCK.getId(value.getBlock()));
+        }
+    };
     
 }

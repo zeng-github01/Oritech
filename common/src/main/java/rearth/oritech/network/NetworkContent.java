@@ -123,9 +123,6 @@ public class NetworkContent {
     public record EnergyStatisticsPacket(BlockPos position, DynamicStatisticEnergyStorage.EnergyStatistics data) {
     }
     
-    public record UnstableContainerContentPacket(BlockPos position, Identifier captured, float quality) {
-    }
-    
     public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize,
                                      int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon,
                                      boolean hasSilkTouchAddon, int targetEntityId, boolean redstonePowered) {
@@ -303,17 +300,6 @@ public class NetworkContent {
                 storageBlock.currentStats = message.data;
             } else if (entity instanceof UnstableContainerBlockEntity storageBlock) {
                 storageBlock.currentStats = message.data;
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(UnstableContainerContentPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof UnstableContainerBlockEntity storageBlock) {
-                storageBlock.capturedBlock = Registries.BLOCK.get(message.captured).getDefaultState();
-                storageBlock.qualityMultiplier = message.quality == 0 ? 1 : message.quality;
             }
             
         }));

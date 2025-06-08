@@ -8,9 +8,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.codec.PacketCodec;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.UpdatableField;
 import rearth.oritech.network.NetworkContent;
@@ -125,6 +123,11 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage implements Up
     }
     
     @Override
+    public Void getFullData() {
+        return null;
+    }
+    
+    @Override
     public boolean useDeltaOnly(SyncType type) {
         return true;
     }
@@ -132,6 +135,11 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage implements Up
     @Override
     public PacketCodec<? extends ByteBuf, FluidStack> getDeltaCodec() {
         return NetworkContent.FLUID_STACK_STREAM_CODEC;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, Void> getFullCodec() {
+        return null;
     }
     
     @Override

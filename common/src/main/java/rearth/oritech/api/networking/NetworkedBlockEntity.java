@@ -68,11 +68,15 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         networkDirty = true;
     }
     
+    public void preNetworkUpdate(SyncType type) {}
+    
     public void sendUpdate(SyncType type) {
         if (world == null) {
             Oritech.LOGGER.warn("unable to send update: World is null.");
             return;
         }
+        
+        preNetworkUpdate(type);
         
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf);
@@ -85,6 +89,8 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
             Oritech.LOGGER.warn("unable to send player update: World is null.");
             return;
         }
+        
+        preNetworkUpdate(type);
         
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf);
