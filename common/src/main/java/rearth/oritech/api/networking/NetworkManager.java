@@ -16,10 +16,12 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.network.NetworkContent;
@@ -31,7 +33,7 @@ import java.util.*;
 
 public class NetworkManager {
     
-    private static final Map<Class<?>, PacketCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
+    private static final Map<Type, PacketCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
     
     @ExpectPlatform
     public static void sendBlockHandle(BlockEntity blockEntity, CustomPayload message) {
@@ -72,14 +74,14 @@ public class NetworkManager {
         registerCodec(Identifier.PACKET_CODEC, Identifier.class);
         registerCodec(BlockPos.PACKET_CODEC, BlockPos.class);
         registerCodec(ItemStack.PACKET_CODEC, ItemStack.class);
+        registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
         registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         
     }
     
-    @SafeVarargs
-    public static <T> void registerCodec(PacketCodec<? extends ByteBuf, T> codec, Class<T>... classes) {
+    public static <T> void registerCodec(PacketCodec<? extends ByteBuf, T> codec, Type... classes) {
         for (var clazz : classes)
             AUTO_CODECS.put(clazz, codec);
     }
@@ -180,8 +182,21 @@ public class NetworkManager {
         return filteredFields;
     }
     
-    @SuppressWarnings({"rawtypes"})
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public static PacketCodec getAutoCodec(Class<?> type) {
+        
+        // try to create codec for records
+        if (!AUTO_CODECS.containsKey(type) && type.isRecord()) {
+            System.out.println("creating reflective codec for: " + type);
+            var computedCodec = ReflectiveRecordCodedBuilder.create((Class<? extends Record>) type);
+            AUTO_CODECS.put(type, computedCodec);
+            return computedCodec;
+        }
+        
+        if (!AUTO_CODECS.containsKey(type)) {
+            Oritech.LOGGER.error("No codec defined for: {}", type);
+        }
+        
         return AUTO_CODECS.get(type);
     }
     
@@ -192,28 +207,40 @@ public class NetworkManager {
             var listTypeCodec = getAutoCodec((Class<?>) listType.get());
             return listTypeCodec.collect(PacketCodecs.toList());
         }
-        
-        // try to create codec for records
-        if (!AUTO_CODECS.containsKey(field.getType()) && field.getType().isRecord()) {
-            System.out.println("creating reflective codec for: " + field.getType());
-            var computedCodec = ReflectiveRecordCodedBuilder.create((Class<? extends Record>) field.getType());
-            AUTO_CODECS.put(field.getType(), computedCodec);
-            return computedCodec;
+        var mapType = getMapType(field.getGenericType());
+        if (mapType.isPresent()) {
+            var keyCodec = getAutoCodec((Class<?>) mapType.get().getLeft());
+            var valueCodec = getAutoCodec((Class<?>) mapType.get().getRight());
+            
+            if (keyCodec == null)
+                Oritech.LOGGER.error("Unable to get codec for map key type: {}", field.getType());
+            if (valueCodec == null)
+                Oritech.LOGGER.error("Unable to get codec for map value type: {}", field.getType());
+            
+            return PacketCodecs.map(HashMap::new, keyCodec, valueCodec);
         }
         
-        if (!AUTO_CODECS.containsKey(field.getType())) {
-            Oritech.LOGGER.error("No codec defined for: " + field.getName());
-        }
-        
-        return AUTO_CODECS.get(field.getType());
+        return getAutoCodec(field.getType());
     }
     
     // Method for checking if a given type is a List and for retrieving its type parameter
     public static Optional<Type> getListType(Type type) {
         if (type instanceof ParameterizedType pType) {
-            var rawType = pType.getRawType();
-            if (rawType instanceof Class && List.class.isAssignableFrom((Class<?>) rawType)) {
+            var rawType = (Class<?>) pType.getRawType();
+            if (rawType instanceof Class && List.class.isAssignableFrom(rawType)) {
                 return Optional.of(pType.getActualTypeArguments()[0]);
+            }
+        }
+        return Optional.empty();
+    }
+    
+    // Method for checking if a given type is a Map and for retrieving its type parameters
+    public static Optional<Pair<Type, Type>> getMapType(Type type) {
+        if (type instanceof ParameterizedType pType) {
+            var rawType = (Class<?>) pType.getRawType();
+            if (rawType instanceof Class && Map.class.isAssignableFrom(rawType)) {
+                var typeArgs = pType.getActualTypeArguments();
+                return Optional.of(new Pair<>(typeArgs[0], typeArgs[1]));
             }
         }
         return Optional.empty();
@@ -265,5 +292,16 @@ public class NetworkManager {
             Identifier.PACKET_CODEC.encode(buf, Registries.BLOCK.getId(value.getBlock()));
         }
     };
+    
+    public static PacketCodec<RegistryByteBuf, Vector2i> VEC2I_PACKED_CODEC = PacketCodec.tuple(
+      PacketCodecs.INTEGER, Vector2i::x,
+      PacketCodecs.INTEGER, Vector2i::y,
+      Vector2i::new
+    );
+    
+    @SuppressWarnings("unchecked")
+    public static <K, V> PacketCodec<RegistryByteBuf, HashMap<K, V>> createMapCodec(Class<K> keyType, Class<V> valueType) {
+        return PacketCodecs.map(HashMap::new, getAutoCodec(keyType), getAutoCodec(valueType));
+    }
     
 }

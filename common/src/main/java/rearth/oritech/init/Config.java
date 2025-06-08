@@ -81,7 +81,7 @@ public class Config {
     public int ventBaseRate = 4;
     public int ventRelativeRate = 100;
     public int maxHeat = 2000;
-    public int maxUnstableTicks = 400;
+    public int maxUnstableTicks = 600;
     public boolean boringNukes = false;
     
     @SectionHeader("arcane")

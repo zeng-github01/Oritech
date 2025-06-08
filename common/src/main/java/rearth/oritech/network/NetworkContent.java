@@ -43,9 +43,6 @@ import rearth.oritech.block.entity.interaction.PumpBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
-import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
-import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
-import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.FluidContent;
@@ -190,17 +187,6 @@ public class NetworkContent {
     }
     
     public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {
-    }
-    
-    public record ReactorUIDataPacket(BlockPos position, BlockPos min, BlockPos max, BlockPos previewMax) {
-    }
-    
-    public record ReactorPortDataPacket(BlockPos position, int capacity, int remaining) {
-    }
-    
-    public record ReactorUISyncPacket(BlockPos position, List<BlockPos> componentPositions,
-                                      List<ReactorControllerBlockEntity.ComponentStatistics> componentHeats,
-                                      long energy) {
     }
     
     public record LaserPlayerUsePacket() {
@@ -545,42 +531,6 @@ public class NetworkContent {
             
             if (entity instanceof AugmentApplicationEntity enhancer) {
                 enhancer.handleAugmentUpdatePacket(message);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(ReactorUIDataPacket.class, ((message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            if (entity instanceof ReactorControllerBlockEntity reactor) {
-                reactor.uiData = message;
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(ReactorUISyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            if (entity instanceof ReactorControllerBlockEntity reactor) {
-                reactor.uiSyncData = message;
-                reactor.energyStorage.setAmount(message.energy);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(ReactorPortDataPacket.class, ((message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            // this is what happens when you're too lazy to add an interface
-            if (entity instanceof ReactorFuelPortEntity port) {
-                port.currentFuelOriginalCapacity = message.capacity;
-                port.availableFuel = message.remaining;
-            } else if (entity instanceof ReactorAbsorberPortEntity port) {
-                port.currentFuelOriginalCapacity = message.capacity;
-                port.availableFuel = message.remaining;
             }
             
         }));
