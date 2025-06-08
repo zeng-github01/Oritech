@@ -101,7 +101,7 @@ public class NetworkManager {
                 networkedBlock.onNetworkUpdated();
             }
         } else {
-            Oritech.LOGGER.warn("Unable to start decoding for block entity type {} at {}. Target Mismatch!", receiverType, message.pos);
+            Oritech.LOGGER.debug("Unable to start decoding for block entity type {} at {}. Target Mismatch!", receiverType, message.pos);
         }
     }
     
