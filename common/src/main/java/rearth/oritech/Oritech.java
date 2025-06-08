@@ -12,6 +12,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
@@ -51,7 +52,9 @@ public final class Oritech {
     public static void initialize() {
         
         LOGGER.info("Begin Oritech initialization");
-        NetworkContent.registerChannels();  // this seems to break datagen for some reason as it claims its using client code?
+        NetworkContent.registerChannels();
+        NetworkManager.init();
+        NetworkManager.registerDefaultCodecs();
         ParticleContent.registerParticles();
         FeatureContent.initialize();
         

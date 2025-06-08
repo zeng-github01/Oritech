@@ -21,9 +21,11 @@ import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.block.base.entity.*;
+import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
+import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
-import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
 import rearth.oritech.block.entity.accelerator.ParticleCollectorBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
@@ -35,7 +37,9 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.block.entity.interaction.*;
+import rearth.oritech.block.entity.interaction.DronePortEntity;
+import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.interaction.PumpBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
@@ -51,7 +55,6 @@ import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
 
@@ -99,15 +102,6 @@ public class NetworkContent {
     public record ParticleAcceleratorAnimationPacket(BlockPos position) {
     }
     
-    public record MachineFrameMovementPacket(BlockPos position, BlockPos currentTarget, BlockPos lastPosition,
-                                             BlockPos areaMin, BlockPos areaMax, boolean redstoneDisable) {
-    }   // times are in ticks
-    
-    public record QuarryTargetPacket(BlockPos position, BlockPos quarryTarget, int range, int yieldAddons,
-                                     boolean hasSilkTouchAddon,
-                                     float operationSpeed) {
-    }
-    
     public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
                                         long steamConsumed, int slaves) {
     }
@@ -141,9 +135,6 @@ public class NetworkContent {
                                      boolean hasSilkTouchAddon, int targetEntityId, boolean redstonePowered) {
     }
     
-    public record DeepDrillSyncPacket(BlockPos position, long lastWorkTime) {
-    }
-    
     public record SingleVariantFluidSyncPacketAPI(BlockPos position, String fluidType, long amount) {
     }
     
@@ -151,9 +142,6 @@ public class NetworkContent {
     }
     
     public record EnchanterSelectionPacket(BlockPos position, String enchantment) {
-    }
-    
-    public record BlackHoleSuckPacket(BlockPos position, BlockPos from, long startedAt, long duration) {
     }
     
     public record EnchanterSyncPacket(BlockPos position, long energy, int progress, int maxProgress,
@@ -295,16 +283,6 @@ public class NetworkContent {
                 laserArmBlock.setLivingTargetFromNetwork(message.targetEntityId);
                 laserArmBlock.hunterTargetMode = LaserArmBlockEntity.HunterTargetMode.fromValue(message.hunterTargetMode);
                 laserArmBlock.setRedstonePowered(message.redstonePowered);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(DeepDrillSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof DeepDrillEntity drillBlock) {
-                drillBlock.setLastWorkTime(message.lastWorkTime);
             }
             
         }));
@@ -523,46 +501,6 @@ public class NetworkContent {
             if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
                 generatorBlock.setCurrentMaxBurnTime(message.burnTime);
                 generatorBlock.isProducingSteam = message.steamAddon;
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(BlackHoleSuckPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof BlackHoleBlockEntity hole) {
-                hole.onClientPullEvent(message);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(MachineFrameMovementPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            if (entity instanceof FrameInteractionBlockEntity machine) {
-                machine.setCurrentTarget(message.currentTarget);
-                machine.setLastTarget(message.lastPosition);
-                machine.setMoveStartedAt(access.player().getWorld().getTime());
-                machine.setAreaMin(message.areaMin);
-                machine.setAreaMax(message.areaMax);
-                machine.disabledViaRedstone = message.redstoneDisable();
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(QuarryTargetPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            if (entity instanceof DestroyerBlockEntity machine) {
-                machine.quarryTarget = message.quarryTarget;
-                machine.range = message.range;
-                machine.yieldAddons = message.yieldAddons;
-                machine.hasSilkTouchAddon = message.hasSilkTouchAddon;
-                
-                var oldData = machine.getBaseAddonData();
-                var newData = new MachineAddonController.BaseAddonData(message.operationSpeed, oldData.efficiency(), oldData.energyBonusCapacity(), oldData.energyBonusTransfer(), oldData.extraChambers());
-                machine.setBaseAddonData(newData);
             }
             
         }));

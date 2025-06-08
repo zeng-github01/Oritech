@@ -1,16 +1,23 @@
 package rearth.oritech.api.fluid.containers;
 
 import dev.architectury.fluid.FluidStack;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.component.ComponentChanges;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.codec.PacketCodec;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.networking.UpdatableField;
+import rearth.oritech.network.NetworkContent;
 
 import java.util.List;
 
-public class SimpleFluidStorage extends FluidApi.SingleSlotStorage {
+public class SimpleFluidStorage extends FluidApi.SingleSlotStorage implements UpdatableField<Void, FluidStack> {
     
     public static Long transfer(SimpleFluidStorage from, SimpleFluidStorage to, long maxAmount, boolean simulate) {
         
@@ -110,5 +117,28 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage {
     @Override
     public FluidStack getStack() {
         return content;
+    }
+    
+    @Override
+    public FluidStack getDeltaData() {
+        return this.content;
+    }
+    
+    @Override
+    public boolean useDeltaOnly(SyncType type) {
+        return true;
+    }
+    
+    @Override
+    public PacketCodec<? extends ByteBuf, FluidStack> getDeltaCodec() {
+        return NetworkContent.FLUID_STACK_STREAM_CODEC;
+    }
+    
+    @Override
+    public void handleFullUpdate(Void updatedData) { }
+    
+    @Override
+    public void handleDeltaUpdate(FluidStack updatedData) {
+        this.setStack(updatedData);
     }
 }

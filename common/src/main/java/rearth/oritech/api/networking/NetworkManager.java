@@ -1,0 +1,231 @@
+package rearth.oritech.api.networking;
+
+import dev.architectury.fluid.FluidStack;
+import dev.architectury.injectables.annotations.ExpectPlatform;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.NotNull;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.network.NetworkContent;
+import rearth.oritech.util.MachineAddonController;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
+
+public class NetworkManager {
+    
+    private static final Map<Class<?>, PacketCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
+    
+    @ExpectPlatform
+    public static void sendUpdateForBlock(BlockEntity blockEntity, MessagePayload message) {
+        throw new AssertionError();
+    }
+    
+    @ExpectPlatform
+    public static void sendUpdateForBlock(MessagePayload message, ServerPlayerEntity player) {
+        throw new AssertionError();
+    }
+    
+    @ExpectPlatform
+    public static <T extends CustomPayload> void registerToClient(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, World, DynamicRegistryManager> consumer) {
+        throw new AssertionError();
+    }
+    
+    public static void registerDefaultCodecs() {
+        
+        // missing bool, double, byte, short, string, uuid, identifier, vec3i, blockpos
+        registerCodec(PacketCodecs.INTEGER, Integer.class, int.class);
+        registerCodec(PacketCodecs.VAR_LONG, Long.class, long.class);
+        registerCodec(PacketCodecs.FLOAT, Float.class, float.class);
+        registerCodec(PacketCodecs.BOOL, Boolean.class, boolean.class);
+        registerCodec(PacketCodecs.DOUBLE, Double.class, double.class);
+        registerCodec(PacketCodecs.BYTE, Byte.class, byte.class);
+        registerCodec(PacketCodecs.SHORT, Short.class, short.class);
+        registerCodec(PacketCodecs.STRING, String.class);
+        registerCodec(Identifier.PACKET_CODEC, Identifier.class);
+        registerCodec(BlockPos.PACKET_CODEC, BlockPos.class);
+        registerCodec(ItemStack.PACKET_CODEC, ItemStack.class);
+        registerCodec(DynamicEnergyStorage.PACKET_CODEC, DynamicEnergyStorage.class);
+        registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
+        registerCodec(MachineAddonController.BaseAddonData.PACKET_CODEC, MachineAddonController.BaseAddonData.class);
+        
+    }
+    
+    @SafeVarargs
+    public static <T> void registerCodec(PacketCodec<? extends ByteBuf, T> codec, Class<T>... classes) {
+        for (var clazz : classes)
+            AUTO_CODECS.put(clazz, codec);
+    }
+    
+    public static void init() {
+        registerDefaultCodecs();
+        registerToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
+    }
+    
+    public static void receiveMessage(MessagePayload message, World world, DynamicRegistryManager registryAccess) {
+        var receivedBuf = new RegistryByteBuf(Unpooled.wrappedBuffer(message.message), registryAccess);
+        var receiverEntity = world.getBlockEntity(message.pos);
+        var receiverType = registryAccess.get(RegistryKeys.BLOCK_ENTITY_TYPE).get(message.targetEntityType);
+        if (receiverEntity != null && receiverType != null && receiverType.equals(receiverEntity.getType())) {
+            decodeFields(receiverEntity, message.syncType, receivedBuf);
+            if (receiverEntity instanceof NetworkedEventHandler networkedBlock) {
+                networkedBlock.onNetworkUpdated();
+            }
+        } else {
+            Oritech.LOGGER.warn("Unable to start decoding for block entity type {} at {}. Target Mismatch!", receiverType, message.pos);
+        }
+    }
+    
+    // returns the number of encoded fields
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf) {
+        
+        var encodedCount = 0;
+        for (var field : getSyncFields(target, type)) {
+            field.setAccessible(true);
+            try {
+                if (UpdatableField.class.isAssignableFrom(field.getType())) {
+                    var fieldInstance = ((UpdatableField) field.get(target));
+                    var deltaOnly = fieldInstance.useDeltaOnly(type);
+                    var dataToSend = deltaOnly ? fieldInstance.getDeltaData() : fieldInstance;
+                    var codec = deltaOnly ? fieldInstance.getDeltaCodec() : getAutoCodec(field);
+                    codec.encode(byteBuf, dataToSend);
+                } else {
+                    var codec = getAutoCodec(field);
+                    var value = field.get(target);
+                    codec.encode(byteBuf, value);
+                }
+                
+                encodedCount++;
+                
+            } catch (Exception ex) {
+                Oritech.LOGGER.warn("failed to encode field: {}", field.getName(), ex);
+            }
+        }
+        
+        return encodedCount;
+    }
+    
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf) {
+        for (var field : getSyncFields(target, type)) {
+            field.setAccessible(true);
+            try {
+                // fields that implement UpdatableField either get a delta or full update. Otherwise, we just set the full value
+                if (UpdatableField.class.isAssignableFrom(field.getType())) {
+                    var fieldInstance = ((UpdatableField) field.get(target));
+                    var deltaOnly = fieldInstance.useDeltaOnly(type);
+                    
+                    var codec = deltaOnly ? fieldInstance.getDeltaCodec() : getAutoCodec(field);
+                    var value = codec.decode(byteBuf);
+                    if (deltaOnly) {
+                        fieldInstance.handleDeltaUpdate(value);
+                    } else {
+                        fieldInstance.handleFullUpdate(value);
+                    }
+                } else {
+                    var codec = getAutoCodec(field);
+                    var value = codec.decode(byteBuf);
+                    field.set(target, value);
+                }
+                
+            } catch (Exception ex) {
+                Oritech.LOGGER.warn("failed to decode field: {}", field.getName(), ex);
+            }
+        }
+    }
+    
+    private static @NotNull List<Field> getSyncFields(Object target, SyncType type) {
+        var fields = new ArrayList<>(Arrays.asList(target.getClass().getDeclaredFields()));
+        var superClass = target.getClass().getSuperclass();
+        while (superClass != null) {
+            fields.addAll(Arrays.asList(superClass.getDeclaredFields()));
+            superClass = superClass.getSuperclass();
+        }
+        
+        var filteredFields = new ArrayList<Field>();
+        fields.stream().filter(field -> hasSyncType(field.getAnnotation(SyncField.class), type)).forEachOrdered(filteredFields::add);
+        
+        if (target instanceof AdditionalNetworkingProvider additionalNetworkingProvider)
+            filteredFields.addAll(additionalNetworkingProvider.additionalSyncedFields(type));
+        
+        return filteredFields;
+    }
+    
+    @SuppressWarnings({"rawtypes"})
+    public static PacketCodec getAutoCodec(Class<?> type) {
+        return AUTO_CODECS.get(type);
+    }
+    
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static PacketCodec getAutoCodec(Field field) {
+        var listType = getListType(field.getGenericType());
+        if (listType.isPresent()) {
+            var listTypeCodec = getAutoCodec((Class<?>) listType.get());
+            return listTypeCodec.collect(PacketCodecs.toList());
+        }
+        return AUTO_CODECS.get(field.getType());
+    }
+    
+    // Sample method for checking if a given type is a List and for retrieving its type parameter
+    public static Optional<Type> getListType(Type type) {
+        if (type instanceof ParameterizedType pType) {
+            var rawType = pType.getRawType();
+            if (rawType instanceof Class && List.class.isAssignableFrom((Class<?>) rawType)) {
+                return Optional.of(pType.getActualTypeArguments()[0]);
+            }
+        }
+        return Optional.empty();
+    }
+    
+    private static boolean hasSyncType(SyncField annotation, SyncType type) {
+        if (annotation == null) return false;
+        
+        for (var value : annotation.value()) {
+            if (value.equals(type)) return true;
+        }
+        return false;
+    }
+    
+    public record MessagePayload(BlockPos pos, Identifier targetEntityType, SyncType syncType,
+                                 byte[] message) implements CustomPayload {
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return GENERIC_PACKET_ID;
+        }
+        
+        public static final CustomPayload.Id<MessagePayload> GENERIC_PACKET_ID = new CustomPayload.Id<>(Oritech.id("generic"));
+        
+        public static final PacketCodec<RegistryByteBuf, MessagePayload> PACKET_CODEC = new PacketCodec<>() {
+            @Override
+            public MessagePayload decode(RegistryByteBuf buf) {
+                return new MessagePayload(BlockPos.PACKET_CODEC.decode(buf), Identifier.PACKET_CODEC.decode(buf), SyncType.PACKET_CODEC.decode(buf), PacketCodecs.BYTE_ARRAY.decode(buf));
+            }
+            
+            @Override
+            public void encode(RegistryByteBuf buf, MessagePayload value) {
+                BlockPos.PACKET_CODEC.encode(buf, value.pos);
+                Identifier.PACKET_CODEC.encode(buf, value.targetEntityType);
+                SyncType.PACKET_CODEC.encode(buf, value.syncType);
+                PacketCodecs.BYTE_ARRAY.encode(buf, value.message);
+            }
+        };
+    }
+    
+}
