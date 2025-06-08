@@ -20,8 +20,8 @@ import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.network.NetworkContent;
-import rearth.oritech.util.MachineAddonController;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -33,17 +33,27 @@ public class NetworkManager {
     private static final Map<Class<?>, PacketCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
     
     @ExpectPlatform
-    public static void sendUpdateForBlock(BlockEntity blockEntity, MessagePayload message) {
+    public static void sendBlockHandle(BlockEntity blockEntity, CustomPayload message) {
         throw new AssertionError();
     }
     
     @ExpectPlatform
-    public static void sendUpdateForBlock(MessagePayload message, ServerPlayerEntity player) {
+    public static void sendPlayerHandle(CustomPayload message, ServerPlayerEntity player) {
+        throw new AssertionError();
+    }
+    
+    @ExpectPlatform
+    public static void sendToServer(CustomPayload message) {
         throw new AssertionError();
     }
     
     @ExpectPlatform
     public static <T extends CustomPayload> void registerToClient(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, World, DynamicRegistryManager> consumer) {
+        throw new AssertionError();
+    }
+    
+    @ExpectPlatform
+    public static <T extends CustomPayload> void registerToServer(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, World, DynamicRegistryManager> consumer) {
         throw new AssertionError();
     }
     
@@ -63,7 +73,7 @@ public class NetworkManager {
         registerCodec(ItemStack.PACKET_CODEC, ItemStack.class);
         registerCodec(DynamicEnergyStorage.PACKET_CODEC, DynamicEnergyStorage.class);
         registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
-        registerCodec(MachineAddonController.BaseAddonData.PACKET_CODEC, MachineAddonController.BaseAddonData.class);
+        registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         
     }
     
@@ -76,6 +86,8 @@ public class NetworkManager {
     public static void init() {
         registerDefaultCodecs();
         registerToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
+        
+        registerToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
     }
     
     public static void receiveMessage(MessagePayload message, World world, DynamicRegistryManager registryAccess) {
@@ -180,10 +192,19 @@ public class NetworkManager {
             var listTypeCodec = getAutoCodec((Class<?>) listType.get());
             return listTypeCodec.collect(PacketCodecs.toList());
         }
+        
+        // try to create codec for records
+        if (!AUTO_CODECS.containsKey(field.getType()) && field.getType().isRecord()) {
+            System.out.println("creating reflective codec for: " + field.getType());
+            var computedCodec = ReflectiveRecordCodedBuilder.create((Class<? extends Record>) field.getType());
+            AUTO_CODECS.put(field.getType(), computedCodec);
+            return computedCodec;
+        }
+        
         return AUTO_CODECS.get(field.getType());
     }
     
-    // Sample method for checking if a given type is a List and for retrieving its type parameter
+    // Method for checking if a given type is a List and for retrieving its type parameter
     public static Optional<Type> getListType(Type type) {
         if (type instanceof ParameterizedType pType) {
             var rawType = pType.getRawType();

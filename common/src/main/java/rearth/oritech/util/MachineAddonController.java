@@ -7,9 +7,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
@@ -301,18 +298,7 @@ public interface MachineAddonController {
     record AddonBlock(MachineAddonBlock addonBlock, BlockState state, BlockPos pos, AddonBlockEntity addonEntity) {
     }
     
-    record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer, int extraChambers) {
-        
-        public static PacketCodec<RegistryByteBuf, BaseAddonData> PACKET_CODEC = PacketCodec.tuple(
-          PacketCodecs.FLOAT, BaseAddonData::speed,
-          PacketCodecs.FLOAT, BaseAddonData::efficiency,
-          PacketCodecs.VAR_LONG, BaseAddonData::energyBonusCapacity,
-          PacketCodecs.VAR_LONG, BaseAddonData::energyBonusTransfer,
-          PacketCodecs.INTEGER, BaseAddonData::extraChambers,
-          BaseAddonData::new
-        );
-        
-    }
+    record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer, int extraChambers) { }
     
     record AddonUiData(List<BlockPos> positions, List<BlockPos> openSlots, float efficiency, float speed,
                        BlockPos ownPosition, int extraChambers) {

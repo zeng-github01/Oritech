@@ -40,7 +40,6 @@ import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.interaction.PumpBlockEntity;
-import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
@@ -126,9 +125,6 @@ public class NetworkContent {
     
     public record UnstableContainerContentPacket(BlockPos position, Identifier captured, float quality) {
     }
-    
-    public record ItemFilterSyncPacket(BlockPos position, ItemFilterBlockEntity.FilterData data) {
-    }   // this goes both ways
     
     public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize,
                                      int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon,
@@ -222,7 +218,6 @@ public class NetworkContent {
         
         Oritech.LOGGER.debug("Registering oritech channels");
         
-        MACHINE_CHANNEL.builder().register(ItemFilterBlockEntity.FILTER_ITEMS_ENDEC, (Class<Map<Integer, ItemStack>>) (Object) Map.class); // I don't even know what kind of abomination this cast is, but it seems to work
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FLUID_STACK_CODEC, FLUID_STACK_STREAM_CODEC), FluidStack.class);
         
@@ -254,16 +249,6 @@ public class NetworkContent {
             
             if (entity instanceof EnchanterBlockEntity machine) {
                 machine.handleSyncPacket(message);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(ItemFilterSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof ItemFilterBlockEntity filter) {
-                filter.setFilterSettings(message.data);
             }
             
         }));
@@ -650,16 +635,6 @@ public class NetworkContent {
             }
             
         });
-        
-        UI_CHANNEL.registerServerbound(ItemFilterSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            if (entity instanceof ItemFilterBlockEntity filter) {
-                filter.setFilterSettings(message.data);
-            }
-            
-        }));
         
         UI_CHANNEL.registerServerbound(EnchanterSelectionPacket.class, (message, access) -> {
             

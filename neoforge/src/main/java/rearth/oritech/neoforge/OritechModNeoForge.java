@@ -117,11 +117,15 @@ public final class OritechModNeoForge {
         public void register(final RegisterPayloadHandlersEvent event) {
             var registrar = event.registrar("1");
             
-            for (var toInit : NetworkManagerImpl.PENDING_INITS) {
+            for (var toInit : NetworkManagerImpl.PENDING_S2C_INITS) {
                 toInit.accept(registrar);
             }
+            NetworkManagerImpl.PENDING_S2C_INITS.clear();
             
-            NetworkManagerImpl.PENDING_INITS.clear();
+            for (var toInit : NetworkManagerImpl.PENDING_C2S_INITS) {
+                toInit.accept(registrar);
+            }
+            NetworkManagerImpl.PENDING_C2S_INITS.clear();
             
         }
         

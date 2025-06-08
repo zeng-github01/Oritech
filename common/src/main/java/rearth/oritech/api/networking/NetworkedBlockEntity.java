@@ -1,13 +1,11 @@
 package rearth.oritech.api.networking;
 
-import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
@@ -79,7 +77,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf);
         if (fieldCount == 0) return;
-        NetworkManager.sendUpdateForBlock(this, new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()));
+        NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()));
     }
     
     public void sendUpdate(SyncType type, ServerPlayerEntity player) {
@@ -91,7 +89,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf);
         if (fieldCount == 0) return;
-        NetworkManager.sendUpdateForBlock(new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()), player);
+        NetworkManager.sendPlayerHandle(new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()), player);
     }
     
     @Override

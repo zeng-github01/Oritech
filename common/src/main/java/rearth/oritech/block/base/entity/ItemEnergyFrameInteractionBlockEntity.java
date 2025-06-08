@@ -146,7 +146,8 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public float getProgress() {
-        return (float) getCurrentProgress() / this.getWorkTime();
+        var maxTime = isMoving() ? getMoveTime() : getWorkTime();
+        return (float) getCurrentProgress() / maxTime;
     }
     
     @Override
