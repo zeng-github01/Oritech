@@ -37,7 +37,6 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.interaction.PumpBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
@@ -90,9 +89,6 @@ public class NetworkContent {
     }
     
     public record AcceleratorParticleInsertEventPacket(BlockPos position) {
-    }
-    
-    public record DroneCardEventPacket(BlockPos position, String message) {
     }
     
     public record ParticleAcceleratorAnimationPacket(BlockPos position) {
@@ -148,9 +144,6 @@ public class NetworkContent {
     public record GeneratorSteamSyncPacket(BlockPos position, long waterAmount, long steamAmount) {
     }
     
-    public record DroneSendEventPacket(BlockPos position, boolean sendEvent, boolean receiveEvent) {
-    
-    }
     
     public record PumpWorkSyncPacket(BlockPos position, String fluidType, long workedAt) {
     }
@@ -178,9 +171,6 @@ public class NetworkContent {
     public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn,
                                             String fluidTypeOut,
                                             long amountOut) {
-    }
-    
-    public record DronePortFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidType, long amount) {
     }
     
     public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) {
@@ -303,27 +293,6 @@ public class NetworkContent {
             
         }));
         
-        MACHINE_CHANNEL.registerClientbound(DroneSendEventPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof DronePortEntity dronePort) {
-                if (message.sendEvent) dronePort.playSendAnimation();
-                if (message.receiveEvent) dronePort.playReceiveAnimation();
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(DroneCardEventPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof DronePortEntity dronePort) {
-                dronePort.setStatusMessage(message.message);
-            }
-            
-        }));
-        
         MACHINE_CHANNEL.registerClientbound(ItemPipeVisualTransferPacket.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
@@ -436,17 +405,6 @@ public class NetworkContent {
                 var outStack = FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidTypeOut)), message.amountOut);
                 centrifuge.fluidContainer.setStack(0, inStack);
                 centrifuge.fluidContainer.setStack(1, outStack);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(DronePortFluidSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof DronePortEntity dronePort) {
-                dronePort.hasFluidAddon = message.fluidAddon;
-                dronePort.fluidStorage.setStack(FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.amount));
             }
             
         }));
