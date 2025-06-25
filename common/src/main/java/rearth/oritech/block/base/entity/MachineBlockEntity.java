@@ -47,10 +47,10 @@ public abstract class MachineBlockEntity extends BlockEntity
   implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, BlockEntityTicker<MachineBlockEntity>, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
-    public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
+    public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlay("packaged");
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("deploy");
-    public static final RawAnimation IDLE = RawAnimation.begin().thenPlayAndHold("idle");
-    public static final RawAnimation WORKING = RawAnimation.begin().thenLoop("working");
+    public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
+    public static final RawAnimation WORKING = RawAnimation.begin().thenPlay("working");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
