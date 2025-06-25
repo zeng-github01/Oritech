@@ -5,12 +5,16 @@ import dev.architectury.platform.Platform;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import rearth.oritech.util.FluidIngredient;
@@ -171,4 +175,33 @@ public class OritechRecipe implements Recipe<RecipeInput> {
     public List<FluidStack> getFluidOutputs() {
         return fluidOutputs;
     }
+    
+    public static PacketCodec<RegistryByteBuf, OritechRecipe> PACKET_CODEC = new PacketCodec<>() {
+        
+        @Override
+        public void encode(RegistryByteBuf buf, OritechRecipe value) {
+            
+            if (value == null || value.equals(OritechRecipe.DUMMY)) {
+                buf.writeIdentifier(Identifier.of("o", "empty"));
+                return;
+            }
+            
+            var recipeId = buf.getRegistryManager().get(RegistryKeys.RECIPE).getId(value);
+            if (recipeId == null || recipeId.getPath().isEmpty()) throw new RuntimeException("Unable to get registry ID for network sync of recipe: " + value);
+            buf.writeIdentifier(recipeId);
+        }
+        
+        @Override
+        public OritechRecipe decode(RegistryByteBuf buf) {
+            var recipeId = buf.readIdentifier();
+            if (recipeId.getPath().isEmpty() || recipeId.getPath().equals("empty")) return OritechRecipe.DUMMY;
+            
+            var recipe = buf.getRegistryManager().get(RegistryKeys.RECIPE).get(recipeId);
+            if (recipe instanceof OritechRecipe result) {
+                return result;
+            } else {
+                throw new RuntimeException("Unable to decide recipe ID on client for recipe sync: " + recipe);
+            }
+        }
+    };
 }

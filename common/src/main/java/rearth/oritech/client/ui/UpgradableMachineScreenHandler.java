@@ -19,7 +19,7 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
     protected final float quality;
     
     public UpgradableMachineScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, ModScreens.UpgradableData.PACKET_CODEC.decode(buf));
+        this(syncId, inventory, new ModScreens.UpgradableData(buf.readBlockPos(), ));
     }
     
     public UpgradableMachineScreenHandler(int syncId, PlayerInventory inventory, ModScreens.UpgradableData data) {

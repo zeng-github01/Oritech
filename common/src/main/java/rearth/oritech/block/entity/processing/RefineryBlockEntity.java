@@ -23,6 +23,9 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -44,10 +47,14 @@ import java.util.Optional;
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
+    @SyncField(SyncType.GUI_TICK)
     public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::markDirty);
+    @SyncField(SyncType.GUI_TICK)
     public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
+    @SyncField(SyncType.GUI_TICK)
     public final SimpleFluidStorage nodeB = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
     
+    @SyncField(SyncType.GUI_OPEN)
     private int moduleCount;    // range 0-2
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
@@ -55,7 +62,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    public void tick(World world, BlockPos pos, BlockState state, MachineBlockEntity blockEntity) {
+    public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         super.tick(world, pos, state, blockEntity);
         
         if (world.getTime() % 25 == 0) {
@@ -183,12 +190,6 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         }
         
         return super.canOutputRecipe(recipe);
-    }
-    
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.RefinerySyncPacket(getPos(), ownStorage.getInStack(), ownStorage.getOutStack(), nodeA.getStack(), nodeB.getStack(), moduleCount));
     }
     
     @Nullable

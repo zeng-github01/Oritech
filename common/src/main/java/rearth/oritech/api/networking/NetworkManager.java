@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.network.NetworkContent;
 
 import java.lang.reflect.Field;
@@ -78,6 +79,7 @@ public class NetworkManager {
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
         registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
+        registerCodec(OritechRecipe.PACKET_CODEC, OritechRecipe.class);
         
     }
     
@@ -189,11 +191,18 @@ public class NetworkManager {
     public static PacketCodec getAutoCodec(Class<?> type) {
         
         // try to create codec for records
-        if (!AUTO_CODECS.containsKey(type) && type.isRecord()) {
-            System.out.println("creating reflective codec for: " + type);
-            var computedCodec = ReflectiveRecordCodedBuilder.create((Class<? extends Record>) type);
-            AUTO_CODECS.put(type, computedCodec);
-            return computedCodec;
+        if (!AUTO_CODECS.containsKey(type)) {
+            if (type.isRecord()) {
+                System.out.println("creating reflective codec for: " + type);
+                var computedCodec = ReflectiveCodecBuilder.create((Class<? extends Record>) type);
+                AUTO_CODECS.put(type, computedCodec);
+                return computedCodec;
+            } else if (type.isEnum()) {
+                System.out.println("creating reflective enum codec for: " + type);
+                var computedCodec = ReflectiveCodecBuilder.createForEnum((Class<? extends Enum>) type);
+                AUTO_CODECS.put(type, computedCodec);
+                return computedCodec;
+            }
         }
         
         if (!AUTO_CODECS.containsKey(type)) {

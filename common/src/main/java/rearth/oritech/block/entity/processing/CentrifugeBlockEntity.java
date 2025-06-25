@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.CentrifugeScreenHandler;
@@ -36,8 +38,10 @@ import java.util.Optional;
 
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
+    @SyncField(SyncType.GUI_TICK)
     public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(Oritech.CONFIG.processingMachines.centrifugeData.tankSizeInBuckets() * FluidStackHooks.bucketAmount(), this::markDirty);
     
+    @SyncField(SyncType.GUI_OPEN)
     public boolean hasFluidAddon = false;
     
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
@@ -247,20 +251,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     @Override
     public int getAnimationDuration() {
         return 20 * 9;
-    }
-    
-    @Override
-    protected void sendNetworkEntry() {
-        super.sendNetworkEntry();
-        
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(
-          new NetworkContent.CentrifugeFluidSyncPacket(
-            pos,
-            hasFluidAddon,
-            Registries.FLUID.getId(fluidContainer.getInStack().getFluid()).toString(),
-            fluidContainer.getInStack().getAmount(),
-            Registries.FLUID.getId(fluidContainer.getOutStack().getFluid()).toString(),
-            fluidContainer.getOutStack().getAmount()));
     }
     
     @Override
