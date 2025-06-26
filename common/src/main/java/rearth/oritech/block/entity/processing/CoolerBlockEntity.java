@@ -5,7 +5,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.RecipeEntry;
-import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.math.BlockPos;
@@ -20,7 +19,6 @@ import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -29,7 +27,6 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
@@ -50,22 +47,14 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     
     @Override
     public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        super.tick(world, pos, state, blockEntity);
+        super.serverTick(world, pos, state, blockEntity);
         
-        if (!world.isClient && !initialized) {
+        if (!initialized) {
             initialized = true;
             var biome = world.getBiome(pos);
             inColdArea = biome.isIn(TagContent.CONVENTIONAL_COLD);
         }
         
-    }
-    
-    @Override
-    public AddonUiData getUiData() {
-        var base = super.getUiData();
-        if (!inColdArea) return base;
-        
-        return new AddonUiData(base.positions(), base.openSlots(), base.efficiency() * 0.5f, base.speed() * 0.5f, base.ownPosition(), base.extraChambers());
     }
     
     @Override

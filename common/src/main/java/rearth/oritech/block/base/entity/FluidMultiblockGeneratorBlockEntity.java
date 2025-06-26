@@ -50,7 +50,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
             processBuckets();
         }
         
-        super.tick(world, pos, state, blockEntity);
+        super.serverTick(world, pos, state, blockEntity);
     }
     
     private void processBuckets() {

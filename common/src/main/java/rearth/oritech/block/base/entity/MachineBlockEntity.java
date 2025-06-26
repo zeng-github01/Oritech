@@ -2,8 +2,6 @@ package rearth.oritech.block.base.entity;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -53,9 +51,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
   implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
     // animations
-    public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlay("packaged");
+    public static final RawAnimation PACKAGED = RawAnimation.begin().thenPlayAndHold("packaged");
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("deploy");
-    public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
+    public static final RawAnimation IDLE = RawAnimation.begin().thenPlayAndHold("idle");
     public static final RawAnimation WORKING = RawAnimation.begin().thenPlay("working");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
@@ -69,7 +67,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
     @SyncField({SyncType.GUI_TICK})
     protected boolean disabledViaRedstone = false;
-    @SyncField({SyncType.GUI_TICK})
+    @SyncField({SyncType.TICK})
     public long lastWorkedAt;
     
     // static data

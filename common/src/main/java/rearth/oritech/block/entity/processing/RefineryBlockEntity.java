@@ -26,7 +26,6 @@ import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -35,7 +34,6 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
@@ -47,11 +45,11 @@ import java.util.Optional;
 public class RefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
     // own storage is exposed through this multiblock, the other storages are exposed through the respective modules
-    @SyncField(SyncType.GUI_TICK)
+    @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(64 * FluidStackHooks.bucketAmount(), this::markDirty);
-    @SyncField(SyncType.GUI_TICK)
+    @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleFluidStorage nodeA = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
-    @SyncField(SyncType.GUI_TICK)
+    @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleFluidStorage nodeB = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::markDirty);
     
     @SyncField(SyncType.GUI_OPEN)
@@ -63,7 +61,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Override
     public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        super.tick(world, pos, state, blockEntity);
+        super.serverTick(world, pos, state, blockEntity);
         
         if (world.getTime() % 25 == 0) {
             refreshModules();
@@ -195,7 +193,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new RefineryScreenHandler(syncId, playerInventory, this, getUiData(), getCoreQuality());
+        return new RefineryScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

@@ -535,7 +535,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "machine", 0, state -> {
-            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED) || state.getController().getAnimationState().equals(AnimationController.State.PAUSED)) {
+            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
                 var targetAnim = isActive(getCachedState()) ? MachineBlockEntity.IDLE : MachineBlockEntity.PACKAGED;
                 state.resetCurrentAnimation();
                 return state.setAndContinue(targetAnim);
@@ -615,8 +615,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     @Override
     public void saveExtraData(PacketByteBuf buf) {
         sendUpdate(SyncType.GUI_OPEN);
-        var data = new ModScreens.UpgradableData(pos, getUiData(), getCoreQuality());
-        ModScreens.UpgradableData.PACKET_CODEC.encode(buf, data);
+        buf.writeBlockPos(pos);
     }
     
     @Override
@@ -627,7 +626,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new DroneScreenHandler(syncId, playerInventory, this, getUiData(), coreQuality);
+        return new DroneScreenHandler(syncId, playerInventory, this);
     }
     
     @Override

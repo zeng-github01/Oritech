@@ -25,6 +25,7 @@ import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.network.NetworkContent;
 
 import java.lang.reflect.Field;
@@ -79,7 +80,7 @@ public class NetworkManager {
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
         registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
-        registerCodec(OritechRecipe.PACKET_CODEC, OritechRecipe.class);
+        registerCodec(OritechRecipeType.PACKET_CODEC, OritechRecipe.class);
         
     }
     
