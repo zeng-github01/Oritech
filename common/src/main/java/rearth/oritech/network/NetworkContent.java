@@ -61,13 +61,6 @@ public class NetworkContent {
     public static final OwoNetChannel MACHINE_CHANNEL = OwoNetChannel.create(Oritech.id("machine_data"));
     public static final OwoNetChannel UI_CHANNEL = OwoNetChannel.create(Oritech.id("ui_interactions"));
     
-    // Server -> Client
-    public record MachineSyncPacket(BlockPos position, long energy, long maxEnergy, long maxInsert, long maxExtract,
-                                    int progress,
-                                    OritechRecipe activeRecipe, InventoryInputMode inputMode, long lastWorkedAt,
-                                    boolean disabledViaRedstone) {
-    }
-    
     // Client -> Server (e.g. from UI interactions
     public record InventoryInputModeSelectorPacket(BlockPos position) {
     }
@@ -77,9 +70,6 @@ public class NetworkContent {
     
     public record RedstoneAddonSyncPacket(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode,
                                           int currentOutput) {
-    }
-    
-    public record GeneratorUISyncPacket(BlockPos position, int burnTime, boolean steamAddon) {
     }
     
     public record MachineSetupEventPacket(BlockPos position) {
@@ -122,9 +112,6 @@ public class NetworkContent {
     }
     
     public record SingleVariantFluidSyncPacketAPI(BlockPos position, String fluidType, long amount) {
-    }
-    
-    public record ItemPipeVisualTransferPacket(BlockPos position, List<Long> codedStops, ItemStack moved) {
     }
     
     public record EnchanterSelectionPacket(BlockPos position, String enchantment) {
@@ -282,16 +269,6 @@ public class NetworkContent {
             
         }));
         
-        MACHINE_CHANNEL.registerClientbound(ItemPipeVisualTransferPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof ItemPipeInterfaceEntity itemPipe) {
-                itemPipe.handleVisualTransferPacket(message);
-            }
-            
-        }));
-        
         MACHINE_CHANNEL.registerClientbound(SingleVariantFluidSyncPacketAPI.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
@@ -394,17 +371,6 @@ public class NetworkContent {
                 var outStack = FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidTypeOut)), message.amountOut);
                 centrifuge.fluidContainer.setStack(0, inStack);
                 centrifuge.fluidContainer.setStack(1, outStack);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(GeneratorUISyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
-                generatorBlock.setCurrentMaxBurnTime(message.burnTime);
-                generatorBlock.isProducingSteam = message.steamAddon;
             }
             
         }));
