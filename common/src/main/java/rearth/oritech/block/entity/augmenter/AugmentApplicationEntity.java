@@ -451,9 +451,8 @@ public class AugmentApplicationEntity extends BlockEntity implements BlockEntity
     }
     
     @Override
-    public void playSetupAnimation() {
-        animationController.setAnimation(MachineBlockEntity.SETUP);
-        animationController.forceAnimationReset();
+    public void triggerSetupAnimation() {
+        // todo
     }
     
     @Override

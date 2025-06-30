@@ -85,7 +85,7 @@ public class RefineryModuleBlock extends HorizontalFacingBlock implements BlockE
             
             // first time created
             if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+                machineEntity.triggerSetupAnimation();
                 return ActionResult.SUCCESS;
             }
             

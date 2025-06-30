@@ -740,9 +740,8 @@ public class LaserArmBlockEntity extends BlockEntity implements
     }
     
     @Override
-    public void playSetupAnimation() {
-        animationController.setAnimation(MachineBlockEntity.SETUP);
-        animationController.forceAnimationReset();
+    public void triggerSetupAnimation() {
+        // todo
     }
     
     public boolean isActive(BlockState state) {

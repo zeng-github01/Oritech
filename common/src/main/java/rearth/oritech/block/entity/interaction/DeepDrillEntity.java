@@ -254,9 +254,8 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     }
     
     @Override
-    public void playSetupAnimation() {
-        animationController.setAnimation(SETUP);
-        animationController.forceAnimationReset();
+    public void triggerSetupAnimation() {
+        // todo
     }
     
     @Override

@@ -82,4 +82,9 @@ public abstract class MultiblockFrameInteractionEntity extends ItemEnergyFrameIn
     public boolean isActive(BlockState state) {
         return state.get(MultiblockMachine.ASSEMBLED);
     }
+    
+    @Override
+    public void triggerSetupAnimation() {
+    
+    }
 }

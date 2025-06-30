@@ -347,9 +347,4 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 new Vec3i(0, 0, 1)
         );
     }
-
-    @Override
-    public void playSetupAnimation() {
-
-    }
 }

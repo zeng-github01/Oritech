@@ -73,7 +73,7 @@ public class DeepDrillBlock extends Block implements BlockEntityProvider {
             
             // first time created
             if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+                deepDrill.triggerSetupAnimation();
                 return ActionResult.SUCCESS;
             }
             

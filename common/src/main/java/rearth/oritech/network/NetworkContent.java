@@ -72,9 +72,6 @@ public class NetworkContent {
                                           int currentOutput) {
     }
     
-    public record MachineSetupEventPacket(BlockPos position) {
-    }
-    
     public record AcceleratorParticleRenderPacket(BlockPos position, List<Vec3d> particleTrail) {
     }
     
@@ -180,17 +177,6 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FLUID_STACK_CODEC, FLUID_STACK_STREAM_CODEC), FluidStack.class);
-        
-        MACHINE_CHANNEL.registerClientbound(MachineSetupEventPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof MultiblockMachineController machine) {
-                Oritech.LOGGER.debug("playing setup on client!");
-                machine.playSetupAnimation();
-            }
-            
-        }));
         
         MACHINE_CHANNEL.registerClientbound(EnchanterSyncPacket.class, ((message, access) -> {
             

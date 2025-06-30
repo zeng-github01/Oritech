@@ -23,6 +23,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
@@ -82,7 +83,6 @@ public class NetworkManager {
         registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         registerCodec(OritechRecipeType.PACKET_CODEC, OritechRecipe.class);
-        registerCodec(getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity.RenderStackData.class);
         
     }
     
@@ -97,6 +97,7 @@ public class NetworkManager {
         registerToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
     }
     
+    @SuppressWarnings("unchecked")
     public static void initClient() {
         registerToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
         registerToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);

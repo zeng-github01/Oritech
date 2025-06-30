@@ -121,7 +121,7 @@ public class LaserArmBlock extends Block implements BlockEntityProvider {
             
             // first time created
             if (isAssembled && !wasAssembled) {
-                NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+                laserArm.triggerSetupAnimation();
                 laserArm.initAddons();
                 return ActionResult.SUCCESS;
             }

@@ -525,7 +525,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void playSetupAnimation() {
+    public void triggerSetupAnimation() {
         triggerAnim("machine", "deploy");
     }
     

@@ -192,7 +192,7 @@ public class AugmentApplicationBlock extends HorizontalFacingBlock implements Bl
         
         // first time created
         if (isAssembled && !wasAssembled) {
-            NetworkContent.MACHINE_CHANNEL.serverHandle(entity).send(new NetworkContent.MachineSetupEventPacket(pos));
+            modifierEntity.triggerSetupAnimation();
             return ActionResult.SUCCESS;
         }
         

@@ -45,8 +45,6 @@ import java.util.Optional;
 
 // next todo: update addon UI data handling, test ALL the things
 // todo switch input mode button
-// todo multiblock animation controller event sending
-// todo geckolib part to handled animations?
 public abstract class MachineBlockEntity extends NetworkedBlockEntity
   implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     
@@ -310,10 +308,6 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     public boolean isActivelyWorking() {
         return world.getTime() - lastWorkedAt < 15;
-    }
-    
-    public void playSetupAnimation() {
-        triggerAnim("base_controller", "setup");
     }
     
     protected float getAnimationSpeed() {

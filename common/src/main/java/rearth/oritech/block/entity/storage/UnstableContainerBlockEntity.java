@@ -176,7 +176,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "machine", 0, state -> {
+        controllers.add(new AnimationController<>(this, 0, state -> {
             if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
                 if (this.getCachedState().get(UnstableContainerBlock.SETUP_DONE)) {
                     return state.setAndContinue(IDLE);
@@ -276,9 +276,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    public void playSetupAnimation() {
-    
-    }
+    public void triggerSetupAnimation() {}
     
     @Override
     public void onCoreBroken(BlockPos corePos) {
