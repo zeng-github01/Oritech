@@ -187,8 +187,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @DispenserPlace
     public static final Block CREATIVE_TANK_BLOCK = new CreativeFluidTank(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().pistonBehavior(PistonBehavior.BLOCK).luminance(state -> state.get(Properties.LIT) ? 15 : 0).hardness(-1.0F));
     
-    public static final Item SMALL_TANK_ITEM = new SmallFluidTankBlockItem(SMALL_TANK_BLOCK, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
-    public static final Item CREATIVE_TANK_ITEM = new SmallFluidTankBlockItem(CREATIVE_TANK_BLOCK, new Item.Settings().component(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()));
+    public static final Item SMALL_TANK_ITEM = new SmallFluidTankBlockItem(SMALL_TANK_BLOCK, new Item.Settings());
+    public static final Item CREATIVE_TANK_ITEM = new SmallFluidTankBlockItem(CREATIVE_TANK_BLOCK, new Item.Settings());
     
     @UseGeoBlockItem(scale = 0.7f)
     public static final Block AUGMENT_APPLICATION_BLOCK = new AugmentApplicationBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque());
