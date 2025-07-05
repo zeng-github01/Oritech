@@ -38,8 +38,6 @@ import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.block.entity.interaction.PumpBlockEntity;
-import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
@@ -49,8 +47,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
-import rearth.oritech.util.InventoryInputMode;
-import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
@@ -126,10 +122,6 @@ public class NetworkContent {
     }
     
     public record GeneratorSteamSyncPacket(BlockPos position, long waterAmount, long steamAmount) {
-    }
-    
-    
-    public record PumpWorkSyncPacket(BlockPos position, String fluidType, long workedAt) {
     }
     
     public record AugmentInstallTriggerPacket(BlockPos position, Identifier id, int operationId) {
@@ -318,18 +310,6 @@ public class NetworkContent {
             
             if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
                 acceleratorBlock.onParticleInsertedClient();
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(PumpWorkSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof PumpBlockEntity pump) {
-                var variant = Registries.FLUID.get(Identifier.of(message.fluidType));
-                pump.setLastPumpedVariant(variant);
-                pump.setLastPumpTime(message.workedAt);
             }
             
         }));
