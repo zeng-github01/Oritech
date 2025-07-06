@@ -79,7 +79,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         preNetworkUpdate(type);
         
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
-        var fieldCount = NetworkManager.encodeFields(this, type, usedBuf);
+        var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, world);
         if (fieldCount == 0) return;
         NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()));
     }
@@ -93,7 +93,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         preNetworkUpdate(type);
         
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
-        var fieldCount = NetworkManager.encodeFields(this, type, usedBuf);
+        var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, world);
         if (fieldCount == 0) return;
         NetworkManager.sendPlayerHandle(new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()), player);
     }

@@ -99,11 +99,6 @@ public class NetworkContent {
     public record EnergyStatisticsPacket(BlockPos position, DynamicStatisticEnergyStorage.EnergyStatistics data) {
     }
     
-    public record LaserArmSyncPacket(BlockPos position, BlockPos target, long lastFiredAt, int areaSize,
-                                     int yieldAddons, int hunterAddons, int hunterTargetMode, boolean cropAddon,
-                                     boolean hasSilkTouchAddon, int targetEntityId, boolean redstonePowered) {
-    }
-    
     public record SingleVariantFluidSyncPacketAPI(BlockPos position, String fluidType, long amount) {
     }
     
@@ -116,9 +111,6 @@ public class NetworkContent {
     
     public record CatalystSyncPacket(BlockPos position, int storedSouls, int progress, boolean isHyperEnchanting,
                                      int maxSouls) {
-    }
-    
-    public record RefinerySyncPacket(BlockPos position, FluidStack mainIn, FluidStack mainOut, FluidStack nodeA, FluidStack nodeB, int moduleCount) {
     }
     
     public record GeneratorSteamSyncPacket(BlockPos position, long waterAmount, long steamAmount) {
@@ -162,7 +154,6 @@ public class NetworkContent {
     public static Codec<FluidStack> FLUID_STACK_CODEC;
     public static PacketCodec<RegistryByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
     
-    @SuppressWarnings("unchecked")
     public static void registerChannels() {
         
         Oritech.LOGGER.debug("Registering oritech channels");
@@ -176,25 +167,6 @@ public class NetworkContent {
             
             if (entity instanceof EnchanterBlockEntity machine) {
                 machine.handleSyncPacket(message);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(LaserArmSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof LaserArmBlockEntity laserArmBlock) {
-                laserArmBlock.setCurrentTarget(message.target);
-                laserArmBlock.setLastFiredAt(message.lastFiredAt);
-                laserArmBlock.areaSize = message.areaSize;
-                laserArmBlock.yieldAddons = message.yieldAddons;
-                laserArmBlock.hunterAddons = message.hunterAddons;
-                laserArmBlock.hasCropFilterAddon = message.cropAddon;
-                laserArmBlock.hasSilkTouchAddon = message.hasSilkTouchAddon;
-                laserArmBlock.setLivingTargetFromNetwork(message.targetEntityId);
-                laserArmBlock.hunterTargetMode = LaserArmBlockEntity.HunterTargetMode.fromValue(message.hunterTargetMode);
-                laserArmBlock.setRedstonePowered(message.redstonePowered);
             }
             
         }));
@@ -310,19 +282,6 @@ public class NetworkContent {
             
             if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
                 acceleratorBlock.onParticleInsertedClient();
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(RefinerySyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof RefineryBlockEntity refinery) {
-                refinery.ownStorage.setStack(0, message.mainIn);
-                refinery.ownStorage.setStack(1, message.mainOut);
-                refinery.nodeA.setStack(message.nodeA);
-                refinery.nodeB.setStack(message.nodeB);
             }
             
         }));

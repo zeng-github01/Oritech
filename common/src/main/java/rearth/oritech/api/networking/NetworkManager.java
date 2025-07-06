@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -21,9 +22,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
@@ -83,6 +86,7 @@ public class NetworkManager {
         registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         registerCodec(OritechRecipeType.PACKET_CODEC, OritechRecipe.class);
+        registerCodec(LaserArmBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
         
     }
     
@@ -108,7 +112,7 @@ public class NetworkManager {
         var receiverEntity = world.getBlockEntity(message.pos);
         var receiverType = registryAccess.get(RegistryKeys.BLOCK_ENTITY_TYPE).get(message.targetEntityType);
         if (receiverEntity != null && receiverType != null && receiverType.equals(receiverEntity.getType())) {
-            decodeFields(receiverEntity, message.syncType, receivedBuf);
+            decodeFields(receiverEntity, message.syncType, receivedBuf, world);
             if (receiverEntity instanceof NetworkedEventHandler networkedBlock) {
                 networkedBlock.onNetworkUpdated();
             }
@@ -119,7 +123,7 @@ public class NetworkManager {
     
     // returns the number of encoded fields
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf) {
+    public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf, @Nullable World world) {
         
         var encodedCount = 0;
         for (var field : getSyncFields(target, type)) {
@@ -130,11 +134,19 @@ public class NetworkManager {
                     var deltaOnly = fieldInstance.useDeltaOnly(type);
                     var dataToSend = deltaOnly ? fieldInstance.getDeltaData() : fieldInstance;
                     var codec = deltaOnly ? fieldInstance.getDeltaCodec() : fieldInstance.getFullCodec();
-                    codec.encode(byteBuf, dataToSend);
+                    if (codec instanceof WorldPacketCodec worldPacketCodec) {
+                        worldPacketCodec.encode(byteBuf, dataToSend, world);
+                    } else {
+                        codec.encode(byteBuf, dataToSend);
+                    }
                 } else {
                     var codec = getAutoCodec(field);
                     var value = field.get(target);
-                    codec.encode(byteBuf, value);
+                    if (codec instanceof WorldPacketCodec worldPacketCodec) {
+                        worldPacketCodec.encode(byteBuf, value, world);
+                    } else {
+                        codec.encode(byteBuf, value);
+                    }
                 }
                 
                 encodedCount++;
@@ -148,7 +160,7 @@ public class NetworkManager {
     }
     
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf) {
+    public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf, World world) {
         for (var field : getSyncFields(target, type)) {
             field.setAccessible(true);
             try {
@@ -157,7 +169,12 @@ public class NetworkManager {
                     var fieldInstance = ((UpdatableField) field.get(target));
                     var deltaOnly = fieldInstance.useDeltaOnly(type);
                     var codec = deltaOnly ? fieldInstance.getDeltaCodec() : fieldInstance.getFullCodec();
-                    var value = codec.decode(byteBuf);
+                    Object value;
+                    if (codec instanceof WorldPacketCodec worldPacketCodec) {
+                        value = worldPacketCodec.decode(byteBuf, world);
+                    } else {
+                        value = codec.decode(byteBuf);
+                    }
                     if (deltaOnly) {
                         fieldInstance.handleDeltaUpdate(value);
                     } else {
@@ -165,7 +182,12 @@ public class NetworkManager {
                     }
                 } else {
                     var codec = getAutoCodec(field);
-                    var value = codec.decode(byteBuf);
+                    Object value;
+                    if (codec instanceof WorldPacketCodec worldPacketCodec) {
+                        value = worldPacketCodec.decode(byteBuf, world);
+                    } else {
+                        value = codec.decode(byteBuf);
+                    }
                     field.set(target, value);
                 }
                 

@@ -38,7 +38,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PumpBlockEntity extends NetworkedBlockEntity implements BlockEntityTicker<NetworkedBlockEntity>, FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
+public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
     
     private static final int MAX_SEARCH_COUNT = 100_000;
     private static final int ENERGY_USAGE = 512;   // per block pumped

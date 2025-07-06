@@ -104,7 +104,7 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     
     public void updateNetwork() {
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
-        var fieldCount = NetworkManager.encodeFields(this, SyncType.GUI_TICK, usedBuf);
+        var fieldCount = NetworkManager.encodeFields(this, SyncType.GUI_TICK, usedBuf, world);
         if (fieldCount == 0) return;
         NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), SyncType.GUI_TICK, usedBuf.array()));
     }
