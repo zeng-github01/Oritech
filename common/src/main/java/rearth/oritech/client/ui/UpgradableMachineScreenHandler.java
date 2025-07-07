@@ -27,7 +27,7 @@ public class UpgradableMachineScreenHandler extends BasicMachineScreenHandler {
         if (blockEntity instanceof MachineAddonController upgradableEntity) {
             addonController = upgradableEntity;
         } else {
-            Oritech.LOGGER.error("Creating Upgrade screen for non-upgradable block: {}", blockEntity);
+            Oritech.LOGGER.debug("Creating Upgrade screen for non-upgradable block: {}", blockEntity);
             addonController = null;
         }
         

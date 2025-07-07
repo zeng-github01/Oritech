@@ -42,6 +42,8 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     public void addExtensionComponents(FlowLayout container) {
         super.addExtensionComponents(container);
         
+        if (handler.addonController == null) return;
+        
         var baseData = handler.addonController.getBaseAddonData();
         
         var speed = 1 / baseData.speed() * 100;
@@ -81,6 +83,8 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         var y = handler.screenData.getEnergyConfiguration().y() + offsetY;
         
         var size = 25;
+        
+        if (handler.addonController == null) return;
         
         var level = handler.addonController.getCoreQuality();
         var upgradeCount = level - 1;

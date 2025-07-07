@@ -135,10 +135,11 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         if (handler.blockEntity == null) return;
         
         // update research panels
-        for (int i = 0; i < researchLabels.size(); i++) {
+        for (int i = 0; i < 3; i++) {
+            if (i >= researchLabels.size()) continue;
             var panelData = researchLabels.get(i);
             var researchData = this.handler.blockEntity.availableStations.get(i);
-            if (researchData == null) break;
+            if (researchData == null || panelData == null) continue;
             
             var baseKey = Text.literal("");
             var time = this.handler.blockEntity.getWorld().getTime();
@@ -323,8 +324,12 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     
     private void addResearchPanels(FlowLayout parent, int width) {
         
-        for (var researchState : this.handler.blockEntity.availableStations.values()) {
-            if (researchState == null) continue;
+        for (int i = 0; i < 3; i++) {
+            var researchState = this.handler.blockEntity.availableStations.getOrDefault(i, null);
+            if (researchState == null) {
+                researchLabels.add(null);
+                continue;
+            }
             
             var panel = Containers.verticalFlow(Sizing.fixed(width), Sizing.fixed((int) (width * 0.4)));
             var title = Components.label(researchState.type.getName().formatted(Formatting.BOLD));

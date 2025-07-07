@@ -128,11 +128,6 @@ public class NetworkContent {
     public record AugmentPlayerTogglePacket(Identifier id) {
     }
     
-    public record AugmentDataPacket(BlockPos position, List<Identifier> allResearched, List<Identifier> researchBlocks,
-                                    List<Boolean> researchStates, List<Identifier> activeResearches,
-                                    List<Long> startedTimes, List<Integer> researchTimes) {
-    }
-    
     public record AugmentPlayerStatePacket(Map<Identifier, Augment.AugmentState> data) {
     }
     
@@ -358,17 +353,6 @@ public class NetworkContent {
             
             if (entity instanceof EnchanterBlockEntity enchanter) {
                 enchanter.handleEnchantmentSelection(message);
-            }
-            
-        }));
-        
-        
-        MACHINE_CHANNEL.registerClientbound(AugmentDataPacket.class, ((message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            if (entity instanceof AugmentApplicationEntity enhancer) {
-                enhancer.handleAugmentUpdatePacket(message);
             }
             
         }));

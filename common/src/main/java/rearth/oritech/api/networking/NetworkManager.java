@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
@@ -87,6 +88,7 @@ public class NetworkManager {
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         registerCodec(OritechRecipeType.PACKET_CODEC, OritechRecipe.class);
         registerCodec(LaserArmBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
+        registerCodec(AugmentApplicationEntity.ResearchState.PACKET_CODEC, AugmentApplicationEntity.ResearchState.class);
         
     }
     
@@ -246,6 +248,11 @@ public class NetworkManager {
             var listTypeCodec = getAutoCodec((Class<?>) listType.get());
             return listTypeCodec.collect(PacketCodecs.toList());
         }
+        var setType = getSetType(field.getGenericType());
+        if (setType.isPresent()) {
+            var setTypeCodec = getAutoCodec((Class<?>) setType.get());
+            return setTypeCodec.collect(toSet());
+        }
         var mapType = getMapType(field.getGenericType());
         if (mapType.isPresent()) {
             var keyCodec = getAutoCodec((Class<?>) mapType.get().getLeft());
@@ -267,6 +274,17 @@ public class NetworkManager {
         if (type instanceof ParameterizedType pType) {
             var rawType = (Class<?>) pType.getRawType();
             if (rawType instanceof Class && List.class.isAssignableFrom(rawType)) {
+                return Optional.of(pType.getActualTypeArguments()[0]);
+            }
+        }
+        return Optional.empty();
+    }
+    
+    // Method for checking if a given type is a Set and for retrieving its type parameter
+    public static Optional<Type> getSetType(Type type) {
+        if (type instanceof ParameterizedType pType) {
+            var rawType = (Class<?>) pType.getRawType();
+            if (rawType instanceof Class && Set.class.isAssignableFrom(rawType)) {
                 return Optional.of(pType.getActualTypeArguments()[0]);
             }
         }
@@ -317,6 +335,10 @@ public class NetworkManager {
                 PacketCodecs.BYTE_ARRAY.encode(buf, value.message);
             }
         };
+    }
+    
+    static <B extends ByteBuf, V> PacketCodec.ResultFunction<B, V, Set<V>> toSet() {
+        return (codec) -> PacketCodecs.collection(HashSet::new, codec);
     }
     
     // transmits only the block type, with the default block state. Custom properties are not sent.
