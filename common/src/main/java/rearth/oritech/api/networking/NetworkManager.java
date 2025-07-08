@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
@@ -97,10 +98,12 @@ public class NetworkManager {
             AUTO_CODECS.put(clazz, codec);
     }
     
+    @SuppressWarnings("unchecked")
     public static void init() {
         registerDefaultCodecs();
         
         registerToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
+        registerToServer(EnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(EnchanterBlockEntity.SelectEnchantingPacket.class), EnchanterBlockEntity::receiveEnchantmentSelection);
     }
     
     @SuppressWarnings("unchecked")

@@ -102,13 +102,6 @@ public class NetworkContent {
     public record SingleVariantFluidSyncPacketAPI(BlockPos position, String fluidType, long amount) {
     }
     
-    public record EnchanterSelectionPacket(BlockPos position, String enchantment) {
-    }
-    
-    public record EnchanterSyncPacket(BlockPos position, long energy, int progress, int maxProgress,
-                                      int requiredCatalysts, int availableCatalysts) {
-    }
-    
     public record CatalystSyncPacket(BlockPos position, int storedSouls, int progress, boolean isHyperEnchanting,
                                      int maxSouls) {
     }
@@ -155,16 +148,6 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FLUID_STACK_CODEC, FLUID_STACK_STREAM_CODEC), FluidStack.class);
-        
-        MACHINE_CHANNEL.registerClientbound(EnchanterSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof EnchanterBlockEntity machine) {
-                machine.handleSyncPacket(message);
-            }
-            
-        }));
         
         MACHINE_CHANNEL.registerClientbound(CatalystSyncPacket.class, ((message, access) -> {
             
@@ -347,16 +330,6 @@ public class NetworkContent {
             
         }));
         
-        MACHINE_CHANNEL.registerClientbound(EnchanterSelectionPacket.class, ((message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            if (entity instanceof EnchanterBlockEntity enchanter) {
-                enchanter.handleEnchantmentSelection(message);
-            }
-            
-        }));
-        
         MACHINE_CHANNEL.registerServerbound(LaserPlayerUsePacket.class, (message, access) -> {
             PortableLaserItem.onUseTick(access.player());
         });
@@ -390,16 +363,6 @@ public class NetworkContent {
             
             if (entity instanceof InventoryProxyAddonBlockEntity machine) {
                 machine.setTargetSlot(message.slot);
-            }
-            
-        });
-        
-        UI_CHANNEL.registerServerbound(EnchanterSelectionPacket.class, (message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            if (entity instanceof EnchanterBlockEntity enchanter) {
-                enchanter.handleEnchantmentSelection(message);
             }
             
         });
