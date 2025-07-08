@@ -26,7 +26,6 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
-import rearth.oritech.block.entity.accelerator.ParticleCollectorBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
@@ -62,9 +61,6 @@ public class NetworkContent {
     }
     
     public record AcceleratorParticleInsertEventPacket(BlockPos position) {
-    }
-    
-    public record ParticleAcceleratorAnimationPacket(BlockPos position) {
     }
     
     public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
@@ -242,15 +238,6 @@ public class NetworkContent {
             var entity = access.player().clientWorld.getBlockEntity(message.position);
             if (entity instanceof SteamEngineEntity machine) {
                 machine.clientStats = message;
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(ParticleAcceleratorAnimationPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            if (entity instanceof ParticleCollectorBlockEntity machine) {
-                machine.playAnimation();
             }
             
         }));
