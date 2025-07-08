@@ -6,43 +6,25 @@ import dev.architectury.registry.menu.MenuRegistry;
 import io.wispforest.owo.network.OwoNetChannel;
 import io.wispforest.owo.serialization.CodecUtils;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
-import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.augmenter.api.Augment;
-import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
-import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.ComponentContent;
-import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
-import rearth.oritech.util.ScreenProvider;
 
-import java.util.List;
 import java.util.Map;
 
 public class NetworkContent {
@@ -57,34 +39,8 @@ public class NetworkContent {
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {
     }
     
-    public record AcceleratorParticleRenderPacket(BlockPos position, List<Vec3d> particleTrail) {
-    }
-    
-    public record AcceleratorParticleInsertEventPacket(BlockPos position) {
-    }
-    
     public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
                                         long steamConsumed, int slaves) {
-    }
-    
-    public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
-    }
-    
-    // for use with addon providers to sync energy state
-    public record GenericEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy) {
-    }
-    
-    public record FullEnergySyncPacket(BlockPos position, long currentEnergy, long maxEnergy, long maxInsert,
-                                       long maxExtract) {
-    }
-    
-    public record EnergyStatisticsPacket(BlockPos position, DynamicStatisticEnergyStorage.EnergyStatistics data) {
-    }
-    
-    public record SingleVariantFluidSyncPacketAPI(BlockPos position, String fluidType, long amount) {
-    }
-    
-    public record GeneratorSteamSyncPacket(BlockPos position, long waterAmount, long steamAmount) {
     }
     
     public record AugmentInstallTriggerPacket(BlockPos position, Identifier id, int operationId) {
@@ -102,15 +58,7 @@ public class NetworkContent {
     public record AugmentPlayerStatePacket(Map<Identifier, Augment.AugmentState> data) {
     }
     
-    public record CentrifugeFluidSyncPacket(BlockPos position, boolean fluidAddon, String fluidTypeIn, long amountIn,
-                                            String fluidTypeOut,
-                                            long amountOut) {
-    }
-    
     public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) {
-    }
-    
-    public record InventorySyncPacket(BlockPos position, List<ItemStack> heldStacks) {
     }
     
     public record LaserPlayerUsePacket() {
@@ -127,145 +75,6 @@ public class NetworkContent {
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FLUID_STACK_CODEC, FLUID_STACK_STREAM_CODEC), FluidStack.class);
         
-        MACHINE_CHANNEL.registerClientbound(GenericEnergySyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getEnergyStorage(null) instanceof DynamicEnergyStorage storage) {
-                storage.capacity = message.maxEnergy;
-                storage.amount = message.currentEnergy;
-            } else if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getEnergyStorage(null) instanceof SimpleEnergyStorage storage) {
-                storage.setAmount(message.currentEnergy);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(EnergyStatisticsPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof ExpandableEnergyStorageBlockEntity storageBlock) {
-                storageBlock.currentStats = message.data;
-            } else if (entity instanceof UnstableContainerBlockEntity storageBlock) {
-                storageBlock.currentStats = message.data;
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(FullEnergySyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof EnergyApi.BlockProvider energyProvider && energyProvider.getEnergyStorage(null) instanceof DynamicEnergyStorage storage) {
-                storage.capacity = message.maxEnergy;
-                storage.amount = message.currentEnergy;
-                storage.maxExtract = message.maxExtract;
-                storage.maxInsert = message.maxInsert;
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(SingleVariantFluidSyncPacketAPI.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof FluidApi.BlockProvider fluidEntity && fluidEntity.getFluidStorage(null) instanceof SimpleFluidStorage fluidContainer) {
-                fluidContainer.setStack(FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.amount));
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(GeneratorSteamSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof SteamEngineEntity steamEngine) {  // water and steam amounts are mixed up in steam engine
-                steamEngine.boilerStorage.setStack(1, FluidStack.create(Fluids.WATER, message.steamAmount));
-                steamEngine.boilerStorage.setStack(0, FluidStack.create(FluidContent.STILL_STEAM.get(), message.waterAmount));
-            } else if (entity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
-                generatorBlock.boilerStorage.setStack(0, FluidStack.create(Fluids.WATER, message.waterAmount));
-                generatorBlock.boilerStorage.setStack(1, FluidStack.create(FluidContent.STILL_STEAM.get(), message.steamAmount));
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(AcceleratorParticleRenderPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
-                acceleratorBlock.onReceiveMovement(message.particleTrail);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(AcceleratorControllerBlockEntity.LastEventPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position());
-            
-            if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
-                acceleratorBlock.onReceivedEvent(message);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(AcceleratorParticleInsertEventPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position());
-            
-            if (entity instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
-                acceleratorBlock.onParticleInsertedClient();
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(CentrifugeFluidSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof CentrifugeBlockEntity centrifuge) {
-                centrifuge.hasFluidAddon = message.fluidAddon;
-                var inStack = FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidTypeIn)), message.amountIn);
-                var outStack = FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidTypeOut)), message.amountOut);
-                centrifuge.fluidContainer.setStack(0, inStack);
-                centrifuge.fluidContainer.setStack(1, outStack);
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(SteamEngineSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            if (entity instanceof SteamEngineEntity machine) {
-                machine.clientStats = message;
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(InventorySyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            if (entity instanceof ScreenProvider machine) {
-                List<ItemStack> heldStacks = message.heldStacks;
-                for (int i = 0; i < heldStacks.size(); i++) {
-                    var stack = heldStacks.get(i);
-                    machine.getDisplayedInventory().setStack(i, stack);
-                }
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(MachineFrameGuiPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            if (entity instanceof ItemEnergyFrameInteractionBlockEntity machine) {
-                machine.setCurrentProgress(message.progress);
-                var energyStorage = machine.getEnergyStorage();
-                energyStorage.amount = message.currentEnergy;
-                energyStorage.capacity = message.maxEnergy;
-            }
-            
-        }));
         
         MACHINE_CHANNEL.registerServerbound(LaserPlayerUsePacket.class, (message, access) -> {
             PortableLaserItem.onUseTick(access.player());

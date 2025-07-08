@@ -19,12 +19,14 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
@@ -85,6 +87,7 @@ public class NetworkManager {
         registerCodec(BlockPos.PACKET_CODEC, BlockPos.class);
         registerCodec(ItemStack.PACKET_CODEC, ItemStack.class);
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
+        registerCodec(VEC3D_PACKET_CODEC, Vec3d.class);
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
         registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
@@ -115,6 +118,8 @@ public class NetworkManager {
         registerToClient(EnchantmentCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(EnchantmentCatalystBlockEntity.CatalystSyncPacket.class), EnchantmentCatalystBlockEntity::receiveUpdatePacket);
         registerToClient(SpawnerControllerBlockEntity.SpawnerSyncPacket.PACKET_ID, getAutoCodec(SpawnerControllerBlockEntity.SpawnerSyncPacket.class), SpawnerControllerBlockEntity::receiveUpdatePacket);
         registerToClient(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.class), RedstoneAddonBlockEntity::receiveOnClient);
+        registerToClient(AcceleratorControllerBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.ParticleRenderTrail.class), AcceleratorControllerBlockEntity::receiveTrail);
+        registerToClient(AcceleratorControllerBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.LastEventPacket.class), AcceleratorControllerBlockEntity::receiveEvent);
     }
     
     public static void receiveMessage(MessagePayload message, World world, DynamicRegistryManager registryAccess) {
@@ -372,5 +377,22 @@ public class NetworkManager {
     public static <K, V> PacketCodec<RegistryByteBuf, HashMap<K, V>> createMapCodec(Class<K> keyType, Class<V> valueType) {
         return PacketCodecs.map(HashMap::new, getAutoCodec(keyType), getAutoCodec(valueType));
     }
+    
+    public static PacketCodec<RegistryByteBuf, Vec3d> VEC3D_PACKET_CODEC = new PacketCodec<>() {
+        @Override
+        public Vec3d decode(RegistryByteBuf buf) {
+            var x = buf.readDouble();
+            var y = buf.readDouble();
+            var z = buf.readDouble();
+            return new Vec3d(x, y, z);
+        }
+        
+        @Override
+        public void encode(RegistryByteBuf buf, Vec3d value) {
+            buf.writeDouble(value.x);
+            buf.writeDouble(value.y);
+            buf.writeDouble(value.z);
+        }
+    };
     
 }

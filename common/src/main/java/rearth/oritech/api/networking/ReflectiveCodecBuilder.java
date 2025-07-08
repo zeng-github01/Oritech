@@ -1,6 +1,5 @@
 package rearth.oritech.api.networking;
 
-import io.wispforest.endec.Endec;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -62,6 +61,8 @@ public class ReflectiveCodecBuilder {
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Failed to unreflect accessor for component: " + component.getName() + " in " + recordClass.getName(), e);
+            } catch (NullPointerException e) {
+                throw new RuntimeException("Failed to get codec for component: " + component.getName() + " in " + recordClass.getName(), e);
             }
         }
         
