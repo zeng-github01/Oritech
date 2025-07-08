@@ -28,8 +28,6 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.accelerator.ParticleCollectorBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
-import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
@@ -58,10 +56,6 @@ public class NetworkContent {
     }
     
     public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {
-    }
-    
-    public record RedstoneAddonSyncPacket(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode,
-                                          int currentOutput) {
     }
     
     public record AcceleratorParticleRenderPacket(BlockPos position, List<Vec3d> particleTrail) {
@@ -286,30 +280,12 @@ public class NetworkContent {
             
         }));
         
-        MACHINE_CHANNEL.registerClientbound(RedstoneAddonSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            if (entity instanceof RedstoneAddonBlockEntity machine) {
-                machine.handleClientBound(message);
-            }
-            
-        }));
-        
         MACHINE_CHANNEL.registerServerbound(LaserPlayerUsePacket.class, (message, access) -> {
             PortableLaserItem.onUseTick(access.player());
         });
         
         MACHINE_CHANNEL.registerClientbound(AugmentPlayerStatePacket.class, (message, access) -> {
             PlayerAugmentsClient.setPlayerAugment(access, message.data);
-        });
-        
-        UI_CHANNEL.registerServerbound(RedstoneAddonSyncPacket.class, (message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            if (entity instanceof RedstoneAddonBlockEntity machine) {
-                machine.handleServerBound(message);
-            }
-            
         });
         
         UI_CHANNEL.registerServerbound(InventoryInputModeSelectorPacket.class, (message, access) -> {

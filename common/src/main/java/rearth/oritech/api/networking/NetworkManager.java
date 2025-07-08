@@ -25,13 +25,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -106,6 +105,7 @@ public class NetworkManager {
         
         registerToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
         registerToServer(EnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(EnchanterBlockEntity.SelectEnchantingPacket.class), EnchanterBlockEntity::receiveEnchantmentSelection);
+        registerToServer(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.class), RedstoneAddonBlockEntity::receiveOnServer);
     }
     
     @SuppressWarnings("unchecked")
@@ -114,6 +114,7 @@ public class NetworkManager {
         registerToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
         registerToClient(EnchantmentCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(EnchantmentCatalystBlockEntity.CatalystSyncPacket.class), EnchantmentCatalystBlockEntity::receiveUpdatePacket);
         registerToClient(SpawnerControllerBlockEntity.SpawnerSyncPacket.PACKET_ID, getAutoCodec(SpawnerControllerBlockEntity.SpawnerSyncPacket.class), SpawnerControllerBlockEntity::receiveUpdatePacket);
+        registerToClient(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.class), RedstoneAddonBlockEntity::receiveOnClient);
     }
     
     public static void receiveMessage(MessagePayload message, World world, DynamicRegistryManager registryAccess) {
