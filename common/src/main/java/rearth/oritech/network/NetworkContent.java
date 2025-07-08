@@ -29,17 +29,13 @@ import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.block.entity.accelerator.ParticleCollectorBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
-import rearth.oritech.block.entity.processing.RefineryBlockEntity;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.FluidContent;
@@ -81,10 +77,6 @@ public class NetworkContent {
                                         long steamConsumed, int slaves) {
     }
     
-    public record SpawnerSyncPacket(BlockPos position, Identifier spawnedMob, boolean hasCage, int collectedSouls,
-                                    int maxSouls) {
-    }
-    
     public record MachineFrameGuiPacket(BlockPos position, long currentEnergy, long maxEnergy, int progress) {
     }
     
@@ -100,10 +92,6 @@ public class NetworkContent {
     }
     
     public record SingleVariantFluidSyncPacketAPI(BlockPos position, String fluidType, long amount) {
-    }
-    
-    public record CatalystSyncPacket(BlockPos position, int storedSouls, int progress, boolean isHyperEnchanting,
-                                     int maxSouls) {
     }
     
     public record GeneratorSteamSyncPacket(BlockPos position, long waterAmount, long steamAmount) {
@@ -149,16 +137,6 @@ public class NetworkContent {
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FLUID_STACK_CODEC, FLUID_STACK_STREAM_CODEC), FluidStack.class);
         
-        MACHINE_CHANNEL.registerClientbound(CatalystSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof EnchantmentCatalystBlockEntity catalystBlock) {
-                catalystBlock.handleNetworkPacket(message);
-            }
-            
-        }));
-        
         MACHINE_CHANNEL.registerClientbound(GenericEnergySyncPacket.class, ((message, access) -> {
             
             var entity = access.player().clientWorld.getBlockEntity(message.position);
@@ -203,19 +181,6 @@ public class NetworkContent {
             
             if (entity instanceof FluidApi.BlockProvider fluidEntity && fluidEntity.getFluidStorage(null) instanceof SimpleFluidStorage fluidContainer) {
                 fluidContainer.setStack(FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.amount));
-            }
-            
-        }));
-        
-        MACHINE_CHANNEL.registerClientbound(SpawnerSyncPacket.class, ((message, access) -> {
-            
-            var entity = access.player().clientWorld.getBlockEntity(message.position);
-            
-            if (entity instanceof SpawnerControllerBlockEntity spawnerEntity) {
-                spawnerEntity.loadEntityFromIdentifier(message.spawnedMob);
-                spawnerEntity.hasCage = message.hasCage;
-                spawnerEntity.collectedSouls = message.collectedSouls;
-                spawnerEntity.maxSouls = message.maxSouls;
             }
             
         }));

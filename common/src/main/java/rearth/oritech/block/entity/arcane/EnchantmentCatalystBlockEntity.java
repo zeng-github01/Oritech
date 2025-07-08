@@ -13,6 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -27,6 +29,7 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.CatalystScreenHandler;
@@ -295,14 +298,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     private void updateNetwork() {
-        NetworkContent.MACHINE_CHANNEL.serverHandle(this).send(new NetworkContent.CatalystSyncPacket(pos, collectedSouls, progress, isHyperEnchanting, maxSouls));
-    }
-    
-    public void handleNetworkPacket(NetworkContent.CatalystSyncPacket packet) {
-        this.isHyperEnchanting = packet.isHyperEnchanting();
-        this.progress = packet.progress();
-        this.collectedSouls = packet.storedSouls();
-        this.maxSouls = packet.maxSouls();
+        NetworkManager.sendBlockHandle(this, new CatalystSyncPacket(pos, collectedSouls, progress, isHyperEnchanting, maxSouls));
     }
     
     @Override
@@ -418,5 +414,24 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     @Override
     public boolean showEnergy() {
         return true;
+    }
+    
+    public static void receiveUpdatePacket(CatalystSyncPacket packet, World world, DynamicRegistryManager dynamicRegistryManager) {
+        if (world.getBlockEntity(packet.position) instanceof EnchantmentCatalystBlockEntity catalystBlock) {
+            catalystBlock.isHyperEnchanting = packet.isHyperEnchanting();
+            catalystBlock.progress = packet.progress();
+            catalystBlock.collectedSouls = packet.storedSouls();
+            catalystBlock.maxSouls = packet.maxSouls();
+        }
+    }
+    
+    public record CatalystSyncPacket(BlockPos position, int storedSouls, int progress, boolean isHyperEnchanting, int maxSouls) implements CustomPayload {
+        
+        public static final CustomPayload.Id<CatalystSyncPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("catalyst"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
     }
 }
