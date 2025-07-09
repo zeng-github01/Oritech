@@ -5,23 +5,17 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.menu.MenuRegistry;
 import io.wispforest.owo.network.OwoNetChannel;
 import io.wispforest.owo.serialization.CodecUtils;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.augmenter.api.Augment;
-import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.item.tools.armor.BaseJetpackItem;
 
 import java.util.Map;
 
@@ -29,10 +23,6 @@ public class NetworkContent {
     
     public static final OwoNetChannel MACHINE_CHANNEL = OwoNetChannel.create(Oritech.id("machine_data"));
     public static final OwoNetChannel UI_CHANNEL = OwoNetChannel.create(Oritech.id("ui_interactions"));
-    
-    public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
-                                        long steamConsumed, int slaves) {
-    }
     
     public record AugmentInstallTriggerPacket(BlockPos position, Identifier id, int operationId) {
     }
@@ -49,9 +39,6 @@ public class NetworkContent {
     public record AugmentPlayerStatePacket(Map<Identifier, Augment.AugmentState> data) {
     }
     
-    public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) {
-    }
-    
     // these two are basically copies of the architectury built-in fluid stack codecs, but using the OPTIONAL_STREAM_CODEC to allow for empty fluid stacks
     public static Codec<FluidStack> FLUID_STACK_CODEC;
     public static PacketCodec<RegistryByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
@@ -65,20 +52,6 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.registerClientbound(AugmentPlayerStatePacket.class, (message, access) -> {
             PlayerAugmentsClient.setPlayerAugment(access, message.data);
-        });
-        
-        UI_CHANNEL.registerServerbound(JetpackUsageUpdatePacket.class, (message, access) -> {
-            var player = access.player();
-            var stack = player.getEquippedStack(EquipmentSlot.CHEST);
-            if (!(stack.getItem() instanceof BaseJetpackItem)) return;
-            
-            // to prevent dedicated servers from kicking the player for flying
-            player.networkHandler.floatingTicks = 0;
-            
-            stack.set(EnergyApi.ITEM.getEnergyComponent(), message.energyStored);
-            if (message.fluidAmount > 0)
-                stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(Registries.FLUID.get(Identifier.of(message.fluidType)), message.fluidAmount));
-            
         });
         
         UI_CHANNEL.registerServerbound(AugmentInstallTriggerPacket.class, (message, access) -> {

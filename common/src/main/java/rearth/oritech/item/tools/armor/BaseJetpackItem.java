@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
@@ -87,7 +88,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var fluid = Registries.FLUID.getId(fluidStack.getFluid());
         
         // this will currently only for instances of this class
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.JetpackUsageUpdatePacket(getStoredEnergy(stack), fluid.toString(), fluidStack.getAmount()));
+        NetworkManager.sendToServer(new JetpackItem.JetpackUsageUpdatePacket(getStoredEnergy(stack), fluid.toString(), fluidStack.getAmount()));
         
         var playerForward = player.getRotationVecClient();
         var playerRight = playerForward.normalize().rotateY(-90);

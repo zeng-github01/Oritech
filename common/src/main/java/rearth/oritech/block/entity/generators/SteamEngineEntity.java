@@ -21,7 +21,6 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -30,7 +29,6 @@ import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventorySlotAssignment;
 
@@ -66,7 +64,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     // client only
     @SyncField(SyncType.GUI_TICK)
-    public NetworkContent.SteamEngineSyncPacket clientStats;
+    public SteamEngineSyncPacket clientStats;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.steamToRfRatio());
@@ -132,7 +130,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         progress = (int) (speed * 100f);
         
         // order/data: speed, efficiency, rf produced, steam consumed, slave count
-        clientStats = new NetworkContent.SteamEngineSyncPacket(pos, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
+        clientStats = new SteamEngineSyncPacket(pos, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
         this.markDirty();
         
     }
@@ -315,5 +313,9 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         if (inSlaveMode()) return master.boilerStorage.getStorageForDirection(direction);
         return boilerStorage.getStorageForDirection(direction);
+    }
+    
+    public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
+                                        long steamConsumed, int slaves) {
     }
 }
