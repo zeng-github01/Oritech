@@ -63,7 +63,7 @@ public final class OritechClient {
         // send mining laser use events to server
         ClientTickEvent.CLIENT_PRE.register(client -> {
             if (client.player != null && client.player.getMainHandStack().getItem() instanceof PortableLaserItem && laserActive) {
-                NetworkContent.MACHINE_CHANNEL.clientHandle().send(new NetworkContent.LaserPlayerUsePacket());
+                NetworkManager.sendToServer(new PortableLaserItem.LaserPlayerUsePacket());
             } else {
                 laserActive = false;
             }

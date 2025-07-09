@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
@@ -36,10 +37,10 @@ public class NetworkManagerImpl {
         });
     }
     
-    public static <T extends CustomPayload> void registerToServer(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, World, DynamicRegistryManager> consumer) {
+    public static <T extends CustomPayload> void registerToServer(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, PlayerEntity, DynamicRegistryManager> consumer) {
         PayloadTypeRegistry.playC2S().register(id, packetCodec);
         ServerPlayNetworking.registerGlobalReceiver(id, (message, context) -> {
-            consumer.accept(message, context.player().getServerWorld(), context.player().getServerWorld().getRegistryManager());
+            consumer.accept(message, context.player(), context.player().getServerWorld().getRegistryManager());
         });
     }
     

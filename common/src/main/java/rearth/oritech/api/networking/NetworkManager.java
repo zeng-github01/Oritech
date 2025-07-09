@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -37,6 +38,7 @@ import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.network.NetworkContent;
 
 import java.lang.reflect.Field;
@@ -69,7 +71,7 @@ public class NetworkManager {
     }
     
     @ExpectPlatform
-    public static <T extends CustomPayload> void registerToServer(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, World, DynamicRegistryManager> consumer) {
+    public static <T extends CustomPayload> void registerToServer(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, PlayerEntity, DynamicRegistryManager> consumer) {
         throw new AssertionError();
     }
     
@@ -109,6 +111,7 @@ public class NetworkManager {
         registerToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
         registerToServer(EnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(EnchanterBlockEntity.SelectEnchantingPacket.class), EnchanterBlockEntity::receiveEnchantmentSelection);
         registerToServer(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.class), RedstoneAddonBlockEntity::receiveOnServer);
+        registerToServer(PortableLaserItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(PortableLaserItem.LaserPlayerUsePacket.class), PortableLaserItem::receiveUsePacket);
     }
     
     @SuppressWarnings("unchecked")

@@ -125,8 +125,8 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
         return Text.literal("");
     }
     
-    public static void receiveOnServer(RedstoneAddonSyncPacket message, World world, DynamicRegistryManager dynamicRegistryManager) {
-        if (world.getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
+    public static void receiveOnServer(RedstoneAddonSyncPacket message, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
+        if (player.getWorld().getBlockEntity(message.position) instanceof RedstoneAddonBlockEntity addonEntity) {
             addonEntity.activeMode = RedstoneMode.values()[message.targetMode()];
             addonEntity.monitoredSlot = message.targetSlot();
         }

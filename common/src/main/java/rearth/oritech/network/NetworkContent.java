@@ -61,9 +61,6 @@ public class NetworkContent {
     public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) {
     }
     
-    public record LaserPlayerUsePacket() {
-    }
-    
     // these two are basically copies of the architectury built-in fluid stack codecs, but using the OPTIONAL_STREAM_CODEC to allow for empty fluid stacks
     public static Codec<FluidStack> FLUID_STACK_CODEC;
     public static PacketCodec<RegistryByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
@@ -74,11 +71,6 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.builder().register(OritechRecipeType.ORI_RECIPE_ENDEC, OritechRecipe.class);
         MACHINE_CHANNEL.builder().register(CodecUtils.toEndecWithRegistries(FLUID_STACK_CODEC, FLUID_STACK_STREAM_CODEC), FluidStack.class);
-        
-        
-        MACHINE_CHANNEL.registerServerbound(LaserPlayerUsePacket.class, (message, access) -> {
-            PortableLaserItem.onUseTick(access.player());
-        });
         
         MACHINE_CHANNEL.registerClientbound(AugmentPlayerStatePacket.class, (message, access) -> {
             PlayerAugmentsClient.setPlayerAugment(access, message.data);

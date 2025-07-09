@@ -145,8 +145,8 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
             world.markDirty(pos);
     }
     
-    public static void handleClientUpdate(ItemFilterPayload message, World world, DynamicRegistryManager registryAccess) {
-        var blockEntity = world.getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER_ENTITY);
+    public static void handleClientUpdate(ItemFilterPayload message, PlayerEntity player, DynamicRegistryManager registryAccess) {
+        var blockEntity = player.getWorld().getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER_ENTITY);
         if (blockEntity.isPresent()) {
             blockEntity.get().setFilterSettings(message.data);
         }

@@ -339,8 +339,8 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         return inventory;
     }
     
-    public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, World world, DynamicRegistryManager dynamicRegistryManager) {
-        var blockEntity = world.getBlockEntity(packet.self);
+    public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
+        var blockEntity = player.getWorld().getBlockEntity(packet.self);
         if (blockEntity instanceof EnchanterBlockEntity enchanterBlock) {
             enchanterBlock.selectedEnchantment = packet.enchantmentId;
         }
