@@ -11,8 +11,10 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.recipe.input.RecipeInput;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.property.Properties;
@@ -21,6 +23,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
@@ -29,6 +32,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
@@ -407,10 +411,6 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return inventoryInputMode;
     }
     
-    public void setInventoryInputMode(InventoryInputMode inventoryInputMode) {
-        this.inventoryInputMode = inventoryInputMode;
-    }
-    
     public abstract int getInventorySize();
     
     public boolean isActive(BlockState state) {
@@ -488,6 +488,11 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         this.disabledViaRedstone = isPowered;
     }
     
+    public static void receiveCycleModePacket(InventoryInputModeSelectorPacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
+        if (player.getWorld().getBlockEntity(packet.position()) instanceof MachineBlockEntity machineBlock)
+            machineBlock.cycleInputMode();
+    }
+    
     public class FilteringInventory extends InOutInventoryStorage {
         
         public FilteringInventory(int size, Runnable onUpdate, InventorySlotAssignment slotAssignment) {
@@ -540,4 +545,14 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         }
     }
     
+    // Client -> Server (e.g. from UI interactions
+    public record InventoryInputModeSelectorPacket(BlockPos position) implements CustomPayload {
+        
+        public static final CustomPayload.Id<InventoryInputModeSelectorPacket> PACKET_ID = new CustomPayload.Id<>(Oritech.id("input_mode"));
+        
+        @Override
+        public Id<? extends CustomPayload> getId() {
+            return PACKET_ID;
+        }
+    }
 }

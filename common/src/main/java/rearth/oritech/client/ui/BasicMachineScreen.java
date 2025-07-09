@@ -29,6 +29,7 @@ import rearth.oracle.Oracle;
 import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
@@ -386,7 +387,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         
         cycleInputButton = Components.button(Text.translatable("button.oritech.input_mode_fill_matching_recipe").withColor(GRAY_TEXT_COLOR),
           button -> {
-              NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.InventoryInputModeSelectorPacket(handler.blockPos));
+              NetworkManager.sendToServer(new MachineBlockEntity.InventoryInputModeSelectorPacket(handler.blockPos));
           });
         cycleInputButton.horizontalSizing(Sizing.fixed(73));
         cycleInputButton.margins(Insets.of(3));

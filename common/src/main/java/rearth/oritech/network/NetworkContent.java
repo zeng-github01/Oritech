@@ -13,7 +13,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
@@ -22,7 +21,6 @@ import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.BaseJetpackItem;
 
 import java.util.Map;
@@ -31,13 +29,6 @@ public class NetworkContent {
     
     public static final OwoNetChannel MACHINE_CHANNEL = OwoNetChannel.create(Oritech.id("machine_data"));
     public static final OwoNetChannel UI_CHANNEL = OwoNetChannel.create(Oritech.id("ui_interactions"));
-    
-    // Client -> Server (e.g. from UI interactions
-    public record InventoryInputModeSelectorPacket(BlockPos position) {
-    }
-    
-    public record InventoryProxySlotSelectorPacket(BlockPos position, int slot) {
-    }
     
     public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
                                         long steamConsumed, int slaves) {
@@ -74,26 +65,6 @@ public class NetworkContent {
         
         MACHINE_CHANNEL.registerClientbound(AugmentPlayerStatePacket.class, (message, access) -> {
             PlayerAugmentsClient.setPlayerAugment(access, message.data);
-        });
-        
-        UI_CHANNEL.registerServerbound(InventoryInputModeSelectorPacket.class, (message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            if (entity instanceof MachineBlockEntity machine) {
-                machine.cycleInputMode();
-            }
-            
-        });
-        
-        UI_CHANNEL.registerServerbound(InventoryProxySlotSelectorPacket.class, (message, access) -> {
-            
-            var entity = access.player().getWorld().getBlockEntity(message.position);
-            
-            if (entity instanceof InventoryProxyAddonBlockEntity machine) {
-                machine.setTargetSlot(message.slot);
-            }
-            
         });
         
         UI_CHANNEL.registerServerbound(JetpackUsageUpdatePacket.class, (message, access) -> {
