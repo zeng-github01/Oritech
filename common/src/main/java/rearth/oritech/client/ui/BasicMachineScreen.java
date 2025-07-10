@@ -35,7 +35,7 @@ import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.client.renderers.LaserArmModel;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
 

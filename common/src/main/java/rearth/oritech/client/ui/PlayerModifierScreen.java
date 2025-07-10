@@ -24,10 +24,10 @@ import net.minecraft.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.init.recipes.AugmentDataRecipe;
-import rearth.oritech.network.NetworkContent;
 import rearth.oritech.util.SizedIngredient;
 import rearth.oritech.util.TooltipHelper;
 
@@ -406,11 +406,11 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
         }
         
         var operationId = operation.ordinal();
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.AugmentInstallTriggerPacket(this.handler.blockPos, id, operationId));
+        NetworkManager.sendToServer(new PlayerAugments.AugmentInstallTriggerPacket(this.handler.blockPos, id, operationId));
     }
     
     private void onLoadAugmentsClick() {
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.LoadPlayerAugmentsToMachinePacket(this.handler.blockPos));
+        NetworkManager.sendToServer(new PlayerAugments.LoadPlayerAugmentsToMachinePacket(this.handler.blockPos));
         
         var loadedAugmentsCount = 0;
         for (var entry : PlayerAugments.allAugments.entrySet()) {
@@ -430,7 +430,7 @@ public class PlayerModifierScreen extends BaseOwoHandledScreen<FlowLayout, Playe
     
     private void onOpenInvClicked() {
         this.close();
-        NetworkContent.UI_CHANNEL.clientHandle().send(new NetworkContent.OpenAugmentScreenPacket(this.handler.blockPos));
+        NetworkManager.sendToServer(new PlayerAugments.OpenAugmentScreenPacket(this.handler.blockPos));
         
     }
     

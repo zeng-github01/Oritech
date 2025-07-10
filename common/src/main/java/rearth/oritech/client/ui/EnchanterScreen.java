@@ -18,7 +18,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
-import rearth.oritech.network.NetworkContent;
+
 
 public class EnchanterScreen extends BasicMachineScreen<EnchanterScreenHandler> {
     

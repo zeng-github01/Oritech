@@ -11,9 +11,9 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.UpdatableField;
-import rearth.oritech.network.NetworkContent;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -258,8 +258,8 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
             @Override
             public Pair<FluidStack, FluidStack> decode(ByteBuf buf) {
                 if (buf instanceof RegistryByteBuf registryByteBuf) {
-                    var left = NetworkContent.FLUID_STACK_STREAM_CODEC.decode(registryByteBuf);
-                    var right = NetworkContent.FLUID_STACK_STREAM_CODEC.decode(registryByteBuf);
+                    var left = NetworkManager.FLUID_STACK_STREAM_CODEC.decode(registryByteBuf);
+                    var right = NetworkManager.FLUID_STACK_STREAM_CODEC.decode(registryByteBuf);
                     return new Pair<>(left, right);
                 } else {
                     Oritech.LOGGER.error("Trying to decode storage data to non-registry buf! {}", buf);
@@ -270,8 +270,8 @@ public class SimpleInOutFluidStorage extends FluidApi.MultiSlotStorage implement
             @Override
             public void encode(ByteBuf buf, Pair<FluidStack, FluidStack> value) {
                 if (buf instanceof RegistryByteBuf registryByteBuf) {
-                    NetworkContent.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getLeft());
-                    NetworkContent.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getRight());
+                    NetworkManager.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getLeft());
+                    NetworkManager.FLUID_STACK_STREAM_CODEC.encode(registryByteBuf, value.getRight());
                 } else {
                     Oritech.LOGGER.error("Trying to encode storage data to non-registry buf! {} in {}", buf, value);
                 }

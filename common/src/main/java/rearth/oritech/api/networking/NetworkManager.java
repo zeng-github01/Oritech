@@ -1,5 +1,6 @@
 package rearth.oritech.api.networking;
 
+import com.mojang.serialization.Codec;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import io.netty.buffer.ByteBuf;
@@ -35,6 +36,8 @@ import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
@@ -42,7 +45,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.JetpackItem;
-import rearth.oritech.network.NetworkContent;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -52,6 +54,10 @@ import java.util.*;
 public class NetworkManager {
     
     private static final Map<Type, PacketCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
+    
+    // these two are basically copies of the architectury built-in fluid stack codecs, but using the OPTIONAL_STREAM_CODEC to allow for empty fluid stacks
+    public static Codec<FluidStack> FLUID_STACK_CODEC;
+    public static PacketCodec<RegistryByteBuf, FluidStack> FLUID_STACK_STREAM_CODEC;
     
     @ExpectPlatform
     public static void sendBlockHandle(BlockEntity blockEntity, CustomPayload message) {
@@ -94,7 +100,7 @@ public class NetworkManager {
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
         registerCodec(VEC3D_PACKET_CODEC, Vec3d.class);
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);
-        registerCodec(NetworkContent.FLUID_STACK_STREAM_CODEC, FluidStack.class);
+        registerCodec(FLUID_STACK_STREAM_CODEC, FluidStack.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         registerCodec(OritechRecipeType.PACKET_CODEC, OritechRecipe.class);
         registerCodec(LaserArmBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
@@ -113,11 +119,15 @@ public class NetworkManager {
         
         registerToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
         registerToServer(EnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(EnchanterBlockEntity.SelectEnchantingPacket.class), EnchanterBlockEntity::receiveEnchantmentSelection);
-        registerToServer(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.class), RedstoneAddonBlockEntity::receiveOnServer);
+        registerToServer(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.class), RedstoneAddonBlockEntity::receiveOnServer);
         registerToServer(PortableLaserItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(PortableLaserItem.LaserPlayerUsePacket.class), PortableLaserItem::receiveUsePacket);
         registerToServer(MachineBlockEntity.InventoryInputModeSelectorPacket.PACKET_ID, getAutoCodec(MachineBlockEntity.InventoryInputModeSelectorPacket.class), MachineBlockEntity::receiveCycleModePacket);
         registerToServer(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.PACKET_ID, getAutoCodec(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.class), InventoryProxyAddonBlockEntity::receiveSlotSelection);
         registerToServer(JetpackItem.JetpackUsageUpdatePacket.PACKET_ID, getAutoCodec(JetpackItem.JetpackUsageUpdatePacket.class), JetpackItem::receiveUsagePacket);
+        registerToServer(PlayerAugments.AugmentInstallTriggerPacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentInstallTriggerPacket.class), PlayerAugments::receiveInstallTrigger);
+        registerToServer(PlayerAugments.LoadPlayerAugmentsToMachinePacket.PACKET_ID, getAutoCodec(PlayerAugments.LoadPlayerAugmentsToMachinePacket.class), PlayerAugments::receivePlayerLoadMachine);
+        registerToServer(PlayerAugments.OpenAugmentScreenPacket.PACKET_ID, getAutoCodec(PlayerAugments.OpenAugmentScreenPacket.class), PlayerAugments::receiveOpenAugmentScreen);
+        registerToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
     }
     
     @SuppressWarnings("unchecked")
@@ -126,9 +136,10 @@ public class NetworkManager {
         registerToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
         registerToClient(EnchantmentCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(EnchantmentCatalystBlockEntity.CatalystSyncPacket.class), EnchantmentCatalystBlockEntity::receiveUpdatePacket);
         registerToClient(SpawnerControllerBlockEntity.SpawnerSyncPacket.PACKET_ID, getAutoCodec(SpawnerControllerBlockEntity.SpawnerSyncPacket.class), SpawnerControllerBlockEntity::receiveUpdatePacket);
-        registerToClient(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonSyncPacket.class), RedstoneAddonBlockEntity::receiveOnClient);
+        registerToClient(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.class), RedstoneAddonBlockEntity::receiveOnClient);
         registerToClient(AcceleratorControllerBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.ParticleRenderTrail.class), AcceleratorControllerBlockEntity::receiveTrail);
         registerToClient(AcceleratorControllerBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.LastEventPacket.class), AcceleratorControllerBlockEntity::receiveEvent);
+        registerToClient(PlayerAugments.AugmentPlayerStatePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerStatePacket.class), PlayerAugmentsClient::receiveAugmentState);
     }
     
     public static void receiveMessage(MessagePayload message, World world, DynamicRegistryManager registryAccess) {
@@ -145,6 +156,7 @@ public class NetworkManager {
         }
     }
     
+    // todo field caching
     // returns the number of encoded fields
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf, @Nullable World world) {

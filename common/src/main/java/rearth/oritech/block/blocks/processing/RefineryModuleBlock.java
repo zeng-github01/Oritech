@@ -25,7 +25,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.block.entity.processing.RefineryModuleBlockEntity;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.StackContext;
 

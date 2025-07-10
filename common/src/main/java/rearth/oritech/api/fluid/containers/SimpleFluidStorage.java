@@ -9,9 +9,9 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.codec.PacketCodec;
 import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.UpdatableField;
-import rearth.oritech.network.NetworkContent;
 
 import java.util.List;
 
@@ -134,7 +134,7 @@ public class SimpleFluidStorage extends FluidApi.SingleSlotStorage implements Up
     
     @Override
     public PacketCodec<? extends ByteBuf, FluidStack> getDeltaCodec() {
-        return NetworkContent.FLUID_STACK_STREAM_CODEC;
+        return NetworkManager.FLUID_STACK_STREAM_CODEC;
     }
     
     @Override

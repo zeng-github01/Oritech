@@ -21,7 +21,7 @@ import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;

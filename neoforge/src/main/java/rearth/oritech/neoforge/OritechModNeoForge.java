@@ -23,9 +23,9 @@ import rearth.oritech.api.attachment.neoforge.AttachmentApiImpl;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.neoforge.NetworkManagerImpl;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
-import rearth.oritech.network.NetworkContent;
 
 @Mod(Oritech.MOD_ID)
 public final class OritechModNeoForge {
@@ -52,8 +52,8 @@ public final class OritechModNeoForge {
         EnergyApi.BLOCK = energyApiInstance;
         EnergyApi.ITEM = energyApiInstance;
         
-        NetworkContent.FLUID_STACK_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
-        NetworkContent.FLUID_STACK_STREAM_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_STREAM_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
+        NetworkManager.FLUID_STACK_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
+        NetworkManager.FLUID_STACK_STREAM_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_STREAM_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
         
         Oritech.initialize();
         

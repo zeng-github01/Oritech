@@ -8,10 +8,13 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import static rearth.oritech.api.networking.NetworkManager.getAutoCodec;
 
 public class ReflectiveCodecBuilder {
     
-    public static <E extends Enum<E>>PacketCodec<RegistryByteBuf, E> createForEnum(Class<E> enumClass) {
+    public static <E extends Enum<E>> PacketCodec<RegistryByteBuf, E> createForEnum(Class<E> enumClass) {
         return new PacketCodec<>() {
             @Override
             public void encode(RegistryByteBuf buf, E value) {
@@ -20,7 +23,7 @@ public class ReflectiveCodecBuilder {
             
             @Override
             public E decode(RegistryByteBuf buf) {
-                var ordinal =  buf.readShort();
+                var ordinal = buf.readShort();
                 return enumClass.getEnumConstants()[ordinal];
             }
         };
@@ -54,10 +57,22 @@ public class ReflectiveCodecBuilder {
             try {
                 accessors.add(lookup.unreflect(component.getAccessor()));
                 var listCandidate = NetworkManager.getListType(component.getGenericType());
+                var mapCandidate = NetworkManager.getMapType(component.getGenericType());
                 if (listCandidate.isPresent()) {
-                    componentCodecs.add(NetworkManager.getAutoCodec((Class<?>) listCandidate.get()).collect(PacketCodecs.toList()));
+                    var codec = getAutoCodec((Class<?>) listCandidate.get()).collect(PacketCodecs.toList());
+                    if (codec == null)
+                        throw new RuntimeException("Failed to get codec for record component: " + component.getName() + " in " + recordClass.getName());
+                    componentCodecs.add(codec);
+                } else if (mapCandidate.isPresent()) {
+                    var keyCodec = getAutoCodec((Class<?>) mapCandidate.get().getLeft());
+                    var valueCodec = getAutoCodec((Class<?>) mapCandidate.get().getRight());
+                    var codec = PacketCodecs.map(HashMap::new, keyCodec, valueCodec);
+                    componentCodecs.add(codec);
                 } else {
-                    componentCodecs.add(NetworkManager.getAutoCodec(component.getType()));
+                    var codec = getAutoCodec(component.getType());
+                    if (codec == null)
+                        throw new RuntimeException("Failed to get codec for record component: " + component.getName() + " in " + recordClass.getName());
+                    componentCodecs.add(codec);
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Failed to unreflect accessor for component: " + component.getName() + " in " + recordClass.getName(), e);

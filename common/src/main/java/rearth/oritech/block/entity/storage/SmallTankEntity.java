@@ -34,7 +34,7 @@ import rearth.oritech.block.blocks.storage.SmallFluidTank;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.BasicMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.*;
 
 import java.util.List;

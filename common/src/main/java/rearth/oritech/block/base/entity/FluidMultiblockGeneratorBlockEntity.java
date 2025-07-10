@@ -21,7 +21,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.InventorySlotAssignment;
 import rearth.oritech.util.StackContext;
 

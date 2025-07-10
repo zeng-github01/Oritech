@@ -15,7 +15,7 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.RecipeType;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
-import rearth.oritech.network.NetworkContent;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.util.FluidIngredient;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
       ItemStack.PACKET_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getResults,
       Identifier.PACKET_CODEC.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier), OritechRecipe::getOriType,
       FluidIngredient.PACKET_CODEC, OritechRecipe::getFluidInput,
-      NetworkContent.FLUID_STACK_STREAM_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getFluidOutputs,
+      NetworkManager.FLUID_STACK_STREAM_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getFluidOutputs,
       OritechRecipe::new
     );
     

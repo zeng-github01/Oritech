@@ -48,7 +48,7 @@ import rearth.oritech.client.ui.PlayerModifierScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.recipes.AugmentDataRecipe;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;

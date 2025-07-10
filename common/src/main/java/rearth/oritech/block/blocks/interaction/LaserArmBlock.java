@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.behavior.LaserArmEntityBehavior;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 

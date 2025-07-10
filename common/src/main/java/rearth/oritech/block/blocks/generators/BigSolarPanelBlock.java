@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.PassiveGeneratorBlock;
 import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;

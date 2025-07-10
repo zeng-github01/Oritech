@@ -23,7 +23,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.List;

@@ -28,7 +28,7 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
@@ -52,7 +52,6 @@ public final class Oritech {
     public static void initialize() {
         
         LOGGER.info("Begin Oritech initialization");
-        NetworkContent.registerChannels();
         NetworkManager.init();
         NetworkManager.registerDefaultCodecs();
         ParticleContent.registerParticles();

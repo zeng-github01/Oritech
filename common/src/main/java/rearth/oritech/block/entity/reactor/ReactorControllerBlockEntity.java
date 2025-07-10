@@ -34,7 +34,7 @@ import rearth.oritech.client.ui.ReactorScreenHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
-import rearth.oritech.network.NetworkContent;
+
 import rearth.oritech.util.Geometry;
 
 import java.util.*;

@@ -15,7 +15,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.util.Helpers;
-import rearth.oritech.network.NetworkContent;
+
 
 public final class OritechClient {
     
