@@ -3,6 +3,7 @@ package rearth.oritech.client.renderers;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
@@ -92,7 +93,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
           pos,
           entity.getWorld(),
           matrices,
-          vertexConsumers.getBuffer(RenderLayers.getBlockLayer(renderedBeam)),
+          vertexConsumers.getBuffer(RenderLayer.getCutout()),
           true,
           random);
         
