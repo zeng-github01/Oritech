@@ -88,9 +88,6 @@ public class TagContent {
 
     // carbon fibre
     public static final TagKey<Item> CARBON_FIBRE = cItemTag("carbon_fibre");
-
-    // wires
-    public static final TagKey<Item> WIRES = cItemTag("wires");
     
     // blocks
     public static final TagKey<Block> DRILL_MINEABLE = oritechBlockTag("mineable/drill");

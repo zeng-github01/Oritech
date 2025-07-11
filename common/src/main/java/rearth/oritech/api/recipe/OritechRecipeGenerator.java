@@ -443,9 +443,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerAtomicForgeRecipe(exporter, BlockContent.CHARGER_BLOCK.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "chargeralt");
         
         // small storage
-        offerAtomicForgeRecipe(exporter, BlockContent.SMALL_STORAGE_BLOCK.asItem(), of(ItemContent.BASIC_BATTERY), of(TagContent.SILICON), of(ItemContent.MAGNETIC_COIL), of(TagContent.NICKEL_INGOTS), of(TagContent.WIRES), "smallstorage");
+        offerAtomicForgeRecipe(exporter, BlockContent.SMALL_STORAGE_BLOCK.asItem(), of(ItemContent.BASIC_BATTERY), of(TagContent.SILICON), of(ItemContent.MAGNETIC_COIL), of(TagContent.NICKEL_INGOTS), of(TagContent.NICKEL_INGOTS), "smallstorage");
         // large storage
-        offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE_BLOCK.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOS_CONTAINER), of(ItemContent.FLUX_GATE), of(TagContent.WIRES), "bigstorage");
+        offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE_BLOCK.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOS_CONTAINER), of(ItemContent.FLUX_GATE), of(ItemContent.MAGNETIC_COIL), "bigstorage");
         // unstable container
         offerAtomicForgeRecipe(exporter, ItemContent.UNSTABLE_CONTAINER, of(ItemContent.FLUXITE), of(ItemContent.DURATIUM_INGOT), of(BlockContent.LARGE_STORAGE_BLOCK), of(ItemContent.FLUX_GATE), of(ItemContent.SUPER_AI_CHIP), "unstablecontainer");
         
@@ -467,11 +467,11 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // machine frame
         offerMachineFrameRecipe(exporter, BlockContent.MACHINE_FRAME_BLOCK.asItem(), of(Items.IRON_BARS), of(TagContent.NICKEL_INGOTS), 16, "frame");
         // energy pipe
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE.asItem(), 6), of(TagContent.ELECTRUM_INGOTS), of(TagContent.WIRES), "energy");
+        offerCableRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE.asItem(), 6), of(TagContent.ELECTRUM_INGOTS), "energy");
         // item pipe
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE.asItem(), 6), of(TagContent.NICKEL_INGOTS), of(ItemTags.PLANKS), "item");
         // item filter
-        offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER_BLOCK.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.WIRES), of(ItemContent.PROCESSING_UNIT), of(TagContent.WIRES), "itemfilter");
+        offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER_BLOCK.asItem(), of(TagContent.MACHINE_PLATING), of(ItemTags.PLANKS), of(ItemContent.PROCESSING_UNIT), of(ItemTags.PLANKS), "itemfilter");
         // fluid pipe
         offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.FLUID_PIPE.asItem(), 6), of(TagContent.SILICON), of(cItemTag("ingots/copper")), "fluidpipe");
         
@@ -600,13 +600,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerBeadsRecipe(exporter,ItemContent.CLAY_CATALYST_BEADS, 8, of(Items.CLAY_BALL), of(ItemTags.SAND), of(Items.REDSTONE), "claybeads");
         AssemblerRecipeBuilder.build().input(Items.CLAY_BALL).input(Items.CLAY_BALL).input(ItemTags.SAND).input(Items.REDSTONE).result(ItemContent.CLAY_CATALYST_BEADS, 32).timeMultiplier(1f).export(exporter, "claybeads");
         
-        // fine wires
-        offerCableRecipe(exporter, new ItemStack(ItemContent.INSULATED_WIRE, 4), of(TagContent.NICKEL_INGOTS), "insulatedwire");
-        AssemblerRecipeBuilder.build().input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(cItemTag("ingots/copper")).result(ItemContent.INSULATED_WIRE, 12).timeMultiplier(0.4f).export(exporter, "fwire");
-        
         // magnetic coils
-        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL, 2), of(TagContent.STEEL_INGOTS), of(TagContent.WIRES), "magnet");
-        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.WIRES).input(TagContent.WIRES).input(TagContent.WIRES).result(ItemContent.MAGNETIC_COIL, 2).timeMultiplier(0.4f).export(exporter, "magnet");
+        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL, 4), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), "magnet");
+        AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(cItemTag("ingots/copper")).result(ItemContent.MAGNETIC_COIL, 6).timeMultiplier(0.4f).export(exporter, "magnet");
         
         // motor
         offerMotorRecipe(exporter, ItemContent.MOTOR, of(TagContent.NICKEL_INGOTS), of(ItemContent.MAGNETIC_COIL), of(TagContent.STEEL_INGOTS), "motorcraft");
@@ -671,7 +667,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AtomicForgeRecipeBuilder.build().input(ItemContent.SUPER_AI_CHIP).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensator");
         AtomicForgeRecipeBuilder.build().input(ItemContent.UNHOLY_INTELLIGENCE).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensatoralt");
         offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL, of(Items.AMETHYST_BLOCK), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.SUPERCONDUCTOR.asItem()), "overchargedcrystal");
-        AssemblerRecipeBuilder.build().input(ItemContent.FLUX_GATE).input(TagContent.WIRES).input(ItemContent.DUBIOS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 3).timeMultiplier(1.6f).export(exporter, "superconductor");
+        AssemblerRecipeBuilder.build().input(ItemContent.FLUX_GATE).input(TagContent.ELECTRUM_INGOTS).input(ItemContent.DUBIOS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 4).timeMultiplier(1.6f).export(exporter, "superconductor");
         AtomicForgeRecipeBuilder.build().input(ItemContent.HEISENBERG_COMPENSATOR).input(ItemContent.OVERCHARGED_CRYSTAL).input(ItemContent.OVERCHARGED_CRYSTAL).result(ItemContent.PROMETHEUM_INGOT).time(240).export(exporter, "prometheum");
         
         // ice in cooler

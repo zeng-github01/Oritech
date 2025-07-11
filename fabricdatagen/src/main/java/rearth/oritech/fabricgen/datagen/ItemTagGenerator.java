@@ -256,10 +256,6 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
         getOrCreateTagBuilder(TagContent.CARBON_FIBRE)
           .add(ItemContent.CARBON_FIBRE_STRANDS);
         
-        // wires
-        getOrCreateTagBuilder(TagContent.WIRES)
-          .add(ItemContent.INSULATED_WIRE);
-        
         // equipment enchanting
         getOrCreateTagBuilder(ItemTags.SWORDS)
           .add(ToolsContent.CHAINSAW, ToolsContent.PROMETHIUM_AXE, ToolsContent.PORTABLE_LASER);

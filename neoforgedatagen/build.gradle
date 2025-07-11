@@ -97,6 +97,8 @@ dependencies {
     // Oritech dependencies
     // architectury
     implementation "dev.architectury:architectury-neoforge:${rootProperties['architectury_api_version']}"
+    // forgified fabric api
+    runtimeOnly "org.sinytra.forgified-fabric-api:forgified-fabric-api:0.107.0+2.0.23+1.21.1"
     // owo lib
     runtimeOnly "io.wispforest:owo-lib-neoforge:0.12.15-beta.9+1.21"
     // geckolib
