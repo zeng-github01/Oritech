@@ -1220,6 +1220,8 @@
   "text.config.oritech-config.option.catalystRFPerSoul": "RF/t per catalyst soul capacity level increase",
   "text.config.oritech-config.option.catalystCostMultiplier": "Catalyst Soul Cost Multiplier",
   "text.config.oritech-config.option.catalystHyperMultiplier": "Additional Catalyst Hyper Enchanting Cost Multiplier",
+  "text.config.oritech-config.option.catalystHyperExpFactor": "Hyper Enchanting Exp Factor",
+  "text.config.oritech-config.option.catalystHyperExpFactor.tooltip": "Exponential Factor for the hyper enchanting cost. Increase this carefully. This makes higher levels MUCH more expensive.",
   "text.config.oritech-config.option.spawnerCostMultiplier": "Spawner Soul Cost Multiplier",
   "text.config.oritech-config.option.easyFindFeatures": "Easily findable features",
   "text.config.oritech-config.option.easyFindFeatures.tooltip": "Makes oil wells and bedrock ore nodes easier to find.Oil wells will include a small fountain, and ore nodes a small boulder on the surface",

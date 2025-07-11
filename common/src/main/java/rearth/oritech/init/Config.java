@@ -90,6 +90,7 @@ public class Config {
     public int catalystRFPerSoul = 20;
     public int catalystCostMultiplier = 2;
     public int catalystHyperMultiplier = 2;
+    public float catalystHyperExpFactor = 1.15f;
     public int spawnerCostMultiplier = 1;
     
     @SectionHeader("particleAccelerator")

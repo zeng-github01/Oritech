@@ -222,7 +222,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     private int getEnchantmentCost(Enchantment enchantment, int targetLevel, boolean hyper) {
         var baseCost = enchantment.getAnvilCost();
         var resultingCost = baseCost * targetLevel * Oritech.CONFIG.catalystCostMultiplier();
-        if (hyper) resultingCost = resultingCost * Oritech.CONFIG.catalystHyperMultiplier() + Oritech.CONFIG.catalystBaseSouls();
+        if (hyper) resultingCost = (int) (Math.pow(resultingCost * Oritech.CONFIG.catalystHyperMultiplier(), Oritech.CONFIG.catalystHyperExpFactor()) + Oritech.CONFIG.catalystBaseSouls());
         return resultingCost;
     }
     
