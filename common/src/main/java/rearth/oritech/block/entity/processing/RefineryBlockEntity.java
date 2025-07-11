@@ -130,7 +130,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
         var results = activeRecipe.getResults();
         if (results.isEmpty()) return List.of();
-        return List.of(results.getFirst().copyWithCount(results.getFirst().getCount() * getItemOutputMultiplier()));
+        return List.of(results.getFirst().copyWithCount(results.getFirst().getCount() * getItemOutputMultiplier(activeRecipe)));
     }
     
     private void craftFluids(OritechRecipe activeRecipe) {
@@ -153,6 +153,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         // if no modules are installed, output twice the resulting items and fluids
         // if one module is installed, output twice the output A
         // if both are installed, output all as normal
+        // if the recipe also only less than 2 fluid outputs, output normal
         
         if (recipe.getFluidOutputs().isEmpty()) return List.of();
         var outA = recipe.getFluidOutputs().get(0);
@@ -168,7 +169,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         };
     }
     
-    private int getItemOutputMultiplier() {
+    private int getItemOutputMultiplier(OritechRecipe recipe) {
+        if (recipe.getFluidOutputs().size() <= 1) return 1;
         return getModuleCount() == 0 ? 2 : 1;
     }
     
