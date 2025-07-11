@@ -1163,7 +1163,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .applyCost(cItemTag("storage_blocks/redstone"), 24)
           .requiredStation(ARCANE_AUGMENT_STATION_ID)
           .uiX(55).uiY(30).time(1800).rfCost(200_000_000)
-          .modifierDefinition(EntityAttributes.GENERIC_LUCK, 100, EntityAttributeModifier.Operation.ADD_VALUE)
+          .modifierDefinition(EntityAttributes.GENERIC_LUCK, 5, EntityAttributeModifier.Operation.ADD_VALUE)
           .export(exporter, "luck");
         
         AugmentRecipeBuilder.build()
