@@ -67,7 +67,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     private final Set<SteamEngineEntity> slaves = new HashSet<>();
     
     // client only
-    @SyncField(SyncType.GUI_TICK)
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public SteamEngineSyncPacket clientStats;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
