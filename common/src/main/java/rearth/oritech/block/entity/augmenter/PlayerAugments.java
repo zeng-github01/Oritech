@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.augmenter;
 
 import dev.architectury.registry.menu.MenuRegistry;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.recipe.RecipeManager;
@@ -8,6 +9,7 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.api.networking.NetworkManager;
@@ -87,6 +89,12 @@ public class PlayerAugments {
     
     public static void receiveToggleAugment(AugmentPlayerTogglePacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
         AugmentApplicationEntity.toggleAugmentForPlayer(packet.id, player);
+    }
+    
+    
+    public static void receiveAugmentState(PlayerAugments.AugmentPlayerStatePacket packet, World world, DynamicRegistryManager dynamicRegistryManager) {
+        if (world.isClient)
+            PlayerAugmentsClient.receiveAugmentState(packet.data);
     }
     
     public enum AugmentApplicatorOperation {

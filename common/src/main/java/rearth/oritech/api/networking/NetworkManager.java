@@ -128,10 +128,8 @@ public class NetworkManager {
         registerToServer(PlayerAugments.LoadPlayerAugmentsToMachinePacket.PACKET_ID, getAutoCodec(PlayerAugments.LoadPlayerAugmentsToMachinePacket.class), PlayerAugments::receivePlayerLoadMachine);
         registerToServer(PlayerAugments.OpenAugmentScreenPacket.PACKET_ID, getAutoCodec(PlayerAugments.OpenAugmentScreenPacket.class), PlayerAugments::receiveOpenAugmentScreen);
         registerToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public static void initClient() {
+        
+        
         registerToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
         registerToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
         registerToClient(EnchantmentCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(EnchantmentCatalystBlockEntity.CatalystSyncPacket.class), EnchantmentCatalystBlockEntity::receiveUpdatePacket);
@@ -139,7 +137,7 @@ public class NetworkManager {
         registerToClient(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.class), RedstoneAddonBlockEntity::receiveOnClient);
         registerToClient(AcceleratorControllerBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.ParticleRenderTrail.class), AcceleratorControllerBlockEntity::receiveTrail);
         registerToClient(AcceleratorControllerBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.LastEventPacket.class), AcceleratorControllerBlockEntity::receiveEvent);
-        registerToClient(PlayerAugments.AugmentPlayerStatePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerStatePacket.class), PlayerAugmentsClient::receiveAugmentState);
+        registerToClient(PlayerAugments.AugmentPlayerStatePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerStatePacket.class), PlayerAugments::receiveAugmentState);
     }
     
     public static void receiveMessage(MessagePayload message, World world, DynamicRegistryManager registryAccess) {

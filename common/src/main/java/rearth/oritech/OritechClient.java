@@ -29,7 +29,6 @@ public final class OritechClient {
         
         Oritech.LOGGER.info("Oritech client initialization");
         ModScreens.registerScreens();
-        NetworkManager.initClient();
         
         KeyMappingRegistry.register(AUGMENT_SELECTOR);
         

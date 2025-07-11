@@ -14,7 +14,7 @@ import java.util.Map;
 // a ClientPlayerEntity class?
 public class PlayerAugmentsClient {
     
-    public static void receiveAugmentState(PlayerAugments.AugmentPlayerStatePacket packet, World world, DynamicRegistryManager dynamicRegistryManager) {
-        AttachmentApi.setAttachment(MinecraftClient.getInstance().player, Augment.ACTIVE_AUGMENTS_DATA, packet.data());
+    public static void receiveAugmentState(Map<Identifier, Augment.AugmentState> data) {
+        AttachmentApi.setAttachment(MinecraftClient.getInstance().player, Augment.ACTIVE_AUGMENTS_DATA, data);
     }
 }
