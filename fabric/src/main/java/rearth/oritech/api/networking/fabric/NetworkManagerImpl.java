@@ -14,7 +14,12 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.util.TriConsumer;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
 public class NetworkManagerImpl {
+    
+    public static final Queue<Runnable> PENDING_S2C_INITS = new ArrayDeque<>();
     
     public static void sendBlockHandle(BlockEntity blockEntity, CustomPayload payload) {
         for (var player : PlayerLookup.tracking(blockEntity)) {
@@ -32,9 +37,13 @@ public class NetworkManagerImpl {
     
     public static <T extends CustomPayload> void registerToClient(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, World, DynamicRegistryManager> consumer) {
         PayloadTypeRegistry.playS2C().register(id, packetCodec);
-        ClientPlayNetworking.registerGlobalReceiver(id, (message, context) -> {
-            consumer.accept(message, context.player().clientWorld, context.client().world.getRegistryManager());
-        });
+        
+        PENDING_S2C_INITS.add(() -> {
+              ClientPlayNetworking.registerGlobalReceiver(id, (message, context) -> {
+                  consumer.accept(message, context.player().clientWorld, context.client().world.getRegistryManager());
+              });
+          }
+        );
     }
     
     public static <T extends CustomPayload> void registerToServer(CustomPayload.Id<T> id, PacketCodec<RegistryByteBuf, T> packetCodec, TriConsumer<T, PlayerEntity, DynamicRegistryManager> consumer) {

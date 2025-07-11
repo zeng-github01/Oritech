@@ -254,12 +254,12 @@ public class NetworkManager {
         // try to create codec for records
         if (!AUTO_CODECS.containsKey(type)) {
             if (type.isRecord()) {
-                System.out.println("creating reflective codec for: " + type);
+                Oritech.LOGGER.debug("creating reflective codec for: " + type);
                 var computedCodec = ReflectiveCodecBuilder.create((Class<? extends Record>) type);
                 AUTO_CODECS.put(type, computedCodec);
                 return computedCodec;
             } else if (type.isEnum()) {
-                System.out.println("creating reflective enum codec for: " + type);
+                Oritech.LOGGER.debug("creating reflective enum codec for: " + type);
                 var computedCodec = ReflectiveCodecBuilder.createForEnum((Class<? extends Enum>) type);
                 AUTO_CODECS.put(type, computedCodec);
                 return computedCodec;
