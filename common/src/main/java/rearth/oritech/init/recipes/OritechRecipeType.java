@@ -40,7 +40,7 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
     public static final PacketCodec<RegistryByteBuf, OritechRecipe> PACKET_CODEC = PacketCodec.tuple(
       PacketCodecs.INTEGER, OritechRecipe::getTime,
       Ingredient.PACKET_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getInputs,
-      ItemStack.PACKET_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getResults,
+      ItemStack.OPTIONAL_LIST_PACKET_CODEC, OritechRecipe::getResults,
       Identifier.PACKET_CODEC.xmap(identifier1 -> (OritechRecipeType) Registries.RECIPE_TYPE.get(identifier1), OritechRecipeType::getIdentifier), OritechRecipe::getOriType,
       FluidIngredient.PACKET_CODEC, OritechRecipe::getFluidInput,
       NetworkManager.FLUID_STACK_STREAM_CODEC.collect(PacketCodecs.toList()), OritechRecipe::getFluidOutputs,

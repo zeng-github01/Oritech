@@ -96,7 +96,7 @@ public class NetworkManager {
         registerCodec(PacketCodecs.STRING, String.class);
         registerCodec(Identifier.PACKET_CODEC, Identifier.class);
         registerCodec(BlockPos.PACKET_CODEC, BlockPos.class);
-        registerCodec(ItemStack.PACKET_CODEC, ItemStack.class);
+        registerCodec(ItemStack.OPTIONAL_PACKET_CODEC, ItemStack.class);
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
         registerCodec(VEC3D_PACKET_CODEC, Vec3d.class);
         registerCodec(SIMPLE_BLOCK_STATE_PACKET_CODEC, BlockState.class);

@@ -100,10 +100,46 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     
     @Override
     protected void craftItem(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.craftItem(activeRecipe, outputInventory, inputInventory);
+        
+        if (!processCraftInstance(activeRecipe)) return;
+        
+        if (supportExtraChambersAuto()) {
+            var chamberCount = getBaseAddonData().extraChambers();
+            
+            // remove extra fluid if more chambers are active
+            for (int i = 0; i < chamberCount; i++) {
+                if (!processCraftInstance(activeRecipe)) break;
+            }
+        }
+        
+    }
+    
+    // returns true if crafting has been successful
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private boolean processCraftInstance(OritechRecipe activeRecipe) {
+        
+        var results = getCraftingResults(activeRecipe);
+        if (results.isEmpty()) return false;
+        var result = results.getFirst();
+        
+        // try removing input fluid if output item would fit
+        if (inventory.heldStacks.getFirst().getCount() + result.getCount() > 64) return false;
         
         var input = activeRecipe.getFluidInput();
-        fluidStorage.extract(fluidStorage.getStack().copyWithAmount(input.amount()), false);
+        var extracted = fluidStorage.extract(fluidStorage.getStack().copyWithAmount(input.amount()), true);
+        if (extracted == activeRecipe.getFluidInput().amount()) {
+            // fluid is available, and item fits.
+            fluidStorage.extract(fluidStorage.getStack().copyWithAmount(input.amount()), false);
+            if (inventory.heldStacks.getFirst().isEmpty()) {
+                inventory.heldStacks.set(0, result.copy());
+            } else {
+                inventory.heldStacks.getFirst().increment(result.getCount());
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
     
     @Override
@@ -157,7 +193,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0,-1)
+          new Vec3i(0, 0, -1)
         );
     }
     
@@ -165,7 +201,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     public List<Vec3i> getAddonSlots() {
         
         return List.of(
-          new Vec3i(0, 0,-2)
+          new Vec3i(0, 0, -2)
         );
     }
     
