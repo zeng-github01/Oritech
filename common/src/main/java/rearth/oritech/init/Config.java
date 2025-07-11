@@ -67,7 +67,7 @@ public class Config {
     public boolean chainsawTreeCutting = true;
     
     @SectionHeader("worldGeneration")
-    public boolean generateOres = true;
+    public boolean generateOresFabricOnly = true;
     public boolean easyFindFeatures = true;
     
     @SectionHeader("reactor")
