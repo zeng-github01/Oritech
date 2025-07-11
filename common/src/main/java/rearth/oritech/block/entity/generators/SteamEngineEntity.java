@@ -6,8 +6,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Pair;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -56,6 +58,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     // master processes at X rate, shows chained count in UI
     
     // progress is used to store/sync animation speed
+    
+    private static Fluid USED_STEAM_FLUID;
     
     public long masterHeartbeat; // set from master, used by slave
     public SteamEngineEntity master;
@@ -186,7 +190,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     @Override
     public boolean boilerAcceptsInput(Fluid fluid) {
-        return fluid.equals(FluidContent.STILL_STEAM.get());
+        return fluid.equals(getUsedSteamFluid());
     }
     
     private void spawnParticles() {
@@ -317,5 +321,13 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
                                         long steamConsumed, int slaves) {
+    }
+    
+    public static Fluid getUsedSteamFluid() {
+        if (USED_STEAM_FLUID == null) {
+            USED_STEAM_FLUID = Registries.FLUID.get(Identifier.of(Oritech.CONFIG.generators.steamId()));
+        }
+        
+        return USED_STEAM_FLUID;
     }
 }

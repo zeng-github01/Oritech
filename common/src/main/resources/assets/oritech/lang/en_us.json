@@ -1058,6 +1058,8 @@
   "text.config.oritech-config.option.processingMachines.refineryData.energyPerTick": "Energy Per Tick",
   "text.config.oritech-config.category.generators": "Generators",
   "text.config.oritech-config.option.generators.animationSpeedMultiplier": "Animation Speed Multiplier",
+  "text.config.oritech-config.option.generators.steamId": "Steam Fluid ID",
+  "text.config.oritech-config.option.generators.steamId.tooltip": "Fluid ID for the steam produced by the steam boiler. Only this is accepted by steam engines.",
   "text.config.oritech-config.category.generators.basicGeneratorData": "Basic Generator Data",
   "text.config.oritech-config.option.generators.basicGeneratorData.energyCapacity": "Energy Capacity",
   "text.config.oritech-config.option.generators.basicGeneratorData.maxEnergyInsertion": "Max Energy Insertion",

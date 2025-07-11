@@ -173,7 +173,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             produced *= SteamEngineEntity.STEAM_AMOUNT_MULTIPLIER;
             
             var extracted = boilerStorage.getInputContainer().extract(FluidStack.create(Fluids.WATER.getStill(), Math.round(produced)), false);
-            boilerStorage.getOutputContainer().insert(FluidStack.create(FluidContent.STILL_STEAM.get(), extracted), false);
+            boilerStorage.getOutputContainer().insert(FluidStack.create(SteamEngineEntity.getUsedSteamFluid(), extracted), false);
         } else {
             energyStorage.amount += produced;
         }
