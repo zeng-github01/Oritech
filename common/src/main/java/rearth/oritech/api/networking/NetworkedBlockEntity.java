@@ -81,6 +81,9 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, world);
         if (fieldCount == 0) return;
+        
+        Oritech.LOGGER.debug("sending networked entity update: {} at {} for {}", type, pos, this.getType().getRegistryEntry().getKey().get().getValue());
+        
         NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()));
     }
     
@@ -95,6 +98,9 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         var usedBuf = new RegistryByteBuf(Unpooled.buffer(), world.getRegistryManager());
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, world);
         if (fieldCount == 0) return;
+        
+        Oritech.LOGGER.debug("sending networked entity player update: {} at {} for {}", type, pos, this.getType().getRegistryEntry().getKey().get().getValue());
+        
         NetworkManager.sendPlayerHandle(new NetworkManager.MessagePayload(pos, Registries.BLOCK_ENTITY_TYPE.getId(getType()), type, usedBuf.array()), player);
     }
     

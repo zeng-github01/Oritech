@@ -37,7 +37,6 @@ import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
-import rearth.oritech.block.entity.augmenter.PlayerAugmentsClient;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
@@ -54,6 +53,7 @@ import java.util.*;
 public class NetworkManager {
     
     private static final Map<Type, PacketCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
+    private static final Map<Integer, List<Field>> CACHED_FIELDS = new HashMap<Integer, List<Field>>();
     
     // these two are basically copies of the architectury built-in fluid stack codecs, but using the OPTIONAL_STREAM_CODEC to allow for empty fluid stacks
     public static Codec<FluidStack> FLUID_STACK_CODEC;
@@ -154,14 +154,14 @@ public class NetworkManager {
         }
     }
     
-    // todo field caching
     // returns the number of encoded fields
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf, @Nullable World world) {
         
+        var fields = getCachedFields(target, type);
+        
         var encodedCount = 0;
-        for (var field : getSyncFields(target, type)) {
-            field.setAccessible(true);
+        for (var field : fields) {
             try {
                 if (UpdatableField.class.isAssignableFrom(field.getType())) {
                     var fieldInstance = ((UpdatableField) field.get(target));
@@ -195,8 +195,10 @@ public class NetworkManager {
     
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf, World world) {
-        for (var field : getSyncFields(target, type)) {
-            field.setAccessible(true);
+        
+        var fields = getCachedFields(target, type);
+        
+        for (var field : fields) {
             try {
                 // fields that implement UpdatableField either get a delta or full update. Otherwise, we just set the full value
                 if (UpdatableField.class.isAssignableFrom(field.getType())) {
@@ -231,6 +233,11 @@ public class NetworkManager {
         }
     }
     
+    private static @NotNull List<Field> getCachedFields(Object target, SyncType type) {
+        var key = target.getClass().hashCode() + type.hashCode();
+        return CACHED_FIELDS.computeIfAbsent(key, elem -> getSyncFields(target, type));
+    }
+    
     private static @NotNull List<Field> getSyncFields(Object target, SyncType type) {
         var fields = new ArrayList<>(Arrays.asList(target.getClass().getDeclaredFields()));
         var superClass = target.getClass().getSuperclass();
@@ -240,7 +247,10 @@ public class NetworkManager {
         }
         
         var filteredFields = new ArrayList<Field>();
-        fields.stream().filter(field -> hasSyncType(field.getAnnotation(SyncField.class), type)).forEachOrdered(filteredFields::add);
+        fields.stream().filter(field -> hasSyncType(field.getAnnotation(SyncField.class), type)).forEachOrdered(field -> {
+            field.setAccessible(true);
+            filteredFields.add(field);
+        });
         
         if (target instanceof AdditionalNetworkingProvider additionalNetworkingProvider)
             filteredFields.addAll(additionalNetworkingProvider.additionalSyncedFields(type));
