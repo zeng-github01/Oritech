@@ -270,8 +270,8 @@ public class MetalProcessingChainBuilder {
             RefineryRecipeBuilder.build()
               .input(rawOreIngredient)
               .fluidInput(FluidContent.STILL_SHEOL_FIRE.get(), 0.25f)
-              .result(firstNonNull(clumpItem, dustItem), 3)
-              .fluidOutput(Fluids.LAVA, 0.2f)
+              .result(firstNonNull(clumpItem, dustItem), 2)
+              .fluidOutput(Fluids.LAVA, 0.1f)
               .timeMultiplier(timeMultiplier)
               .export(exporter, resourcePath + "rawsheol/" + metalName);
         }
