@@ -122,7 +122,6 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        // todo update constructors here
         return new UpgradableMachineScreenHandler(syncId, playerInventory, this);
     }
     

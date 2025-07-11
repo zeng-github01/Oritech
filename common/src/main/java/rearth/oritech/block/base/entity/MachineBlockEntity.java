@@ -47,8 +47,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-// next todo: update addon UI data handling, test ALL the things
-// todo switch input mode button
 public abstract class MachineBlockEntity extends NetworkedBlockEntity
   implements ExtendedMenuProvider, GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable {
     

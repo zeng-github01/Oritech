@@ -255,7 +255,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     
     @Override
     public void triggerSetupAnimation() {
-        // todo
+        triggerAnim("base_controller", "setup");
     }
     
     @Override
@@ -291,7 +291,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
+        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()).triggerableAnim("setup", SETUP);
     }
     
     public void setLastWorkTime(long lastWorkTime) {
