@@ -92,7 +92,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
             return;
         }
         
-        if (world.getTime() % PUMP_RATE == 0 && hasEnoughEnergy()) {
+        if (world.getTime() % PUMP_RATE == 0 && hasEnoughEnergy() && world.getReceivedRedstonePower(pos) <= 0) {
             
             if (pendingLiquidPositions.isEmpty() || tankIsFull()) return;
             
