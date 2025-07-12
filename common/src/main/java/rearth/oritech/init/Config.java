@@ -25,6 +25,10 @@ public class Config {
     public FertilizerConfig fertilizerConfig = new FertilizerConfig();
     @Nest
     public MachineFrameData placerConfig = new MachineFrameData(10, 5, 8, 64);
+    @Nest
+    public AddonConfig addonConfig = new AddonConfig();
+    public boolean additiveAddons = true;
+    public boolean layeredExtenders = false;
     
     @SectionHeader("storageBlocks")
     @Nest
@@ -204,6 +208,15 @@ public class Config {
         public long energyCapacity = 20000;
         public int stepsPerOre = 20;
         public int energyPerStep = 1024;
+    }
+    
+    public static class AddonConfig {
+        public float speedAddonSpeed = 0.5f;
+        public float speedAddonEfficiency = 1.2f;
+        public float efficiencyAddonEfficiency = 0.8f;
+        public float ultimateAddonSpeed = 0.25f;
+        public float ultimateAddonEfficiency = 1.1f;
+        public float chamberAddonEfficiency = 1.5f;
     }
     
     public static class CentrifugeConfig {

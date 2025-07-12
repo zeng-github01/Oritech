@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -19,7 +20,7 @@ public abstract class MultiblockFrameInteractionEntity extends ItemEnergyFrameIn
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
-    @SyncField
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     private float coreQuality = 1f;
     
     public MultiblockFrameInteractionEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

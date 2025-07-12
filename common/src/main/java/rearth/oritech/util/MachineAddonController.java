@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
@@ -102,6 +103,8 @@ public interface MachineAddonController {
     // addon loading algorithm, called during init
     default List<AddonBlock> getAllAddons(BlockPos brokenAddon) {
         
+        var useLayered = Oritech.CONFIG.layeredExtenders();
+        
         var maxIterationCount = (int) getCoreQuality() + 1;
         
         // start with base slots (on machine itself)
@@ -115,6 +118,8 @@ public interface MachineAddonController {
         
         var openSlots = getOpenAddonSlots();
         openSlots.clear();
+        
+        var foundExtenders = 0;
         
         var baseSlots = getAddonSlots();    // available addon slots on machine itself (includes multiblocks)
         var searchedPositions = new HashSet<BlockPos>(baseSlots.size()); // all positions ever checked, to avoid adding duplicates
@@ -163,6 +168,15 @@ public interface MachineAddonController {
                     continue;
                 }
                 
+                // if non-layered mode, check if we have too many extenders already
+                if (addonBlock.getAddonSettings().extender()) {
+                    if (foundExtenders < (maxIterationCount - 1) && !useLayered) {
+                        foundExtenders++;
+                    } else {
+                        continue;
+                    }
+                }
+                
                 var entry = new AddonBlock(addonBlock, candidate, candidatePos, candidateAddonEntity);
                 result.add(entry);
                 
@@ -195,14 +209,26 @@ public interface MachineAddonController {
         
         for (var addon : addons) {
             var addonSettings = addon.addonBlock().getAddonSettings();
-            speed *= addonSettings.speedMultiplier();
-            efficiency *= addonSettings.efficiencyMultiplier();
+            
+            if (Oritech.CONFIG.additiveAddons()) {
+                speed += 1 - addonSettings.speedMultiplier();
+                efficiency += 1 - addonSettings.efficiencyMultiplier();
+            } else {
+                speed *= addonSettings.speedMultiplier();
+                efficiency *= addonSettings.efficiencyMultiplier();
+            }
             
             energyAmount += addonSettings.addedCapacity();
             energyInsert += addonSettings.addedInsert();
             extraChambers += addonSettings.chamberCount();
             
             getAdditionalStatFromAddon(addon);
+        }
+        
+        if (Oritech.CONFIG.additiveAddons()) {
+            // convert addon numbers to base (e.g. +2 (+200%) speed bonus is actually a total multiplier of 0.5) (+2 would be a speed of 3, because we start at 1)
+            speed = 1f / speed;
+            efficiency = 1f / Math.max(efficiency, 0.001f);
         }
         
         var baseData = new BaseAddonData(speed, efficiency, energyAmount, energyInsert, extraChambers);
@@ -275,6 +301,7 @@ public interface MachineAddonController {
             connectedAddons.add(pos);
         }
     }
+    
     private static Set<BlockPos> getNeighbors(BlockPos pos) {
         return Set.of(
           pos.add(-1, 0, 0),
@@ -289,7 +316,9 @@ public interface MachineAddonController {
     record AddonBlock(MachineAddonBlock addonBlock, BlockState state, BlockPos pos, AddonBlockEntity addonEntity) {
     }
     
-    record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer, int extraChambers) { }
+    record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer,
+                         int extraChambers) {
+    }
     
     BaseAddonData DEFAULT_ADDON_DATA = new BaseAddonData(1, 1, 0, 0, 0);
     

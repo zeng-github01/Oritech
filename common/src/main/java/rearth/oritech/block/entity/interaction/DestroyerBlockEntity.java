@@ -317,12 +317,14 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     @Override
     public float getMoveTime() {
-        return Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier();
+        var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
+        return Oritech.CONFIG.destroyerConfig.moveDuration() * this.getSpeedMultiplier() * quarrySpeedBonus;
     }
 
     @Override
     public float getWorkTime() {
-        return (float) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness, 0.5f));
+        var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
+        return (float) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness, 0.5f) * quarrySpeedBonus);
     }
 
     @Override
@@ -332,7 +334,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     @Override
     public int getOperationEnergyUsage() {
-        return Oritech.CONFIG.destroyerConfig.workEnergyUsage();
+        var quarryCostBonus = range > 1 ? 4 : 1;
+        return Oritech.CONFIG.destroyerConfig.workEnergyUsage() * quarryCostBonus;
     }
 
     @Override

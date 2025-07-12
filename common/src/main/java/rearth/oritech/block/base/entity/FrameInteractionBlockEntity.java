@@ -420,4 +420,10 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     public ItemStack getToolheadAdditionalRender() {
         return null;
     }
+    
+    @Override
+    public void sendUpdate(SyncType type) {
+        if (currentTarget == null || lastTarget == null) return;
+        super.sendUpdate(type);
+    }
 }

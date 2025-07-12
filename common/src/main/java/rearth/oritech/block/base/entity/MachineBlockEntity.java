@@ -382,7 +382,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         this.currentRecipe = currentRecipe;
     }
     
-    // lower = better for both
+    // lower = better for both (speed and efficiency)
     public float getSpeedMultiplier() {
         return 1;
     }
