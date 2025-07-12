@@ -175,7 +175,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidContent.STILL_HEAVY_OIL.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.25f)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.25f)
-          .timeInSeconds(6)
           .export(exporter, "oilbase");
         
         RefineryRecipeBuilder.build()
@@ -184,7 +183,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidContent.STILL_DIESEL.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.5f)
-          .timeInSeconds(6)
+          .timeMultiplier(1.6f)
           .export(exporter, "oilalt");
         
         // heavy oil
@@ -194,7 +193,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidContent.STILL_DIESEL.get(), 1f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.25f)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.25f)
-          .timeInSeconds(6)
           .export(exporter, "heavyoil");
         
         // lava
@@ -203,7 +201,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 64_000))
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
           .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
-          .timeInSeconds(6)
           .export(exporter, "lava");
         
         RefineryRecipeBuilder.build()
@@ -212,7 +209,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 1f)
           .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_STRANGE_MATTER.get(), 0.2f)
-          .timeInSeconds(6)
+          .timeMultiplier(1.6f)
           .export(exporter, "lavaalt");
         
         // biodiesel
@@ -221,7 +218,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .fluidInput(FluidContent.STILL_BIOFUEL.get())
           .fluidOutput(FluidContent.STILL_DIESEL.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.2f)
-          .timeInSeconds(6)
           .export(exporter, "biodiesel");
         
         // centrifuge turbofuel
@@ -246,14 +242,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(TagContent.QUARTZ_DUSTS)
           .fluidInput(FluidContent.STILL_NAPHTHA.get())
           .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 1f)
-          .timeMultiplier(0.5f)
           .export(exporter, "siliconwash");
         
         CentrifugeFluidRecipeBuilder.build()
           .input(Items.GRAVEL)
           .fluidInput(FluidContent.STILL_NAPHTHA.get())
           .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 0.05f)
-          .timeMultiplier(0.5f)
+          .timeMultiplier(1.6f)
           .export(exporter, "siliconwashbad");
         
         // polymer resin from naphtha (manual)
@@ -278,6 +273,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.DUBIOS_CONTAINER)
           .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
           .result(ItemContent.ADVANCED_BATTERY, 8)
+          .timeMultiplier(2f)
           .export(exporter, "advbatteryacid");
         
         // silicon from silicon wash + sand in refinery
@@ -285,6 +281,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemTags.SAND)
           .fluidInput(FluidContent.STILL_SILICON_WASH.get())
           .result(ItemContent.SILICON, 4)
+          .timeMultiplier(2f)
           .export(exporter, "siliconwashing");
         
         // silicon wafer in centrifuge
@@ -292,6 +289,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.CARBON_FIBRE_STRANDS)
           .fluidInput(FluidContent.STILL_SILICON_WASH.get())
           .result(ItemContent.SILICON_WAFER, 4)
+          .timeMultiplier(2f)
           .export(exporter, "siliconwafers");
         
         // quartz from mineral wash in refinery
@@ -299,6 +297,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.CLAY_CATALYST_BEADS)
           .fluidInput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f)
           .result(Items.QUARTZ)
+          .timeMultiplier(2f)
           .export(exporter, "quartz");
         
         // reinforced carbon sheeting
@@ -306,6 +305,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.CARBON_FIBRE_STRANDS)
           .fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.5f)
           .result(ItemContent.REINFORCED_CARBON_SHEET)
+          .timeMultiplier(3f)
           .export(exporter, "carbonsheet");
         
         // dubious container and strange matter in centrifuge
@@ -313,6 +313,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.DUBIOS_CONTAINER)
           .fluidInput(FluidContent.STILL_STRANGE_MATTER.get())
           .result(ItemContent.UNHOLY_INTELLIGENCE, 1)
+          .timeMultiplier(8f)
           .export(exporter, "unholyai");
     }
     
