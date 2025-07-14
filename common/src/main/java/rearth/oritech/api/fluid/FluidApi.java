@@ -48,9 +48,10 @@ public class FluidApi {
     }
     
     public static long transfer(FluidStorage from, FluidStorage to, FluidStack toMove, boolean simulate) {
-        var extracted = from.extract(toMove, true);
+        var maxExtraction = from.extract(toMove, true);
+        var potentialInsertion = to.insert(toMove.copyWithAmount(maxExtraction), true);
+        var extracted = from.extract(toMove.copyWithAmount(potentialInsertion), simulate);
         var inserted = to.insert(toMove.copyWithAmount(extracted), simulate);
-        extracted = from.extract(toMove.copyWithAmount(inserted), simulate);
         
         if (extracted > 0 && !simulate) {
             from.update();
