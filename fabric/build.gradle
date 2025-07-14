@@ -136,7 +136,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("stitch")
+        requires("athena-mod")
         requires("fabric-api")
         requires("architectury-api")
 
@@ -151,7 +151,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("stitch")
+        requires("athena")
         requires("fabric-api")
         requires("architectury-api")
 

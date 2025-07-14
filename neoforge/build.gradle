@@ -131,7 +131,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("stitch")
+        requires("athena-mod")
         requires("architectury-api")
 
         announcementTitle = "Neoforge Version on Modrinth"
@@ -145,7 +145,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("stitch")
+        requires("athena")
         requires("architectury-api")
 
         javaVersions.add(JavaVersion.VERSION_21)
