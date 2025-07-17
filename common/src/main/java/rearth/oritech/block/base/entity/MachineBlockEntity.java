@@ -75,7 +75,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     // own storages
     public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::markDirty, getSlotAssignments());
-    @SyncField({SyncType.GUI_TICK})
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
