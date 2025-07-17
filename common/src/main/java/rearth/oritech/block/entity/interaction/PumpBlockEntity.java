@@ -87,6 +87,15 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     @Override
     public void serverTick(World world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
+        if ((initialized && pendingLiquidPositions.isEmpty() && world.getTime() % 62 == 0) || (!initialized && toolheadLowered && !searchActive && world.getTime() % 62 == 0)) {
+            // reset
+            initialized = false;
+            toolheadLowered = false;
+            searchActive = false;
+            toolheadPosition = pos;
+            System.out.println("pump reset");
+        }
+        
         if (!initialized) {
             progressStartup();
             return;
