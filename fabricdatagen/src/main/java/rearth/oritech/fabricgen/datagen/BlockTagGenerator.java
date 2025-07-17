@@ -167,6 +167,9 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
 
         getOrCreateTagBuilder(TagContent.MACHINE_FRAME_SUPPORT)
           .add(BlockContent.METAL_BEAM_BLOCK);
+
+        getOrCreateTagBuilder(TagContent.BLACK_HOLE_BLACKLIST)
+          .add(BlockContent.BLOCK_PLACER_HEAD); // just a dummy so packdevs can find the tag easier
         
         // storage block tags
         getOrCreateTagBuilder(getStorageBlockyTag("steel"))

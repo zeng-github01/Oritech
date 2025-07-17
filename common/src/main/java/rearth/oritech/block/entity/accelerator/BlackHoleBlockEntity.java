@@ -55,7 +55,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
         
         for (var candidate : BlockPos.iterateOutwards(pos, pullRange, pullRange, pullRange)) {
             var candidateState = world.getBlockState(candidate);
-            if (candidate.equals(pos) || candidateState.isAir() || candidateState.getFluidState().isStill() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK))
+            if (candidate.equals(pos) || candidateState.isAir() || candidateState.isIn(TagContent.BLACK_HOLE_BLACKLIST) || candidateState.getFluidState().isStill() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK))
                 continue;
             
             currentlyPullingFrom = candidate;
