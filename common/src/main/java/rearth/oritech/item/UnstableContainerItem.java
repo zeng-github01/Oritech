@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
@@ -113,10 +114,10 @@ public class UnstableContainerItem extends Item implements GeoItem {
         }
         
         for (var offset : UnstableContainerBlockEntity.getCoreOffsets()) {
-            // the block is symetrical, so offsets don't matter here
+            // the block is symetrical, so directions don't matter here
             var worldPos = targetBlockPos.add(offset);
             var candidateState = context.getWorld().getBlockState(worldPos);
-            if (!candidateState.isReplaceable()) {
+            if (!candidateState.isReplaceable() && !offset.equals(new Vec3i(0, -1, 0))) {   // ignore below block for dragon egg support blocks
                 context.getPlayer().sendMessage(Text.translatable("text.oritech.unstable_container_blocked"));
                 ParticleContent.HIGHLIGHT_BLOCK.spawn(context.getWorld(), Vec3d.of(worldPos));
                 return ActionResult.FAIL;
