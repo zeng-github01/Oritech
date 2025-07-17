@@ -125,7 +125,7 @@ tasks.remapJar {
 publishMods {
     file = remapJar.archiveFile
     changelog = file("../CHANGELOG.MD").getText()
-    type = ALPHA
+    type = BETA
     modLoaders.add("fabric")
 
     modrinth {
