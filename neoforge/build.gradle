@@ -131,7 +131,7 @@ publishMods {
 
         requires("owo-lib")
         requires("geckolib")
-        requires("athena-mod")
+        requires("athena-ctm")
         requires("architectury-api")
 
         announcementTitle = "Neoforge Version on Modrinth"
