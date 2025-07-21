@@ -1,0 +1,6 @@
+- Change efficiency calculations to allow more than -100% efficiency changes (-100% now doubles energy usage, and so on)
+- Add placement helper renderer for particle accelerator components
+- Allow fluid pipes to extract from cauldrons on NF with default settings
+- Make default assembler, foundry and grinder recipes faster
+- Fix energy storage capacity / details of upgraded machines not synced properly
+- Update translations from crowdIn + new russian translations (@SlavaVas)
