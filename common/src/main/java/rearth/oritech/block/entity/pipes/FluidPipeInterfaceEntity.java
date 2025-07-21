@@ -4,6 +4,8 @@ import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -55,7 +57,12 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             var offset = pos.subtract(sourcePos);
             var direction = Direction.fromVector(offset.getX(), offset.getY(), offset.getZ());
             if (!block.isSideExtractable(state, direction.getOpposite())) continue;
-            var sourceContainer = FluidApi.BLOCK.find(world, sourcePos, direction);
+            
+            var sourceBlock = world.getBlockState(sourcePos);
+            if (sourceBlock.isIn(BlockTags.CAULDRONS))
+                transferAmount = (int) FluidStackHooks.bucketAmount();
+            
+            var sourceContainer = FluidApi.BLOCK.find(world, sourcePos, sourceBlock, null, direction);
             if (sourceContainer == null || !sourceContainer.supportsExtraction()) continue;
             
             var contents = sourceContainer.getContent();
