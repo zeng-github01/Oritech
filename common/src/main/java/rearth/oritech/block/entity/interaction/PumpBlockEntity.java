@@ -93,7 +93,6 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
             toolheadLowered = false;
             searchActive = false;
             toolheadPosition = pos;
-            System.out.println("pump reset");
         }
         
         if (!initialized) {

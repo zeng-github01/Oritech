@@ -7,7 +7,7 @@ public class AssemblerRecipeBuilder extends OritechRecipeBuilder {
 
     protected AssemblerRecipeBuilder() {
         super(RecipeContent.ASSEMBLER, "assembler");
-        this.time = 160;
+        this.time = 120;
     }
 
     public static OritechRecipeBuilder build() {
