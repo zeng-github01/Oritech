@@ -7,7 +7,7 @@ public class GrinderRecipeBuilder extends OritechRecipeBuilder {
 
     protected GrinderRecipeBuilder() {
         super(RecipeContent.GRINDER, "grinder");
-        this.time = 80;
+        this.time = 60;
     }
 
     public static OritechRecipeBuilder build() {
