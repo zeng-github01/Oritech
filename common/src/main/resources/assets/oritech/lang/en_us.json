@@ -387,7 +387,7 @@
   "title.oritech.machine_speed": "⌛ %s%% ",
   "tooltip.oritech.machine_speed": "Processing Speed",
   "title.oritech.machine_efficiency": "⚡ %s%% ",
-  "tooltip.oritech.machine_efficiency": "Energy Efficiency",
+  "tooltip.oritech.machine_efficiency": "Energy Efficiency Change",
   "tooltip.oritech.steam_workers": "Chained steam generators will share/use the steam and water tank of this block.",
   "title.oritech.machine_energy_production": "↗ %d RF/t ",
   "tooltip.oritech.steam_energy_production": "Total production (includes chained generators)",

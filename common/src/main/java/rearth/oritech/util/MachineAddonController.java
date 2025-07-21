@@ -227,8 +227,16 @@ public interface MachineAddonController {
         
         if (Oritech.CONFIG.additiveAddons()) {
             // convert addon numbers to base (e.g. +2 (+200%) speed bonus is actually a total multiplier of 0.5) (+2 would be a speed of 3, because we start at 1)
+            // efficiency change of -100% would result in efficiency multiplier of 2. -400% would be 5
+            // efficiency and speed numbers < 1 here make things better.
+            
             speed = 1f / speed;
-            efficiency = 1f / Math.max(efficiency, 0.001f);
+            
+            var efficiencyChange = efficiency - 1;
+            efficiency = 1f / efficiency;
+            if (efficiencyChange < 0) {
+                efficiency = 1 + Math.abs(efficiencyChange);   // yes this order looks stupid, but it's easier to understand like this for me
+            }
         }
         
         var baseData = new BaseAddonData(speed, efficiency, energyAmount, energyInsert, extraChambers);

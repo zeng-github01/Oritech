@@ -47,15 +47,28 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         var baseData = handler.addonController.getBaseAddonData();
         
         var speed = (int) (1f / baseData.speed() * 100);
-        var efficiency = (int) (1f / baseData.efficiency() * 100);
+        var efficiency = baseData.efficiency();
         var extraChambers = baseData.extraChambers();
+        
+        var efficiencyText = "100";
+        
+        // transform the efficiency chang
+        if (efficiency > 1.03) {    // bad efficiency
+            efficiency = (efficiency - 1) * 100;
+            efficiency = Math.round(efficiency / 5f) * 5;
+            efficiencyText = "-" + (int) efficiency;
+        } else if (efficiency < 0.97) {
+            efficiency = ((1f / efficiency) - 1) * 100;
+            efficiency = Math.round(efficiency / 5f) * 5;
+            efficiencyText = "+" + (int) efficiency;
+        }
         
         // round to nearest 5
         speed = Math.round(speed / 5f) * 5;
-        efficiency = Math.round(efficiency / 5f) * 5;
+        
         
         speedLabel = Components.label(Text.translatable("title.oritech.machine_speed", speed));
-        efficiencyLabel = Components.label(Text.translatable("title.oritech.machine_efficiency", efficiency));
+        efficiencyLabel = Components.label(Text.translatable("title.oritech.machine_efficiency", efficiencyText));
         
         container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
         container.child(speedLabel.tooltip(Text.translatable("tooltip.oritech.machine_speed")).margins(Insets.of(3)));
