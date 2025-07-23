@@ -27,6 +27,7 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.state.property.Properties;
@@ -731,12 +732,23 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             } else {
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
             }
-        }).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
+        }).triggerableAnim("setup", MachineBlockEntity.SETUP).setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>());
     }
     
     @Override
     public void triggerSetupAnimation() {
-        // todo
+        triggerAnim("base_controller", "setup");
+    }
+    
+    @Override
+    public void sendUpdate(SyncType type, ServerPlayerEntity player) {
+        
+        if (type.equals(SyncType.GUI_TICK)) {
+            super.sendUpdate(SyncType.GUI_OPEN, player);
+            return;
+        }
+        
+        super.sendUpdate(type, player);
     }
     
     public boolean isActive(BlockState state) {
