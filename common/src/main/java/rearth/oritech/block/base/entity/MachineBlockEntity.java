@@ -76,7 +76,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     // own storages
     public final FilteringInventory inventory = new FilteringInventory(getInventorySize(), this::markDirty, getSlotAssignments());
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty);
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), getDefaultExtractionRate(), this::markDirty, this.canEnergyStorageChangeWhileGUIOpen());
     
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state);
@@ -484,6 +484,11 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     @Override
     public void onRedstoneEvent(boolean isPowered) {
         this.disabledViaRedstone = isPowered;
+    }
+    
+    // whether the energy storage should only send the current amount on network updates, or the full data
+    public boolean canEnergyStorageChangeWhileGUIOpen() {
+        return false;
     }
     
     public static void receiveCycleModePacket(InventoryInputModeSelectorPacket packet, PlayerEntity player, DynamicRegistryManager dynamicRegistryManager) {
