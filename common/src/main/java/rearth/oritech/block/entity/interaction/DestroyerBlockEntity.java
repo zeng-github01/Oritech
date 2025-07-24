@@ -84,6 +84,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
 
         super.getAdditionalStatFromAddon(addonBlock);
+        
+        yieldAddons = Math.min(yieldAddons, 3);
     }
 
     @Override

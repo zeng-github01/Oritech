@@ -465,6 +465,8 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         hasSilkTouchAddon = false;
         
         MachineAddonController.super.gatherAddonStats(addons);
+        
+        yieldAddons = Math.min(yieldAddons, 3);
     }
     
     @Override
