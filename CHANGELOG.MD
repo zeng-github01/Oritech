@@ -1,0 +1,5 @@
+- Mining mode for enderic railguns also disables explosive shots
+- Fix atomic forge GUI sync broken
+- Fix enderic laser setup animation not playing
+- Fix new empty steam engines causing crashes
+- Fix yield addons not being limited to 3 on enderic lasers and block destroyers
