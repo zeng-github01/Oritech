@@ -103,7 +103,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var energyUsed = Oritech.CONFIG.portableLaserConfig.energyPerBoom();
         
         if (world.isClient) {
-            if (getStoredEnergy(stack) > energyUsed && !player.isSneaking())
+            if (getStoredEnergy(stack) > energyUsed && !player.isSneaking() && !isMiningEnabled(stack))
                 lastSingleShot = world.getTime();
                 
             return TypedActionResult.consume(stack);
@@ -119,6 +119,11 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             player.sendMessage(Text.translatable("tooltip.oritech.portable_laser.status.begin").append(Text.literal(String.valueOf(!lastMode))));
             
             return TypedActionResult.consume(stack);
+        }
+        
+        if (isMiningEnabled(stack)) {
+            player.sendMessage(Text.translatable("tooltip.oritech.portable_laser.status.shot_mining_error"));
+            return TypedActionResult.pass(stack);
         }
         
         if (!laserItem.tryUseEnergy(stack, energyUsed, player)) {
