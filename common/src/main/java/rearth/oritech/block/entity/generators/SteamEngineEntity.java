@@ -72,6 +72,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, Oritech.CONFIG.generators.steamEngineData.steamToRfRatio());
+        clientStats = new SteamEngineSyncPacket(pos, 1f, 1f, 0, 0, 0);
     }
     
     @Override
