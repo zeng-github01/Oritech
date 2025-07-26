@@ -53,7 +53,7 @@ public class OritechRecipeType extends EndecRecipeSerializer<OritechRecipe> impl
         return identifier;
     }
     
-    protected OritechRecipeType(Identifier identifier) {
+    public OritechRecipeType(Identifier identifier) {
         super((StructEndec<OritechRecipe>) ORI_RECIPE_ENDEC);
         this.identifier = identifier;
     }

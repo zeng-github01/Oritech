@@ -9,6 +9,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ public abstract class ExpandableMultiblockEnergyStorageBlockEntity extends Expan
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
+    @SyncField(SyncType.GUI_OPEN)
     private float coreQuality = 1f;
     
     public ExpandableMultiblockEnergyStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

@@ -9,6 +9,8 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -18,6 +20,7 @@ public abstract class MultiblockGeneratorBlockEntity extends UpgradableGenerator
     
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     
+    @SyncField(SyncType.GUI_OPEN)
     private float coreQuality = 1f;
     
     public MultiblockGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {

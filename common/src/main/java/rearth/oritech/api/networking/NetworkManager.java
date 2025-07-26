@@ -252,8 +252,13 @@ public class NetworkManager {
             filteredFields.add(field);
         });
         
-        if (target instanceof AdditionalNetworkingProvider additionalNetworkingProvider)
-            filteredFields.addAll(additionalNetworkingProvider.additionalSyncedFields(type));
+        if (target instanceof AdditionalNetworkingProvider additionalNetworkingProvider) {
+            var addedFields = additionalNetworkingProvider.additionalSyncedFields(type);
+            addedFields.forEach(field -> {
+                field.setAccessible(true);
+                filteredFields.add(field);
+            });
+        }
         
         return filteredFields;
     }
