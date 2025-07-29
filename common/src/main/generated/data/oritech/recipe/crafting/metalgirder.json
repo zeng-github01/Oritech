@@ -10,12 +10,12 @@
     }
   },
   "pattern": [
-    "ici",
-    "ici",
-    "ici"
+    "iii",
+    "ccc",
+    "iii"
   ],
   "result": {
     "count": 6,
-    "id": "oritech:metal_beam_block"
+    "id": "oritech:metal_girder_block"
   }
 }

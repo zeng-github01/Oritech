@@ -36,6 +36,13 @@ public class RecipeHelpers {
         return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('i', insulation).pattern("iii").pattern("ccc").pattern("iii");
     }
     
+    public static CraftingRecipeJsonBuilder createRotatedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input, Ingredient insulation) {
+        return ShapedRecipeJsonBuilder.create(category, output, count).input('c', input).input('i', insulation)
+                 .pattern("ici")
+                 .pattern("ici")
+                 .pattern("ici");
+    }
+    
     public static Ingredient of(ItemConvertible item) {
         return Ingredient.ofItems(item);
     }

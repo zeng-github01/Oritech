@@ -388,6 +388,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block NICKEL_PLATING_PRESSURE_PLATE = new PressurePlateBlock(BlockSetType.IRON, AbstractBlock.Settings.copy(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block METAL_BEAM_BLOCK = new MetalBeamBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().solid());
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative) // todo recipe
+    public static final Block METAL_GIRDER_BLOCK = new MetalGirderBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK).nonOpaque().solid());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block INDUSTRIAL_GLASS_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.GLASS).requiresTool().strength(7.0F, 8.0F).nonOpaque());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)

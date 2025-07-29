@@ -380,7 +380,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // tech door
         offerDoorRecipe(exporter, BlockContent.TECH_DOOR.asItem(), of(TagContent.STEEL_INGOTS), "techdoor");
         // metal beam
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
+        offerRotatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
+        // metal girder
+        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_GIRDER_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalgirder");
         // tech glass
         offerMachinePlatingRecipe(exporter, BlockContent.INDUSTRIAL_GLASS_BLOCK.asItem(), of(TagContent.STEEL_INGOTS), of(cItemTag("glass_blocks")), of(TagContent.MACHINE_PLATING), 4, "industrialglass");
         // machine plated stairs, slabs, pressure plates
@@ -1368,6 +1370,11 @@ public class OritechRecipeGenerator extends RecipeProvider {
     public void offerInsulatedCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
         var item = output.getItem();
         createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/" + suffix));
+    }
+    
+    public void offerRotatedCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
+        var item = output.getItem();
+        createRotatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).criterion(hasItem(item), conditionsFromItem(item)).offerTo(exporter, Oritech.id("crafting/" + suffix));
     }
     
     public void offerFramedCableRecipe(RecipeExporter exporter, ItemStack output, Ingredient input, String suffix) {
