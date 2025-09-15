@@ -73,7 +73,6 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements Block
     
     public TreefellerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.TREEFELLER_BLOCK_ENTITY, pos, state);
-        SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
     
     @Override

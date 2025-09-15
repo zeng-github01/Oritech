@@ -143,42 +143,42 @@ dependencies {
     dataImplementation "curse.maven:productive-metalworks-1184570:$productive_metalworks_version_id"
 }
 
-//publishMods {
-//    file = remapJar.archiveFile
-//    changelog = file("../CHANGELOG.MD").getText()
-//    type = BETA
-//    modLoaders.add("neoforge")
-//
-//    modrinth {
-//        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
-//        projectId = "4sYI62kA"
-//        minecraftVersions.add("1.21.1")
-//        minecraftVersions.add("1.21")
-//
-//        requires("owo-lib")
-//        requires("geckolib")
-//        requires("athena-ctm")
-//        requires("architectury-api")
-//
-//        announcementTitle = "Neoforge Version on Modrinth"
-//    }
-//
-//    curseforge {
-//        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-//        projectId = "1030830"
-//        minecraftVersions.add("1.21.1")
-//        minecraftVersions.add("1.21")
-//
-//        requires("owo-lib")
-//        requires("geckolib")
-//        requires("athena")
-//        requires("architectury-api")
-//
-//        javaVersions.add(JavaVersion.VERSION_21)
-//        clientRequired = true
-//        serverRequired = true
-//
-//        projectSlug = "oritech"
-//        announcementTitle = "Neoforge Version on CurseForge"
-//    }
-//}
+publishMods {
+    file = jar.archiveFile
+    changelog = file("../CHANGELOG.MD").getText()
+    type = BETA
+    modLoaders.add("neoforge")
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+        projectId = "4sYI62kA"
+        minecraftVersions.add("1.21.1")
+        minecraftVersions.add("1.21")
+
+        requires("owo-lib")
+        requires("geckolib")
+        requires("athena-ctm")
+        requires("architectury-api")
+
+        announcementTitle = "Neoforge Version on Modrinth"
+    }
+
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = "1030830"
+        minecraftVersions.add("1.21.1")
+        minecraftVersions.add("1.21")
+
+        requires("owo-lib")
+        requires("geckolib")
+        requires("athena")
+        requires("architectury-api")
+
+        javaVersions.add(JavaVersion.VERSION_21)
+        clientRequired = true
+        serverRequired = true
+
+        projectSlug = "oritech"
+        announcementTitle = "Neoforge Version on CurseForge"
+    }
+}

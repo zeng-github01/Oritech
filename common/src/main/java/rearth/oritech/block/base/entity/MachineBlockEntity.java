@@ -80,7 +80,6 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     public MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state);
         this.energyPerTick = energyPerTick;
-        SingletonGeoAnimatable.registerSyncedAnimatable(this);
         
         if (level != null)
             lastWorkedAt = level.getGameTime();
