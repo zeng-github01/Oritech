@@ -10,9 +10,9 @@
     }
   },
   "pattern": [
-    "iii",
-    "ccc",
-    "iii"
+    "ici",
+    "ici",
+    "ici"
   ],
   "result": {
     "count": 6,
