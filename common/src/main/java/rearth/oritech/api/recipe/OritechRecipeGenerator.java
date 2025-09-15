@@ -207,7 +207,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // lava
         RefineryRecipeBuilder.build()
           .fluidInput(Fluids.LAVA)
-          .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 64_000))
+          .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 32_000))
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
           .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
           .export(exporter, "lava");
