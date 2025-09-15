@@ -108,6 +108,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
             
             var targetBlock = pendingLiquidPositions.peekLast();
             
+            // Only drain the source (still) fluid, so it doesn't keep pumping infinitely
             if (!world.getBlockState(targetBlock).getFluidState().isSource()) {
                 pendingLiquidPositions.pollLast();
                 return;
@@ -231,9 +232,9 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         var blockBelow = stateBelow.getBlock();
         
         var isAirOrTrunk = stateBelow.canBeReplaced() || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK);
-        var isStillFluid = stateBelow.getFluidState().isSource();
+        var isFluid = !stateBelow.getFluidState().isEmpty();
         
-        return isStillFluid || !isAirOrTrunk;
+        return isFluid || !isAirOrTrunk;
     }
     
     private void startLiquidSearch(BlockPos start) {
@@ -330,7 +331,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         private boolean isValidTarget(BlockPos target) {
             var state = world.getFluidState(target);
-            return state.isSource();
+            return !state.isEmpty();
         }
         
         private void addNeighborsToQueue(BlockPos self) {

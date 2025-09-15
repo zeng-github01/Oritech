@@ -116,7 +116,7 @@ public class LaserArmBlockBehavior {
                 if (world.getGameTime() % 40 == 0) {    // periodically reset target
                     return false;
                 }
-                if (blockState.isAir() || blockState.getFluidState().isSource()) return false;
+                if (blockState.isAir() || !blockState.getFluidState().isEmpty()) return false;
                 
                 blockState.randomTick((ServerLevel) world, blockPos, world.random);
                 ParticleContent.ACCELERATING.spawn(world, Vec3.atLowerCornerOf(blockPos));
