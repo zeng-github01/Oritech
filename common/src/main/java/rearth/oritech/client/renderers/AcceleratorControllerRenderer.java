@@ -23,7 +23,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
     private record RenderedLine(float startedAt, List<Vec3> positions) {
     }
     
-    private final Map<AcceleratorControllerBlockEntity, RenderedLine> activeLines = new HashMap<>();
+    private final Map<Long, RenderedLine> activeLines = new HashMap<>();
     
     @Override
     public int getViewDistance() {
@@ -38,7 +38,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
     public void render(AcceleratorControllerBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         
         if (entity.displayTrail == null) {
-            activeLines.remove(entity);
+            activeLines.remove(entity.getBlockPos().asLong());
             return;
         }
         
@@ -47,8 +47,8 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
         
         // try adding new tail to lines
         var displayTrail = entity.displayTrail;
-        if (!activeLines.containsKey(entity) || !activeLines.get(entity).positions.equals(displayTrail)) {
-            activeLines.put(entity, new RenderedLine(time, displayTrail));
+        if (!activeLines.containsKey(entity.getBlockPos().asLong()) || !activeLines.get(entity.getBlockPos().asLong()).positions.equals(displayTrail)) {
+            activeLines.put(entity.getBlockPos().asLong(), new RenderedLine(time, displayTrail));
             ParticleContent.PARTICLE_MOVING.spawn(entity.getLevel(), displayTrail.getLast());
         }
         

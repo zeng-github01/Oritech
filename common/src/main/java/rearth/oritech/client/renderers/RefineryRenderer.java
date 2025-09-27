@@ -30,7 +30,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     
-    private final Map<T, VisualTankHeights> tankHeights = new HashMap<>();
+    private final Map<Long, VisualTankHeights> tankHeights = new HashMap<>();
     
     public RefineryRenderer(String model) {
         super(new MachineModel<>(model));
@@ -49,7 +49,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
         var consumer = bufferSource.getBuffer(RenderType.translucent());
         // consumer = buffer;
         
-        var lastHeight = tankHeights.computeIfAbsent(animatable, key -> new VisualTankHeights());
+        var lastHeight = tankHeights.computeIfAbsent(animatable.getBlockPos().asLong(), key -> new VisualTankHeights());
         
         var inputStack = animatable.ownStorage.getInStack();
         if (!inputStack.isEmpty()) {

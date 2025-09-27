@@ -36,6 +36,7 @@ import static net.minecraft.core.Direction.DOWN;
 
 
 public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
+    
     public LaserArmRenderer(String modelPath) {
         super(new LaserArmModel<>(modelPath));
         addRenderLayer(new AutoGlowingGeoLayer<>(this));
@@ -43,7 +44,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     
     // Modified RenderLayer.LINES
     public static final RenderType.CompositeRenderType CUSTOM_LINES = RenderType.create("lines", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 1536, RenderType.CompositeState.builder().setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER).setLayeringState(VIEW_OFFSET_Z_LAYERING).setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY).setOutputState(RenderStateShard.ITEM_ENTITY_TARGET).setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE).setCullState(RenderStateShard.NO_CULL).createCompositeState(false));
-    private static final HashMap<LaserArmBlockEntity, Vec3> cachedOffsets = new HashMap<>();
+    private static final HashMap<Long, Vec3> cachedOffsets = new HashMap<>();
     
     
     @Override
@@ -75,7 +76,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
             if (startPos.z < targetPos.z) moveZ = -0.5;
             targetPos = targetPos.add(moveX, 0.5, moveZ);
         } else if (laserEntity.isTargetingDeepdrill(targetBlock)) {
-            var offset = cachedOffsets.computeIfAbsent(laserEntity, id -> idToOffset(id.getBlockPos(), 0.5f, laserEntity.getLevel(), laserEntity.getCurrentTarget()));
+            var offset = cachedOffsets.computeIfAbsent(laserEntity.getBlockPos().asLong(), id -> idToOffset(BlockPos.of(id), 0.5f, laserEntity.getLevel(), laserEntity.getCurrentTarget()));
             targetPos = targetPos.add(offset);
         }
         
