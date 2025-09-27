@@ -92,6 +92,8 @@ dependencies {
     
     /// runtime-only
 
+    runtimeOnly "curse.maven:jade-324717:5846105"
+
     // recipe viewer runtime
     switch (recipe_viewer.toLowerCase(Locale.ROOT)) {
         case "emi": localRuntime "dev.emi:emi-neoforge:$emi_version"; break

@@ -47,6 +47,15 @@ public class FluidTagGenerator extends FabricTagProvider.FluidTagProvider {
         getOrCreateTagBuilder(TagContent.BIOFUEL)
             .add(FluidContent.STILL_BIOFUEL.get());
         
+        getOrCreateTagBuilder(TagContent.SULFURIC_ACID)
+            .add(FluidContent.STILL_SULFURIC_ACID.get());
+        
+        getOrCreateTagBuilder(TagContent.NAPHTHA)
+            .add(FluidContent.STILL_NAPHTHA.get());
+        
+        getOrCreateTagBuilder(TagContent.DIESEL)
+            .add(FluidContent.STILL_DIESEL.get());
+        
         getOrCreateTagBuilder(TagContent.TURBOFUEL)
             .add(FluidContent.STILL_FUEL.get());
     }

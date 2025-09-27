@@ -168,8 +168,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // fuel
         FuelGeneratorRecipeBuilder.build().fluidInput(cFluidTag("oil"), 0.1f).timeInSeconds(1).export(exporter, "crude");
         FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_HEAVY_OIL.get(), 0.1f).timeInSeconds(2).export(exporter, "heavyoil");
-        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_DIESEL.get(), 0.1f).timeInSeconds(4).export(exporter, "diesel");
-        FuelGeneratorRecipeBuilder.build().fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.1f).timeInSeconds(2).export(exporter, "naptha");
+        FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.DIESEL, 0.1f).timeInSeconds(4).export(exporter, "diesel");
+        FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.NAPHTHA, 0.1f).timeInSeconds(2).export(exporter, "naptha");
         FuelGeneratorRecipeBuilder.build().fluidInput(TagContent.TURBOFUEL, 0.1f).timeInSeconds(16).export(exporter, "fuel");
         //steam
         // 32 fabric droplets / 32 neoforge mb (yes this will works, as we produce 2 millis per RF in the generator boilers, and then consume it at a 1:1 ratio)
@@ -207,7 +207,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // lava
         RefineryRecipeBuilder.build()
           .fluidInput(Fluids.LAVA)
-          .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 32_000))
+          .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 4_000))
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
           .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
           .export(exporter, "lava");
@@ -216,15 +216,15 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .input(ItemContent.ENDERIC_COMPOUND)
           .fluidInput(Fluids.LAVA)
           .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 1f)
-          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.5f)
-          .fluidOutput(FluidContent.STILL_STRANGE_MATTER.get(), 0.2f)
+          .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.25f)
+          .fluidOutput(FluidContent.STILL_STRANGE_MATTER.get(), 0.1f)
           .timeMultiplier(1.6f)
           .export(exporter, "lavaalt");
         
         // biodiesel
         RefineryRecipeBuilder.build()
           .input(ItemContent.CLAY_CATALYST_BEADS)
-          .fluidInput(FluidContent.STILL_BIOFUEL.get())
+          .fluidInput(TagContent.BIOFUEL)
           .fluidOutput(FluidContent.STILL_DIESEL.get(), 0.5f)
           .fluidOutput(FluidContent.STILL_NAPHTHA.get(), 0.2f)
           .export(exporter, "biodiesel");
@@ -233,7 +233,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         CentrifugeFluidRecipeBuilder
           .build()
           .input(ItemContent.FLUXITE)
-          .fluidInput(FluidContent.STILL_DIESEL.get())
+          .fluidInput(TagContent.DIESEL)
           .fluidOutput(FluidContent.STILL_FUEL.get())
           .export(exporter, "fuel");
         
@@ -249,13 +249,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // silicon wash from naphtha in centrifuge
         CentrifugeFluidRecipeBuilder.build()
           .input(TagContent.QUARTZ_DUSTS)
-          .fluidInput(FluidContent.STILL_NAPHTHA.get())
+          .fluidInput(TagContent.NAPHTHA)
           .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 1f)
           .export(exporter, "siliconwash");
         
         CentrifugeFluidRecipeBuilder.build()
           .input(Items.GRAVEL)
-          .fluidInput(FluidContent.STILL_NAPHTHA.get())
+          .fluidInput(TagContent.NAPHTHA)
           .fluidOutput(FluidContent.STILL_SILICON_WASH.get(), 0.05f)
           .timeMultiplier(1.6f)
           .export(exporter, "siliconwashbad");
@@ -266,21 +266,21 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // polymer resin from naphtha in centrifuge
         CentrifugeFluidRecipeBuilder.build()
           .input(ItemTags.SAND)
-          .fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.1f)
+          .fluidInput(TagContent.NAPHTHA, 0.1f)
           .result(ItemContent.POLYMER_RESIN, 2)
           .export(exporter, "naptharesin");
         
         // basic battery in centrifuge with sulfuric acid
         CentrifugeFluidRecipeBuilder.build()
           .input(TagContent.STEEL_INGOTS)
-          .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
+          .fluidInput(TagContent.SULFURIC_ACID)
           .result(ItemContent.BASIC_BATTERY, 2)
           .export(exporter, "batteryacid");
         
         // adv battery in centrifuge with sulfuric acid
         CentrifugeFluidRecipeBuilder.build()
           .input(ItemContent.DUBIOS_CONTAINER)
-          .fluidInput(FluidContent.STILL_SULFURIC_ACID.get())
+          .fluidInput(TagContent.SULFURIC_ACID)
           .result(ItemContent.ADVANCED_BATTERY, 8)
           .timeMultiplier(2f)
           .export(exporter, "advbatteryacid");
@@ -312,7 +312,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // reinforced carbon sheeting
         RefineryRecipeBuilder.build()
           .input(ItemContent.CARBON_FIBRE_STRANDS)
-          .fluidInput(FluidContent.STILL_NAPHTHA.get(), 0.5f)
+          .fluidInput(TagContent.NAPHTHA, 0.5f)
           .result(ItemContent.REINFORCED_CARBON_SHEET)
           .timeMultiplier(3f)
           .export(exporter, "carbonsheet");

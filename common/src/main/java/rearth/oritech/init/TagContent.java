@@ -154,7 +154,10 @@ public class TagContent {
 
     // fuels
     public static final TagKey<Fluid> OIL = cFluidTag("oil");
-    public static final TagKey<Fluid> BIOFUEL = oritechFluidTag("biofuel");
-    public static final TagKey<Fluid> TURBOFUEL = oritechFluidTag("turbofuel");
+    public static final TagKey<Fluid> BIOFUEL = cFluidTag("biofuel");
+    public static final TagKey<Fluid> SULFURIC_ACID = cFluidTag("sulfuric_acid");
+    public static final TagKey<Fluid> NAPHTHA = cFluidTag("naphtha");
+    public static final TagKey<Fluid> DIESEL = cFluidTag("diesel");
+    public static final TagKey<Fluid> TURBOFUEL = cFluidTag("turbofuel");
 
 }
