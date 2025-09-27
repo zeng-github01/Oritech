@@ -33,7 +33,6 @@ public class EnderIORecipeGenerator {
     public static void generateRecipes(RecipeOutput exporter, RecipeProvider provider) {
         addAlloys(exporter);
         conduitBinderCrafting(exporter, provider);
-        addFireCrafting(exporter);
 
         CentrifugeRecipeBuilder.build().input(EIOItems.POWDERED_ENDER_PEARL.get()).result(ItemContent.ENDERIC_COMPOUND, 2).export(exporter, PATH + "endericcompound");
     }
@@ -71,10 +70,5 @@ public class EnderIORecipeGenerator {
             .pattern("fcf")
             .pattern("sbs")
             .unlockedBy(provider.getHasName(conduitBinder), RecipeProvider.has(conduitBinder)).save(exporter, Oritech.id(PATH + "crafting/pump"));
-    }
-
-    private static void addFireCrafting(RecipeOutput exporter) {
-        exporter.accept(Oritech.id(PATH + "firecrafting/sculk"), new FireCraftingRecipe(FireCraftingLootProvider.SCULK_CRAFTING, 2, List.of(Blocks.SCULK), List.of(), List.of(Level.OVERWORLD), Optional.of(Blocks.AIR)), null);
-        exporter.accept(Oritech.id(PATH + "firecrafting/endstone"), new FireCraftingRecipe(FireCraftingLootProvider.SCULK_CRAFTING, 1, List.of(Blocks.END_STONE), List.of(), List.of(Level.END), Optional.of(Blocks.BLACKSTONE)), null);
     }
 }
