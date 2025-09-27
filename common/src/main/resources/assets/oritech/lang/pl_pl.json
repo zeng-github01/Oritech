@@ -304,6 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
   "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
   "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
   "tooltip.oritech.capture_item_desc_1": [
     {
@@ -650,6 +651,7 @@
   "block.oritech.tech_door": "Przemysłowe Drzwi",
   "block.oritech.tech_door_hinge": "Zawias Przemysłowy",
   "block.oritech.metal_beam_block": "Przemysłowa Belka Wsparcia",
+  "block.oritech.metal_girder_block": "Industrial Support Girder",
   "block.oritech.machine_plating_block": "Płytka Wzmocniona Miedzią",
   "block.oritech.machine_plating_slab": "Płytka Wzmocniona Miedzią (Płaska)",
   "block.oritech.machine_plating_stairs": "Schody Wzmocnione Miedzią",

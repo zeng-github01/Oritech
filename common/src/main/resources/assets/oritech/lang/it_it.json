@@ -304,6 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "Works with most pickaxe enchantments, unbreaking, and sharpness.",
   "tooltip.oritech.portable_laser.status.begin": "Mining Mode: ",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
   "tooltip.oritech.portable_laser.status.hint": " (Sneak + Right-Click to toggle)",
   "tooltip.oritech.capture_item_desc_1": [
     {
@@ -650,6 +651,7 @@
   "block.oritech.tech_door": "Porta industriale",
   "block.oritech.tech_door_hinge": "Porta industriale",
   "block.oritech.metal_beam_block": "Fascio Di Supporto Industriale",
+  "block.oritech.metal_girder_block": "Industrial Support Girder",
   "block.oritech.machine_plating_block": "Placcatura Rinforzata Di Rame",
   "block.oritech.machine_plating_slab": "Lastra Di Placcatura Rinforzata Di Rame",
   "block.oritech.machine_plating_stairs": "Scale Di Rame Rinforzato Di Placcatura",

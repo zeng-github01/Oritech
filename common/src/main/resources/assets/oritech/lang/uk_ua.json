@@ -304,6 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "Працює з більшістю зачарувань киркою, незламністю та гостротою.",
   "tooltip.oritech.portable_laser.status.begin": "Режим видобутку: ",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
   "tooltip.oritech.portable_laser.status.hint": " (Підкрастись + права кнопка миші для перемикання)",
   "tooltip.oritech.capture_item_desc_1": [
     {
@@ -650,6 +651,7 @@
   "block.oritech.tech_door": "Промислові двері",
   "block.oritech.tech_door_hinge": "Промислові двері",
   "block.oritech.metal_beam_block": "Промінь промислової підтримки",
+  "block.oritech.metal_girder_block": "Industrial Support Girder",
   "block.oritech.machine_plating_block": "Армоване мідне покриття",
   "block.oritech.machine_plating_slab": "Армована мідна плита",
   "block.oritech.machine_plating_stairs": "Сходи з мідним посиленим покриттям",

@@ -1,6 +1,6 @@
 {
-  "oracle_index.title.oritech": "Оритех",
-  "advancements.oritech.begin": "Оритех",
+  "oracle_index.title.oritech": "Oritech",
+  "advancements.oritech.begin": "Oritech",
   "advancements.oritech.begin.description": "Никель & Диме - начните свое технологическое приключение с добычи необработанного никеля. Сияй, сумасшедший шахтер!",
   "advancements.oritech.generator": "Заряжайся!",
   "advancements.oritech.generator.description": "Получите серьезную энергию с помощью генератора. Захватывающе, не правда ли?",
@@ -304,6 +304,7 @@
   "tooltip.oritech.portable_laser.4": "",
   "tooltip.oritech.portable_laser.5": "Работает с большинством зачарований кирки, прочностью и остротой.",
   "tooltip.oritech.portable_laser.status.begin": "Режим копания: ",
+  "tooltip.oritech.portable_laser.status.shot_mining_error": "No shot fired, mining mode is enabled.",
   "tooltip.oritech.portable_laser.status.hint": " (Крадитесь + ПКМ для переключения)",
   "tooltip.oritech.capture_item_desc_1": [
     {
@@ -650,6 +651,7 @@
   "block.oritech.tech_door": "Промышленная дверь",
   "block.oritech.tech_door_hinge": "Промышленная дверь",
   "block.oritech.metal_beam_block": "Лучи промышленной поддержки",
+  "block.oritech.metal_girder_block": "Industrial Support Girder",
   "block.oritech.machine_plating_block": "Усиленная Медная Насадка",
   "block.oritech.machine_plating_slab": "Медная укрепленная плита",
   "block.oritech.machine_plating_stairs": "Усиленные Медные Ступени",
