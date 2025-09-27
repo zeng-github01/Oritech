@@ -116,6 +116,8 @@ dependencies {
     modLocalRuntime "curse.maven:simple-conveyor-belts-1292980:6721806"
     // Tags Viewer
     modLocalRuntime "curse.maven:tags-viewer-1119728:5807898"
+    // Jade
+    modLocalRuntime "curse.maven:jade-324717:5639994"
 
     /// datagen-only
 
