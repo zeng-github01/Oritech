@@ -20,7 +20,7 @@ neoForge {
         server {
             server()
         }
-        
+
         // datagen run config for NeoForge recipes
         data {
             data()
@@ -89,7 +89,7 @@ dependencies {
     interfaceInjectionData "io.wispforest:owo-lib-neoforge:$owo_neo_version"
     // REI
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
-    
+
     /// runtime-only
 
     runtimeOnly "curse.maven:jade-324717:5846105"
@@ -105,12 +105,12 @@ dependencies {
     // Athena (CTM)
     runtimeOnly "earth.terrarium.athena:athena-neoforge-1.21:4.0.0"
     // Applied Energistics 2
-    // localRuntime "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
-    // localRuntime "curse.maven:guideme-1173950:$guideme_version_id"
+    localRuntime "curse.maven:applied-energistics-2-223794:$applied_energistics_version_id"
+    localRuntime "curse.maven:guideme-1173950:$guideme_version_id"
     // Mekanism
-    // localRuntime "curse.maven:mekanism-268560:5680395"
+    localRuntime "curse.maven:mekanism-268560:5680395"
     // Spark
-    // localRuntime "curse.maven:spark-361579:5759671"
+    localRuntime "curse.maven:spark-361579:5759671"
 
     /// datagen-only
 

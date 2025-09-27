@@ -6,23 +6,30 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
+import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.init.FluidContent;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 
 @Mod(Oritech.MOD_ID)
@@ -107,6 +114,16 @@ public final class OritechModNeoForge {
             if (Oritech.EVENT_MAP.containsKey(id)) {
                 Oritech.LOGGER.debug(event.getRegistryKey().toString());
                 Oritech.EVENT_MAP.get(id).forEach(Runnable::run);
+            }
+            
+            if (event.getRegistryKey().equals(NeoForgeRegistries.Keys.FLUID_TYPES)) {
+                
+                FluidContent.FLUID_ATTRIBUTES.forEach(attribute -> {
+                    var type = attribute.getSourceFluid().getFluidType();
+                    var fluidId = BuiltInRegistries.FLUID.getKey(attribute.getSourceFluid());
+                    event.register(NeoForgeRegistries.Keys.FLUID_TYPES, registry -> registry.register(fluidId, type));
+                });
+                
             }
             
         }

@@ -83,22 +83,22 @@ public class OritechClientNeoForge {
         @SubscribeEvent
         public void initializeClient(RegisterClientExtensionsEvent event) {
             
-            FluidContent.FLUID_ATTRIBUTES.forEach(attribute -> event.registerFluidType(new IClientFluidTypeExtensions() {
-                @Override
-                public @NotNull ResourceLocation getStillTexture() {
-                    return attribute.getSourceTexture();
-                }
-                
-                @Override
-                public @NotNull ResourceLocation getFlowingTexture() {
-                    return attribute.getFlowingTexture();
-                }
-                
-                @Override
-                public int getTintColor() {
-                    return attribute.getColor();
-                }
-            }, attribute.getSourceFluid().getFluidType()));
+//            FluidContent.FLUID_ATTRIBUTES.forEach(attribute -> event.registerFluidType(new IClientFluidTypeExtensions() {
+//                @Override
+//                public @NotNull ResourceLocation getStillTexture() {
+//                    return attribute.getSourceTexture();
+//                }
+//
+//                @Override
+//                public @NotNull ResourceLocation getFlowingTexture() {
+//                    return attribute.getFlowingTexture();
+//                }
+//
+//                @Override
+//                public int getTintColor() {
+//                    return attribute.getColor();
+//                }
+//            }, attribute.getSourceFluid().getFluidType()));
             
             event.registerItem(new TankItemExtensions(Oritech.id("tank_item_model")), BlockContent.SMALL_TANK_ITEM);
             event.registerItem(new TankItemExtensions(Oritech.id("creative_tank_item_model")), BlockContent.CREATIVE_TANK_ITEM);
