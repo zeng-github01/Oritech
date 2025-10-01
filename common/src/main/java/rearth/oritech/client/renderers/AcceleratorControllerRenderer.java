@@ -52,7 +52,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
             ParticleContent.PARTICLE_MOVING.spawn(entity.getLevel(), displayTrail.getLast());
         }
         
-        var activeLine = activeLines.get(entity);
+        var activeLine = activeLines.get(entity.getBlockPos().asLong());
         var line = activeLine.positions;
         var age = time - activeLine.startedAt;
         if (age >= 60) {
