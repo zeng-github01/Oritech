@@ -1,18 +1,4 @@
-- Migrate entire to mojang mappings (huge thanks to @relentless / @rlnt for this one, he did most of the work here and helped me out a ton). This should make it easier for
-addon developers to depend on Oritech. Source jars are now also published to a public maven (see github for more details on this).
-- Improve addon models to help with alignment
-- Add support for ftb chunk protection to nukes and enderic railgun
-- Remove centrifuge fluid sidedness
-- Add "Sided" item input mode to assembler and atomic forge, making automation in some cases easier
-- Add industrial support girder blocks
-- Nerf refinery lava -> steam recipe
-- Improve fluid detection for some blocks (@MUKSC)
-- Improve refinery recipes tag usage
-- Buff bonus transfer rates of capacity addons
-- Move augmentation networking to platform native APIs (this is a new feature in NF, so a somewhat recent (> .200) Neoforge version is required from now on.)
-- Fix productive metalworks compat recipes fluid amounts
-- Fix layered extenders config option not working as intended
-- Fix network debug logs spam
-- Fix machines not sending capability invalidation events on Neoforge (this should help with some AE2 issues)
-- Fix misaligned centrifuge addon port in model
-- Fix some smaller bugs
+- Pumps now only extract the first found fluid type
+- Add / redo neoforge fluid type registration, improving compatibility with some mods
+- Move transaction APIs to service loaders, make it easier for addons to use them
+- Fix crash with particle accelerators
