@@ -2,6 +2,7 @@ package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import net.minecraft.world.level.material.Fluid;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
@@ -17,8 +18,6 @@ import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.*;
@@ -26,19 +25,15 @@ import java.util.stream.Collectors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.Vec3;
 
 public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity {
     
@@ -242,7 +237,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         var state = level.getFluidState(start);
         if (!state.isSource()) return;
         
-        searchInstance = new FloodFillSearch(start, level);
+        searchInstance = new FloodFillSearch(start, level, state.getType());
         searchActive = true;
         
         Oritech.LOGGER.debug("starting search at: " + start + " " + state.getType() + " " + state.isSource());
@@ -291,9 +286,11 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         final HashSet<BlockPos> nextTargets = new HashSet<>();
         final Deque<BlockPos> foundTargets = new ArrayDeque<>();
         final Level world;
+        final Fluid fluidType;
         
-        public FloodFillSearch(BlockPos startPosition, Level world) {
+        public FloodFillSearch(BlockPos startPosition, Level world, Fluid fluidType) {
             this.world = world;
+            this.fluidType = fluidType;
             nextTargets.add(startPosition);
         }
         
@@ -331,7 +328,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         private boolean isValidTarget(BlockPos target) {
             var state = world.getFluidState(target);
-            return !state.isEmpty();
+            return !state.isEmpty() && state.is(fluidType);
         }
         
         private void addNeighborsToQueue(BlockPos self) {
