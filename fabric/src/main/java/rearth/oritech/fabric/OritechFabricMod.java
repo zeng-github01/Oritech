@@ -19,19 +19,8 @@ public final class OritechFabricMod implements ModInitializer {
     @Override
     public void onInitialize() {
         
-        var energyApiInstance = new FabricEnergyApiImpl();
-        EnergyApi.BLOCK = energyApiInstance;
-        EnergyApi.ITEM = energyApiInstance;
-        
-        var fluidApiInstance = new FabricFluidApiImpl();
-        FluidApi.BLOCK = fluidApiInstance;
-        FluidApi.ITEM = fluidApiInstance;
-        
-        ItemApi.BLOCK = new FabricItemApi();
-        
         NetworkManager.FLUID_STACK_CODEC = FluidStack.CODEC;
         NetworkManager.FLUID_STACK_STREAM_CODEC = FluidStack.STREAM_CODEC;
-        
         
         // Run our common setup.
         Oritech.runAllRegistries();

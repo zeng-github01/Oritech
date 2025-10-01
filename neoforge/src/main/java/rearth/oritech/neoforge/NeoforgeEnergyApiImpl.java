@@ -1,5 +1,6 @@
 package rearth.oritech.neoforge;
 
+import com.google.auto.service.AutoService;
 import dev.technici4n.grandpower.api.ILongEnergyStorage;
 import dev.technici4n.grandpower.impl.NonLongWrapper;
 import net.minecraft.core.BlockPos;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.item.BlockItemApi;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.api.energy.BlockEnergyApi;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+@AutoService({BlockEnergyApi.class, ItemEnergyApi.class})
 public class NeoforgeEnergyApiImpl implements BlockEnergyApi, ItemEnergyApi {
     
     private final List<Supplier<BlockEntityType<?>>> registeredBlockEntities = new ArrayList<>();

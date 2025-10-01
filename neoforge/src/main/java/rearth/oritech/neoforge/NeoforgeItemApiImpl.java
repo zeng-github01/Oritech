@@ -1,5 +1,6 @@
 package rearth.oritech.neoforge;
 
+import com.google.auto.service.AutoService;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+@AutoService({BlockItemApi.class})
 public class NeoforgeItemApiImpl implements BlockItemApi {
     
     private final List<Supplier<BlockEntityType<?>>> registeredBlockEntities = new ArrayList<>();

@@ -1,5 +1,6 @@
 package rearth.oritech.fabric;
 
+import com.google.auto.service.AutoService;
 import com.google.common.collect.Streams;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.fabric.FluidStackHooksFabric;
@@ -21,6 +22,8 @@ import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.BlockEnergyApi;
+import rearth.oritech.api.energy.ItemEnergyApi;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.api.fluid.BlockFluidApi;
 import rearth.oritech.api.fluid.FluidApi;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+@AutoService({BlockFluidApi.class, ItemFluidApi.class})
 public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
     @SuppressWarnings("IfCanBeSwitch")

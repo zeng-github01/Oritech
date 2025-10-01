@@ -35,27 +35,12 @@ import rearth.oritech.item.tools.util.ArmorEventHandler;
 @Mod(Oritech.MOD_ID)
 public final class OritechModNeoForge {
     
-    private final NeoforgeEnergyApiImpl energyApiInstance;
-    private final NeoforgeFluidApiImpl fluidApiInstance;
-    private final NeoforgeItemApiImpl itemApiInstance;
-    
     public OritechModNeoForge(IEventBus eventBus) {
         
         eventBus.register(new EventHandler());
         EventHandler.COMPONENT_REGISTRAR.register(eventBus);
         
         OritechPlatformNeoForge.ATTACHMENT_TYPES.register(eventBus);
-        
-        fluidApiInstance = new NeoforgeFluidApiImpl();
-        FluidApi.BLOCK = fluidApiInstance;
-        FluidApi.ITEM = fluidApiInstance;
-        
-        itemApiInstance = new NeoforgeItemApiImpl();
-        ItemApi.BLOCK = itemApiInstance;
-        
-        energyApiInstance = new NeoforgeEnergyApiImpl();
-        EnergyApi.BLOCK = energyApiInstance;
-        EnergyApi.ITEM = energyApiInstance;
         
         NetworkManager.FLUID_STACK_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_CODEC.xmap(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
         NetworkManager.FLUID_STACK_STREAM_CODEC = net.neoforged.neoforge.fluids.FluidStack.OPTIONAL_STREAM_CODEC.map(FluidStackHooksForge::fromForge, FluidStackHooksForge::toForge);
@@ -101,9 +86,19 @@ public final class OritechModNeoForge {
         
         @SubscribeEvent
         public void registerCapabilities(RegisterCapabilitiesEvent event) {
-            itemApiInstance.registerEvent(event);
-            fluidApiInstance.registerEvent(event);
-            energyApiInstance.registerEvent(event);
+            
+            if (ItemApi.BLOCK instanceof NeoforgeItemApiImpl neoApi)
+                neoApi.registerEvent(event);
+            
+            if (FluidApi.ITEM instanceof NeoforgeItemApiImpl neoApi)
+                neoApi.registerEvent(event);
+            if (FluidApi.BLOCK instanceof NeoforgeFluidApiImpl neoApi)
+                neoApi.registerEvent(event);
+            
+            if (EnergyApi.ITEM instanceof NeoforgeEnergyApiImpl neoApi)
+                neoApi.registerEvent(event);
+            if (EnergyApi.BLOCK instanceof NeoforgeEnergyApiImpl neoApi)
+                neoApi.registerEvent(event);
         }
         
         @SubscribeEvent

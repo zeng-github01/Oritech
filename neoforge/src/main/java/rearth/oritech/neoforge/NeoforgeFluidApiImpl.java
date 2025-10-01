@@ -1,5 +1,6 @@
 package rearth.oritech.neoforge;
 
+import com.google.auto.service.AutoService;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.forge.FluidStackHooksForge;
 import net.minecraft.core.BlockPos;
@@ -18,6 +19,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.item.BlockItemApi;
 import rearth.oritech.util.StackContext;
 import rearth.oritech.api.fluid.BlockFluidApi;
 import rearth.oritech.api.fluid.FluidApi;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+@AutoService({BlockFluidApi.class, ItemFluidApi.class})
 public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     
     private final List<Supplier<BlockEntityType<?>>> registeredBlockEntities = new ArrayList<>();

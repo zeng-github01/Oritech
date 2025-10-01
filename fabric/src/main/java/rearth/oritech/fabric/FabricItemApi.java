@@ -1,5 +1,6 @@
 package rearth.oritech.fabric;
 
+import com.google.auto.service.AutoService;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.item.base.SingleStackStorage;
@@ -20,6 +21,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.fluid.BlockFluidApi;
+import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.api.item.BlockItemApi;
 import rearth.oritech.api.item.ItemApi;
 import java.util.Iterator;
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+@AutoService({BlockItemApi.class})
 public class FabricItemApi implements BlockItemApi {
     
     @Override
