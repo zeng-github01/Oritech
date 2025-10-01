@@ -1,4 +1,0 @@
-- Pumps now only extract the first found fluid type
-- Add / redo neoforge fluid type registration, improving compatibility with some mods
-- Move transaction APIs to service loaders, make it easier for addons to use them
-- Fix crash with particle accelerators
