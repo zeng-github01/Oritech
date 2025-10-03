@@ -20,6 +20,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     
     private boolean networkDirty = false;
     private boolean needsInitialUpdate = false;
+    private long lastSentTickUpdate = 0;
     
     public NetworkedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -35,12 +36,15 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         
         serverTick(world, pos, state, blockEntity);
         
-        if ((world.getGameTime() + this.worldPosition.asLong()) % getSparseUpdateInterval() == 0)
+        var time = world.getGameTime();
+        
+        if ((time + this.worldPosition.asLong()) % getSparseUpdateInterval() == 0)
             sendUpdate(SyncType.SPARSE_TICK);
         
-        if (networkDirty) {
+        if (networkDirty && time >= lastSentTickUpdate + getTickUpdateInterval()) {
             networkDirty = false;
             sendUpdate(SyncType.TICK);
+            lastSentTickUpdate = time;
         }
         if (needsInitialUpdate) {
             needsInitialUpdate = false;
@@ -52,6 +56,8 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     public void clientTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {};
     
     public int getSparseUpdateInterval() {return 100;}
+    
+    public int getTickUpdateInterval() {return 4;}
     
     @Override
     public void setChanged() {

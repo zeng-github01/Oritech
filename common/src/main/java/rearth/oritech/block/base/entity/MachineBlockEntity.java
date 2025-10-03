@@ -219,6 +219,12 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
     
     protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
+        
+        // check if old recipe fits
+        if (currentRecipe != null && currentRecipe != OritechRecipe.DUMMY) {
+            if (currentRecipe.matches(getInputInventory(), level)) return Optional.of(new RecipeHolder<>(currentRecipe.getOriType().getIdentifier(), currentRecipe));
+        }
+        
         return level.getRecipeManager().getRecipeFor(getOwnRecipeType(), getInputInventory(), level);
     }
     

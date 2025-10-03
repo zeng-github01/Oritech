@@ -32,7 +32,8 @@ public class PlayerAugments {
     public static void serverTickAugments(ServerPlayer player) {
         
         for (var augment : allAugments.values()) {
-            if (augment.isEnabled(player)) {
+            var data = AttachmentApi.getAttachmentValue(player, Augment.ACTIVE_AUGMENTS_DATA);
+            if (augment.isEnabled(data)) {
                 if (player.serverLevel().getGameTime() % augment.refreshInterval() == 0)
                     augment.refreshServer(player);
             }

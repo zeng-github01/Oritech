@@ -801,7 +801,12 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     
     public boolean isFiring() {
         var idleTime = level.getGameTime() - lastFiredAt;
-        return idleTime < 3;
+        return idleTime < 5;
+    }
+    
+    @Override
+    public int getTickUpdateInterval() {
+        return 2;
     }
     
     public boolean isTargetingAtomicForge(Block block) {

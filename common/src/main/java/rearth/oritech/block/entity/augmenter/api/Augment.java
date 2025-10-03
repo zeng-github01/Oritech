@@ -84,7 +84,11 @@ public abstract class Augment {
     
     public boolean isEnabled(Player player) {
         var data = AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA);
-        var state = data.getOrDefault(id, AugmentState.NOT_INSTALLED);
+        return isEnabled(data);
+    }
+    
+    public boolean isEnabled(Map<ResourceLocation, AugmentState> playerData) {
+        var state = playerData.getOrDefault(id, AugmentState.NOT_INSTALLED);
         return state.equals(AugmentState.ENABLED);
     }
     
