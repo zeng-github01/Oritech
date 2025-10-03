@@ -41,7 +41,18 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuProvider, ScreenProvider, ItemApi.BlockProvider {
     
-    private final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new InventorySlotAssignment(0, 1, 1, 0));
+    private final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new InventorySlotAssignment(0, 1, 1, 0)) {
+        @Override
+        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
+            
+            var craftingInv = new SimpleCraftingInventory(addedStack);
+            var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.REACTOR, craftingInv, level);
+            if (recipeCandidate.isEmpty()) return 0;
+            
+            return super.insertToSlot(addedStack, slot, simulate);
+            
+        }
+    };
     
     @SyncField(SyncType.GUI_TICK)
     public int availableFuel;
