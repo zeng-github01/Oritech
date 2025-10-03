@@ -90,7 +90,7 @@ public final class OritechModNeoForge {
             if (ItemApi.BLOCK instanceof NeoforgeItemApiImpl neoApi)
                 neoApi.registerEvent(event);
             
-            if (FluidApi.ITEM instanceof NeoforgeItemApiImpl neoApi)
+            if (FluidApi.ITEM instanceof NeoforgeFluidApiImpl neoApi)
                 neoApi.registerEvent(event);
             if (FluidApi.BLOCK instanceof NeoforgeFluidApiImpl neoApi)
                 neoApi.registerEvent(event);
