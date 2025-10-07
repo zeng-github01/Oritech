@@ -1,5 +1,7 @@
 package rearth.oritech.block.entity.interaction;
 
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -46,19 +48,21 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     
     // work data
     private boolean initialized;
-    private final List<Block> targetedOre = new ArrayList<>();
-    private int progress;
+    public final List<Block> targetedOre = new ArrayList<>();
+    public int progress;
     @SyncField
     private long lastWorkTime;
     
     // config
-    private final int worktime = Oritech.CONFIG.deepDrillConfig.stepsPerOre();
-    private final int energyPerStep = Oritech.CONFIG.deepDrillConfig.energyPerStep();
     
     // storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), 0, 0, this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(Oritech.CONFIG.deepDrillConfig.energyCapacity(), getMaxRfInput(), 0, this::setChanged);
     
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::setChanged);
+    public final SimpleInventoryStorage inventory = createInventoryStorage();
+    
+    private @NotNull SimpleInventoryStorage createInventoryStorage() {
+        return new SimpleInventoryStorage(1, this::setChanged);
+    }
     
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
@@ -69,7 +73,12 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     private final AnimationController<DeepDrillEntity> animationController = getAnimationController();
     
     public DeepDrillEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.DEEP_DRILL_ENTITY, pos, state);
+        this(BlockEntitiesContent.DEEP_DRILL_ENTITY, pos, state);
+    }
+    
+    // this second option is here to allow addons to create custom deep drill entities with special logic
+    public DeepDrillEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
     
     public boolean init(boolean manual) {
@@ -93,6 +102,8 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         if (!inventory.isEmpty() && inventory.heldStacks.get(0).getCount() >= inventory.heldStacks.get(0).getMaxStackSize())
             return;    // inv full
         
+        var energyPerStep = getRfPerStep();
+        
         if (energyStorage.amount >= energyPerStep) {
             progress++;
             energyStorage.amount -= energyPerStep;
@@ -111,9 +122,9 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
             }
         }
         
-        if (progress >= worktime) {
+        if (progress >= Oritech.CONFIG.deepDrillConfig.stepsPerOre()) {
             craftResult(world, pos);
-            progress -= worktime;
+            progress -= Oritech.CONFIG.deepDrillConfig.stepsPerOre();
             this.setChanged();
         }
         
@@ -125,7 +136,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         return worldPosition.offset(Geometry.rotatePosition(new Vec3i(1, y, 0), facing));
     }
     
-    private void loadOreBlocks(boolean manual) {
+    public void loadOreBlocks(boolean manual) {
         var center = getCenter(-1);
         
         for (int x = -1; x <= 1; x++) {
@@ -269,6 +280,14 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return animatableInstanceCache;
+    }
+    
+    public int getMaxRfInput() {
+        return 0;
+    }
+    
+    public int getRfPerStep() {
+        return Oritech.CONFIG.deepDrillConfig.energyPerStep();
     }
     
     private AnimationController<DeepDrillEntity> getAnimationController() {
