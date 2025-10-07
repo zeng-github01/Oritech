@@ -62,6 +62,12 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addRecipeHandler(ModScreens.ASSEMBLER_SCREEN, new EmiTransferHandler<>(RecipeContent.ASSEMBLER.getIdentifier()));
         registry.addRecipeHandler(ModScreens.FOUNDRY_SCREEN, new EmiTransferHandler<>(RecipeContent.FOUNDRY.getIdentifier()));
         registry.addRecipeHandler(ModScreens.ATOMIC_FORGE_SCREEN, new EmiTransferHandler<>(RecipeContent.ATOMIC_FORGE.getIdentifier()));
+        registry.addRecipeHandler(ModScreens.PULVERIZER_SCREEN, new EmiTransferHandler<>(RecipeContent.PULVERIZER.getIdentifier()));
+        registry.addRecipeHandler(ModScreens.GRINDER_SCREEN, new EmiTransferHandler<>(RecipeContent.GRINDER.getIdentifier()));
+        registry.addRecipeHandler(ModScreens.COOLER_SCREEN, new EmiTransferHandler<>(RecipeContent.COOLER.getIdentifier()));
+        registry.addRecipeHandler(ModScreens.CENTRIFUGE_SCREEN, new EmiTransferHandler<>(RecipeContent.CENTRIFUGE.getIdentifier()));
+        registry.addRecipeHandler(ModScreens.CENTRIFUGE_SCREEN, new EmiTransferHandler<>(RecipeContent.CENTRIFUGE_FLUID.getIdentifier()));
+        registry.addRecipeHandler(ModScreens.REFINERY_SCREEN, new EmiTransferHandler<>(RecipeContent.REFINERY.getIdentifier()));
 
         registry.addDragDropHandler(ItemFilterScreen.class, new EmiItemFilterDragDropHandler());
     }
