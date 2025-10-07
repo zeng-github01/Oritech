@@ -74,8 +74,6 @@ public final class Oritech {
         // for player augment ticks
         TickEvent.SERVER_PRE.register(event -> event.getAllLevels().forEach(world -> world.players().forEach(PlayerAugments::serverTickAugments)));
         LOGGER.info("Oritech initialization complete");
-
-        PlayerEvent.PLAYER_CLONE.register(Oritech::copyAttributesOnClone);
     }
     
     // fabric only
@@ -145,22 +143,6 @@ public final class Oritech {
             var superConductorDataId = "superconductor_" + regKey.getNamespace() + "_" + regKey.getPath();
             var superConductorResult = world.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
             SuperConductorBlock.SUPERCONDUCTOR_DATA.put(regKey, superConductorResult);
-        });
-    }
-
-    private static void copyAttributesOnClone(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean isNotDeath) {
-        if (!isNotDeath) return; // don't copy attributes on death (only copy on end portal teleport)
-
-        oldPlayer.getAttributes().getSyncableAttributes().forEach(oldAttributeInstance -> {
-            oldAttributeInstance.getModifiers().forEach(oldModifier -> {
-                var isAugment = oldModifier.id().getNamespace().equals(Oritech.MOD_ID);
-                if (!isAugment) return;
-
-                var newInstance = newPlayer.getAttribute(oldAttributeInstance.getAttribute());
-                if (newInstance == null) return;
-                newInstance.addOrReplacePermanentModifier(oldModifier);
-
-            });
         });
     }
 }
