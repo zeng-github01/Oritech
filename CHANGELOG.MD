@@ -1,5 +1,0 @@
-- Update reactor fuel/coolant ports to only allow correct items to be inserted
-- Small performance improvements for some machines in large modpacks
-- Fix mixins not being applied, general mixin cleanup, improve mixin compatibility (huge thanks to @ChiefArug)
-- Fix fluid item container registration on neoforge
-- Minor other fixes and improvements
