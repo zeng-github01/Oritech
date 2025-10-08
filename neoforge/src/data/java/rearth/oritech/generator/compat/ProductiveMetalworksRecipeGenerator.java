@@ -106,7 +106,7 @@ public class ProductiveMetalworksRecipeGenerator {
         FluidAlloyingRecipeBuilder.of(
             List.of(
                 new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_REDSTONE.get()), 1),
-                new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_NICKEL.get()), 1)),
+                new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_GOLD.get()), 1)),
             10, new FluidStack(MetalworksRegistrator.MOLTEN_ELECTRUM.get(), 1))
         .save(exporter, Oritech.id("compat/productivemetalworks/alloying/electrum"));
         FluidAlloyingRecipeBuilder.of(
