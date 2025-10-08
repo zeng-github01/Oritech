@@ -115,10 +115,12 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         }
         
         // try increasing faster if too much energy is provided
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < Oritech.CONFIG.deepDrillConfig.stepsPerOre(); i++) {
             if (energyStorage.amount >= energyPerStep) {
                 progress++;
                 energyStorage.amount -= energyPerStep;
+            } else {
+                break;
             }
         }
         
