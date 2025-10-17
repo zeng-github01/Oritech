@@ -1,32 +1,24 @@
 package rearth.oritech.client.ui;
 
-import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.OverlayContainer;
-import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
-import java.util.List;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
-import rearth.oritech.block.blocks.addons.MachineAddonBlock.AddonSettings;
 import rearth.oritech.block.entity.processing.FragmentForgeBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import rearth.oritech.client.ui.components.BlockPreviewComponent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.util.MachineAddonController.BaseAddonData;
 
 
 public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> extends BasicMachineScreen<S> {
@@ -42,6 +34,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     
     protected LabelComponent speedLabel;
     protected LabelComponent efficiencyLabel;
+    protected LabelComponent burstLabel;
     
     public UpgradableMachineScreen(S handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
@@ -58,6 +51,8 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         var speed = (int) (1f / baseData.speed() * 100);
         var efficiency = baseData.efficiency();
         var extraChambers = baseData.extraChambers();
+        
+        var burstKey = getBurstStatusKey();
         
         var efficiencyText = "100";
         
@@ -78,10 +73,16 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         
         speedLabel = Components.label(Component.translatable("title.oritech.machine_speed", speed));
         efficiencyLabel = Components.label(Component.translatable("title.oritech.machine_efficiency", efficiencyText));
+        burstLabel = Components.label(Component.translatable("title.oritech." + burstKey));
+        burstLabel.tooltip(Component.translatable("title.oritech." + burstKey + ".tooltip", 0));
         
         container.child(Components.box(Sizing.fixed(73), Sizing.fixed(1)).color(new Color(0.8f, 0.8f, 0.8f)));
         container.child(speedLabel.tooltip(Component.translatable("tooltip.oritech.machine_speed")).margins(Insets.of(3)));
         container.child(efficiencyLabel.tooltip(Component.translatable("tooltip.oritech.machine_efficiency")).margins(Insets.of(3)));
+        
+        if (!burstKey.isBlank()) {
+            container.child(burstLabel.margins(Insets.of(3)));
+        }
         
         if (extraChambers > 0) {
             container.child(Components.label(Component.translatable("title.oritech.chambers", extraChambers)).tooltip(Component.translatable("tooltip.oritech.chambers")).margins(Insets.of(3)));
@@ -96,6 +97,23 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         
         if (!((MachineAddonController) menu.blockEntity).getAddonSlots().isEmpty())
             addMachinePreview(container);
+    }
+    
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        
+        var burstKey = getBurstStatusKey();
+        if (!burstKey.isBlank()) {
+            
+            var burstTicks = 0;
+            if (this.menu.addonController instanceof UpgradableMachineBlockEntity upgradableMachineBlock)
+                burstTicks = upgradableMachineBlock.remainingBurstTicks;
+            
+            burstLabel.text(Component.translatable("title.oritech." + burstKey));
+            burstLabel.tooltip(Component.translatable("title.oritech." + burstKey + ".tooltip", burstTicks));
+        }
+        
     }
     
     @Override
@@ -134,7 +152,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
         );
         
         for (int i = 1; i <= upgradeCount; i++) {
-             overlay.child(
+            overlay.child(
               Components.texture(getRingIdentifier(i), 64, 64, 64, 64, 64, 64)
                 .sizing(Sizing.fixed(size))
                 .positioning(Positioning.absolute(x, y))
@@ -150,6 +168,26 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
     
     private ResourceLocation getRingIdentifier(int level) {
         return Oritech.id("textures/gui/modular/machine_core/ring_" + level + ".png");
+    }
+    
+    private String getBurstStatusKey() {
+        
+        if (this.menu.addonController instanceof UpgradableMachineBlockEntity upgradableMachineBlock) {
+            var isWorking = upgradableMachineBlock.isActivelyWorking();
+            var canBurst = upgradableMachineBlock.isBurstAvailable();
+            var isThrottled = upgradableMachineBlock.isBurstThrottled();
+            
+            if (isThrottled) {
+                return "burst.throttled";
+            } else if (isWorking && canBurst) {
+                return "burst.active";
+            } else if (canBurst) {
+                return "burst.ready";
+            }
+            
+        }
+        
+        return "";
     }
     
     public void addMachinePreview(FlowLayout sidePanel) {
@@ -197,7 +235,7 @@ public class UpgradableMachineScreen<S extends UpgradableMachineScreenHandler> e
             var addonBlock = menu.worldAccess.getBlockState(addonBlockPos);
             var addonBlockEntity = menu.worldAccess.getBlockEntity(addonBlockPos);
             
-            var facing  = menu.machineBlock.getValue(menu.screenData.getBlockFacingProperty());
+            var facing = menu.machineBlock.getValue(menu.screenData.getBlockFacingProperty());
             var relativePos = MultiblockMachineEntity.worldToRelativePos(menu.blockPos, addonBlockPos, facing);
             
             holoPreviewContainer.child(

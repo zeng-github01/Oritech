@@ -1,17 +1,5 @@
 package rearth.oritech.block.base.entity;
 
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
-import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.util.MachineAddonController;
-import rearth.oritech.util.ScreenProvider;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -23,6 +11,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.ScreenProvider;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity implements MachineAddonController {
     
@@ -33,8 +34,29 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @SyncField(SyncType.GUI_OPEN)
     private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
     
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
+    public int remainingBurstTicks = 0;
+    
     public UpgradableMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int energyPerTick) {
         super(type, pos, state, energyPerTick);
+    }
+    
+    @Override
+    protected void useEnergy() {
+        super.useEnergy();
+        
+        // consume burst tick with each tick that we progress (which uses energy once)
+        remainingBurstTicks -= 2;
+        remainingBurstTicks = Math.max(remainingBurstTicks, -addonData.maxBurstTicks());
+        
+    }
+    
+    @Override
+    public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        super.serverTick(world, pos, state, blockEntity);
+        
+        remainingBurstTicks++;
+        remainingBurstTicks = Math.min(remainingBurstTicks, addonData.maxBurstTicks());
     }
     
     @Override
@@ -47,7 +69,8 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
             // craft N extra items if we have extra chambers
             for (int i = 0; i < chamberCount; i++) {
                 var newRecipe = getRecipe();
-                if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe)) break;
+                if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe))
+                    break;
                 super.craftItem(activeRecipe, outputInventory, inputInventory);
             }
         }
@@ -114,7 +137,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
         this.addonData = data;
         this.setChanged();
     }
-
+    
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
@@ -131,14 +154,35 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
         return this;
     }
     
-    @Override
-    public float getSpeedMultiplier() {
-        return getBaseAddonData().speed();
+    public boolean isBurstAvailable() {
+        return remainingBurstTicks > 0;
     }
     
+    public boolean isBurstThrottled() {
+        return remainingBurstTicks < 0;
+    }
+    
+    // todo config settings, wiki, recipes, translations
+    public float getBurstBonus() {
+        if (isBurstAvailable()) {
+            return 1/8f;
+        } else if(isBurstThrottled()) {
+            return 4f;
+        } else {
+            return 1f;
+        }
+    }
+    
+    // values smaller than 1 are faster, higher than 1 are slower
+    @Override
+    public float getSpeedMultiplier() {
+        return getBaseAddonData().speed() * getBurstBonus();
+    }
+    
+    // same here
     @Override
     public float getEfficiencyMultiplier() {
-        return getBaseAddonData().efficiency();
+        return getBaseAddonData().efficiency() * getBurstBonus();
     }
     
     @Override

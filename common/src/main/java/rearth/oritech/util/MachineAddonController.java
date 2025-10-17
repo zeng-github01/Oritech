@@ -1,12 +1,5 @@
 package rearth.oritech.util;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.block.blocks.addons.MachineAddonBlock;
-import rearth.oritech.block.blocks.addons.MachineAddonBlock.AddonSettings;
-import rearth.oritech.block.entity.addons.AddonBlockEntity;
-import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -14,8 +7,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.block.blocks.addons.MachineAddonBlock;
+import rearth.oritech.block.entity.addons.AddonBlockEntity;
+
+import java.util.*;
 
 public interface MachineAddonController {
     
@@ -207,6 +206,7 @@ public interface MachineAddonController {
         var energyAmount = 0L;
         var energyInsert = 0L;
         var extraChambers = 0;
+        var extraBurstTicks = 0;
         
         for (var addon : addons) {
             var addonSettings = addon.addonBlock().getAddonSettings();
@@ -222,6 +222,7 @@ public interface MachineAddonController {
             energyAmount += addonSettings.addedCapacity();
             energyInsert += addonSettings.addedInsert();
             extraChambers += addonSettings.chamberCount();
+            extraBurstTicks += addonSettings.burstTicks();
             
             getAdditionalStatFromAddon(addon);
         }
@@ -240,7 +241,7 @@ public interface MachineAddonController {
             }
         }
         
-        var baseData = new BaseAddonData(speed, efficiency, energyAmount, energyInsert, extraChambers);
+        var baseData = new BaseAddonData(speed, efficiency, energyAmount, energyInsert, extraChambers, extraBurstTicks);
         setBaseAddonData(baseData);
     }
     
@@ -282,6 +283,7 @@ public interface MachineAddonController {
         nbt.putLong("energyBonusCapacity", data.energyBonusCapacity);
         nbt.putLong("energyBonusTransfer", data.energyBonusTransfer);
         nbt.putInt("extraChambers", data.extraChambers);
+        nbt.putInt("maxBurst", data.maxBurstTicks);
         
         var posList = new ListTag();
         for (var pos : getConnectedAddons()) {
@@ -295,7 +297,14 @@ public interface MachineAddonController {
     }
     
     default void loadAddonNbtData(CompoundTag nbt) {
-        var data = new BaseAddonData(nbt.getFloat("speed"), nbt.getFloat("efficiency"), nbt.getLong("energyBonusCapacity"), nbt.getLong("energyBonusTransfer"), nbt.getInt("extraChambers"));
+        var data = new BaseAddonData(
+          nbt.getFloat("speed"),
+          nbt.getFloat("efficiency"),
+          nbt.getLong("energyBonusCapacity"),
+          nbt.getLong("energyBonusTransfer"),
+          nbt.getInt("extraChambers"),
+          nbt.getInt("maxBurst")
+        );
         setBaseAddonData(data);
         
         var posList = nbt.getList("connectedAddons", Tag.TAG_COMPOUND);
@@ -326,9 +335,9 @@ public interface MachineAddonController {
     }
     
     record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer,
-                         int extraChambers) {
+                         int extraChambers, int maxBurstTicks) {
     }
     
-    BaseAddonData DEFAULT_ADDON_DATA = new BaseAddonData(1, 1, 0, 0, 0);
+    BaseAddonData DEFAULT_ADDON_DATA = new BaseAddonData(1, 1, 0, 0, 0, 0);
     
 }
