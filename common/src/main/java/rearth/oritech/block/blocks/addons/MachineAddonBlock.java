@@ -68,6 +68,8 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     public static VoxelShape[][] STEAM_BOILER_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_YIELD_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_SILK_TOUCH_ADDON_SHAPE;
+    public static VoxelShape[][] MACHINE_COMBI_ADDON_SHAPE;
+    public static VoxelShape[][] MACHINE_BURST_ADDON_SHAPE;
     
     // because this parameter is needed in appendProperties, but we can't initialize or pass it to that
     private static boolean constructorAssignmentSupportWorkaround = false;
@@ -321,6 +323,8 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
         STEAM_BOILER_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_YIELD_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_SILK_TOUCH_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
+        MACHINE_COMBI_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
+        MACHINE_BURST_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         for (var facing : Direction.values()) {
             if (!facing.getAxis().isHorizontal()) continue;
             for (var face : AttachFace.values()) {
@@ -449,6 +453,31 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                   Geometry.rotateVoxelShape(Shapes.box(0.625, 0.1875, 0.3125, 0.6875, 0.25, 0.8125), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.1875, 0.25, 0.875, 0.25, 0.4375), facing, face),
                   Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.125, 0.1875, 0.875, 0.1875, 0.875), facing, face)
+                );
+                MACHINE_COMBI_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
+                  Geometry.rotateVoxelShape(Shapes.box(0.3125, -0.0015625, 0.25, 0.6875, 0.1234375, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.25, 0, 0.3125, 0.75, 0.125, 0.6875), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.3125, 0.4375, 0.3125, 0.6875, 0.8125, 0.6875), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.11875, 0.38125, 0.4375, 0.24375, 0.56875, 0.5625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.275, 0.438125, 0.3125, 0.4625, 0.563125), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.25, 0.25, 0.4375, 0.75, 0.375, 0.5625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.2484375, 0.25, 0.5625, 0.3734375, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.3796875, 0.1171875, 0.5625, 0.5671875, 0.2421875), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.438125, 0.2640625, 0.165625, 0.563125, 0.4515625, 0.290625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.438125, 0.2640625, 0.709375, 0.563125, 0.4515625, 0.834375), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.3796875, 0.7578125, 0.5625, 0.5671875, 0.8828125), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.759375, 0.38125, 0.4375, 0.884375, 0.56875, 0.5625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.6875, 0.275, 0.438125, 0.8125, 0.4625, 0.563125), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.125, 0.4375, 0.5625, 0.25, 0.5625), facing, face)
+                );
+                MACHINE_BURST_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
+                  Geometry.rotateVoxelShape(Shapes.box(0.25, 0, 0.3125, 0.75, 0.125, 0.6875), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.3125, -0.0015625, 0.25, 0.6875, 0.1234375, 0.75), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.315625, 0.4375, 0.315625, 0.6859375, 0.5, 0.684375), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.315625, 0.21875, 0.315625, 0.6859375, 0.28125, 0.684375), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.375, 0.0625, 0.375, 0.625, 0.625, 0.625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.25, 0.125, 0.4375, 0.75, 0.5625, 0.5625), facing, face),
+                  Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.125, 0.25, 0.5625, 0.5625, 0.75), facing, face)
                 );
             }
         }
