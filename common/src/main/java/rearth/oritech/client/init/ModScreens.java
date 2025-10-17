@@ -34,6 +34,8 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
     public static final MenuType<UpgradableMachineScreenHandler> PLACER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     public static final MenuType<UpgradableMachineScreenHandler> FERTILIZER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
     
+    public static final MenuType<UpgradableMachineScreenHandler> SHRINKER_SCREEN = MenuRegistry.ofExtended((UpgradableMachineScreenHandler::new));
+    
     public static final MenuType<ReactorScreenHandler> REACTOR_SCREEN = MenuRegistry.ofExtended((ReactorScreenHandler::new));
     public static final MenuType<CatalystScreenHandler> CATALYST_SCREEN = MenuRegistry.ofExtended((CatalystScreenHandler::new));
     public static final MenuType<EnchanterScreenHandler> ENCHANTER_SCREEN = MenuRegistry.ofExtended((EnchanterScreenHandler::new));
@@ -74,6 +76,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(PLACER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(FERTILIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(LASER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(SHRINKER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         
         MenuRegistry.registerScreenFactory(INVENTORY_PROXY_SCREEN, InventoryProxyScreen::new);
         MenuRegistry.registerScreenFactory(REACTOR_SCREEN, ReactorScreen::new);

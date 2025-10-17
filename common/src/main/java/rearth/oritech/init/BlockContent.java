@@ -1,6 +1,5 @@
 package rearth.oritech.init;
 
-import dev.architectury.fluid.FluidStack;
 import dev.architectury.registry.registries.RegistrySupplier;
 import io.wispforest.owo.registration.reflect.BlockRegistryContainer.NoBlockItem;
 import net.minecraft.core.Registry;
@@ -10,16 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.AmethystClusterBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ComposterBlock;
-import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.PressurePlateBlock;
-import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.SlimeBlock;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -49,10 +39,9 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeDuctBlock;
 import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
+import rearth.oritech.block.blocks.interaction.ShrinkerBlock;
 import rearth.oritech.block.blocks.storage.*;
-import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.ItemContent.Compostable;
-import rearth.oritech.init.ItemContent.Groups;
 import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
@@ -182,6 +171,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block DEEP_DRILL_BLOCK = new DeepDrillBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.3f)
     public static final Block DRONE_PORT_BLOCK = new DronePortBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    @UseGeoBlockItem(scale = 0.7f)
+    public static final Block SHRINKER_BLOCK = new ShrinkerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     
     @NoAutoDrop
     @DispenserPlace

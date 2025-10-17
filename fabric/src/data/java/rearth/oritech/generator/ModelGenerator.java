@@ -130,6 +130,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.BIG_SOLAR_PANEL_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.DEEP_DRILL_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.DRONE_PORT_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
+        blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.SHRINKER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.TECH_DOOR, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.TECH_DOOR_HINGE, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.TREEFELLER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);

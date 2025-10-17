@@ -9,5 +9,4 @@ public class MachineModel<T extends BlockEntity & GeoAnimatable> extends Default
     public MachineModel(String subpath) {
         super(Oritech.id(subpath));
     }
-    
 }

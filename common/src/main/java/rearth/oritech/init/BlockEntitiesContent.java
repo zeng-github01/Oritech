@@ -1,6 +1,10 @@
 package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.item.ItemApi;
@@ -21,6 +25,7 @@ import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
+import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 import rearth.oritech.block.entity.storage.*;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
@@ -29,12 +34,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 
-@SuppressWarnings("deprecation")
 public class BlockEntitiesContent implements ArchitecturyRegistryContainer<BlockEntityType<?>> {
     
     @AssignSidedInventory
@@ -113,9 +113,13 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedEnergy
     public static final BlockEntityType<DronePortEntity> DRONE_PORT_ENTITY = BlockEntityType.Builder.of(DronePortEntity::new, BlockContent.DRONE_PORT_BLOCK).build(null);
     
+    @AssignSidedInventory
     @AssignSidedFluid
     @AssignSidedEnergy
     public static final BlockEntityType<PumpBlockEntity> PUMP_BLOCK = BlockEntityType.Builder.of(PumpBlockEntity::new, BlockContent.PUMP_BLOCK).build(null);
+    
+    @AssignSidedEnergy
+    public static final BlockEntityType<ShrinkerBlockEntity> SHRINKER_BLOCK_ENTITY = BlockEntityType.Builder.of(ShrinkerBlockEntity::new, BlockContent.SHRINKER_BLOCK).build(null);
     
     @AssignSidedInventory
     @AssignSidedFluid

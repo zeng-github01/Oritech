@@ -1,5 +1,8 @@
 package rearth.oritech.client.init;
 
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.world.level.block.Block;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.*;
 import rearth.oritech.init.BlockContent;
@@ -7,9 +10,6 @@ import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.world.level.block.Block;
 
 public class ModRenderers {
     
@@ -54,6 +54,7 @@ public class ModRenderers {
         BlockEntityRenderers.register(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY, ctx -> new MachineGantryRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.SMALL_TANK_ENTITY, ctx -> new SmallTankRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.CREATIVE_TANK_ENTITY, ctx -> new SmallTankRenderer());
+        BlockEntityRenderers.register(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY, ctx -> new ShrinkerBlockRenderer("models/shrinker_block"));
         
         BlockEntityRenderers.register(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY, ctx -> new SpawnerControllerRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY, ctx -> new AcceleratorControllerRenderer());
@@ -86,6 +87,7 @@ public class ModRenderers {
         RENDER_LAYERS.put(BlockContent.QUARRY_BEAM_RING, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.WITHER_CROP_BLOCK, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.SPAWNER_CONTROLLER_BLOCK, RenderType.cutout());
+        RENDER_LAYERS.put(BlockContent.SHRINKER_BLOCK, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.ACCELERATOR_MOTOR, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.ACCELERATOR_RING, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.ACCELERATOR_CONTROLLER, RenderType.cutout());
