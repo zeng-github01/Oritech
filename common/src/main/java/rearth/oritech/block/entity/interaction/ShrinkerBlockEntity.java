@@ -116,6 +116,9 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         
         if (currentCandidate == null || connectedAddons.isEmpty() || !inventory.isEmpty()) return;
         
+        energyStorage.setAmount(energyStorage.getAmount() - getDefaultCapacity());
+        energyStorage.update();
+        
         var createdStack = new ItemStack(BlockContent.MACHINE_COMBI_ADDON.asItem());
         createdStack.set(ComponentContent.ADDON_DATA.get(), currentCandidate);
         
