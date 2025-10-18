@@ -1,22 +1,6 @@
 package rearth.oritech.block.entity.processing;
 
-import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.Geometry;
-import rearth.oritech.util.InventorySlotAssignment;
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
@@ -26,6 +10,23 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.entity.addons.CombiAddonEntity;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.Geometry;
+import rearth.oritech.util.InventorySlotAssignment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
@@ -53,7 +54,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON)) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
             hasByproductAddon = true;
         }
     }

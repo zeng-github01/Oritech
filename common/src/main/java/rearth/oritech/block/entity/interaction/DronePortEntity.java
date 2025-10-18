@@ -21,7 +21,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
@@ -39,6 +38,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.interaction.DronePortBlock;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
+import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.DroneScreenHandler;
@@ -73,7 +73,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> openSlots = new ArrayList<>();
     @SyncField(SyncType.GUI_OPEN)
-    private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
     
     // storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
@@ -237,7 +237,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON)) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasFluid()) {
             hasFluidAddon = true;
         }
     }

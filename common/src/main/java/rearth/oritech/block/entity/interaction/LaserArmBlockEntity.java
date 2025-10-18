@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
@@ -19,7 +18,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
@@ -29,7 +27,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Unbreakable;
@@ -38,7 +35,6 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -47,7 +43,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
@@ -57,10 +52,10 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.WorldPacketCodec;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
-import rearth.oritech.block.behavior.LaserArmEntityBehavior;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
+import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
@@ -111,7 +106,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     @SyncField(SyncType.GUI_OPEN)
     private float coreQuality = 1f;
     @SyncField(SyncType.GUI_OPEN)
-    private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
     @SyncField(SyncType.GUI_OPEN)
     public int areaSize = 1;
     @SyncField(SyncType.GUI_OPEN)
@@ -494,6 +489,13 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             hasCropFilterAddon = true;
         if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON))
             hasSilkTouchAddon = true;
+        
+        if (addonBlock.addonEntity() instanceof CombiAddonEntity combi) {
+            areaSize = combi.getQuarryCount();
+            yieldAddons =  combi.getYieldCount();
+            hasCropFilterAddon = combi.hasCropFilter();
+            hasSilkTouchAddon = combi.hasSilk();
+        }
         
     }
     

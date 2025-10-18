@@ -18,11 +18,8 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.blocks.accelerator.*;
-import rearth.oritech.block.blocks.addons.InventoryProxyAddonBlock;
-import rearth.oritech.block.blocks.addons.MachineAddonBlock;
+import rearth.oritech.block.blocks.addons.*;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock.AddonSettings;
-import rearth.oritech.block.blocks.addons.RedstoneAddonBlock;
-import rearth.oritech.block.blocks.addons.SteamBoilerAddonBlock;
 import rearth.oritech.block.blocks.arcane.*;
 import rearth.oritech.block.blocks.augmenter.AugmentApplicationBlock;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
@@ -258,7 +255,9 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block MACHINE_REDSTONE_ADDON = new RedstoneAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_REDSTONE_ADDON_SHAPE));
     public static final Block MACHINE_SILK_TOUCH_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_SILK_TOUCH_ADDON_SHAPE));
     public static final Block MACHINE_BURST_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBurstTicks(20 * 8).withBoundingShape(MachineAddonBlock.MACHINE_BURST_ADDON_SHAPE)); // todo config settings
-    public static final Block MACHINE_COMBI_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_COMBI_ADDON_SHAPE));
+    
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.none)
+    public static final Block MACHINE_COMBI_ADDON = new CombiAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_COMBI_ADDON_SHAPE));
     
     //region reactor
     public static final Block REACTOR_CONTROLLER = new ReactorControllerBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).lightLevel(state -> 5));

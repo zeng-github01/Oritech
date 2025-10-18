@@ -1,5 +1,7 @@
 package rearth.oritech.util;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -13,6 +15,7 @@ import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
+import rearth.oritech.block.entity.addons.CombiAddonEntity;
 
 import java.util.*;
 
@@ -186,6 +189,12 @@ public interface MachineAddonController {
                         if (!searchedPositions.contains(neighbor)) toAdd.add(neighbor);
                     }
                 }
+                
+                if (entry.addonEntity() instanceof CombiAddonEntity) {
+                    toAdd.clear();
+                    maxIterationCount = 0;
+                    break;
+                }
             }
             
             queuedPositions.addAll(toAdd);
@@ -200,6 +209,12 @@ public interface MachineAddonController {
     
     // can be overridden to allow custom addon loading (e.g. custom stat, or check for specific addon existence)
     default void gatherAddonStats(List<AddonBlock> addons) {
+        
+        if (addons.size() == 1 && addons.getFirst().addonEntity() instanceof CombiAddonEntity combiAddonEntity) {
+            getAdditionalStatFromAddon(addons.getFirst());
+            setBaseAddonData(combiAddonEntity.getBaseData());
+            return;
+        }
         
         var speed = 1f;
         var efficiency = 1f;
@@ -336,8 +351,17 @@ public interface MachineAddonController {
     
     record BaseAddonData(float speed, float efficiency, long energyBonusCapacity, long energyBonusTransfer,
                          int extraChambers, int maxBurstTicks) {
+        
+        public static final Codec<BaseAddonData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+          Codec.FLOAT.fieldOf("speed").forGetter(BaseAddonData::speed),
+          Codec.FLOAT.fieldOf("efficiency").forGetter(BaseAddonData::efficiency),
+          Codec.LONG.fieldOf("energy_bonus_capacity").forGetter(BaseAddonData::energyBonusCapacity),
+          Codec.LONG.fieldOf("energy_bonus_transfer").forGetter(BaseAddonData::energyBonusTransfer),
+          Codec.INT.fieldOf("extra_chambers").forGetter(BaseAddonData::extraChambers),
+          Codec.INT.fieldOf("max_burst_ticks").forGetter(BaseAddonData::maxBurstTicks)
+        ).apply(instance, BaseAddonData::new));
+        
+        public static final BaseAddonData DEFAULT_ADDON_DATA = new BaseAddonData(1, 1, 0, 0, 0, 0);
     }
-    
-    BaseAddonData DEFAULT_ADDON_DATA = new BaseAddonData(1, 1, 0, 0, 0, 0);
     
 }

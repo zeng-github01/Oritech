@@ -32,7 +32,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> openSlots = new ArrayList<>();
     @SyncField(SyncType.GUI_OPEN)
-    private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public int remainingBurstTicks = 0;
@@ -162,12 +162,12 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
         return remainingBurstTicks < 0;
     }
     
-    // todo config settings, wiki, recipes, translations
+    // todo config settings, wiki, recipes
     public float getBurstBonus() {
         if (isBurstAvailable()) {
             return 1/8f;
         } else if(isBurstThrottled()) {
-            return 4f;
+            return 1.5f;
         } else {
             return 1f;
         }

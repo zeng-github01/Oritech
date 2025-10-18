@@ -27,7 +27,6 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,7 +45,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     private final List<BlockPos> openSlots = new ArrayList<>();
     
     @SyncField({SyncType.GUI_OPEN})
-    private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
     
     public ItemEnergyFrameInteractionBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);

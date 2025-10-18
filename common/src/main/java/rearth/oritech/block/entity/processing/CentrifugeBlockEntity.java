@@ -2,7 +2,19 @@ package rearth.oritech.block.entity.processing;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
@@ -11,7 +23,7 @@ import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.entity.MachineCoreEntity;
+import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.CentrifugeScreenHandler;
 import rearth.oritech.init.BlockContent;
@@ -19,24 +31,11 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.FluidIngredient;
 import rearth.oritech.util.InventorySlotAssignment;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
     
@@ -151,7 +150,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON)) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasFluid()) {
             hasFluidAddon = true;
         }
     }

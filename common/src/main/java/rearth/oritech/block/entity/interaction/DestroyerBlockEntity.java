@@ -2,7 +2,6 @@ package rearth.oritech.block.entity.interaction;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
@@ -19,15 +18,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CocoaBlock;
-import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.NetherWartBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.LootParams.Builder;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +29,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
+import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
@@ -77,16 +72,26 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasCropFilter())
             hasCropFilterAddon = true;
 
         if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON))
             range *= 8;
+        
+        if (addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getQuarryCount() > 0) {
+            for (int i = 0; i < combi.getQuarryCount(); i++) {
+                range *= 8;
+            }
+        }
 
         if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON))
             yieldAddons++;
+        
+        if (addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
+            yieldAddons += combi.getYieldCount();
+        }
 
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasSilk())
             hasSilkTouchAddon = true;
 
 

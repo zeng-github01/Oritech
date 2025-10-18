@@ -4,7 +4,6 @@ import dev.architectury.registry.menu.ExtendedMenuProvider;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
@@ -36,7 +35,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,7 +48,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> openSlots = new ArrayList<>();
     @SyncField(SyncType.GUI_OPEN)
-    private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
     
     @SyncField(SyncType.GUI_TICK)
     private boolean redstonePowered;

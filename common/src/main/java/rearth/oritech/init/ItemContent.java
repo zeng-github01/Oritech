@@ -1,6 +1,14 @@
 package rearth.oritech.init;
 
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.food.Foods;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.ComposterBlock;
 import rearth.oritech.item.UnstableContainerItem;
 import rearth.oritech.item.other.CustomTooltipItem;
 import rearth.oritech.item.other.MobCaptureItem;
@@ -17,14 +25,6 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import net.minecraft.core.Registry;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.food.Foods;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.ComposterBlock;
 
 public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     
@@ -173,7 +173,7 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     }
     
     public enum Groups {
-        machines, components, equipment, decorative
+        machines, components, equipment, decorative, none
     }
     
     @Retention(RetentionPolicy.RUNTIME)

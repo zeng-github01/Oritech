@@ -118,6 +118,7 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     @AssignSidedEnergy
     public static final BlockEntityType<PumpBlockEntity> PUMP_BLOCK = BlockEntityType.Builder.of(PumpBlockEntity::new, BlockContent.PUMP_BLOCK).build(null);
     
+    @AssignSidedInventory
     @AssignSidedEnergy
     public static final BlockEntityType<ShrinkerBlockEntity> SHRINKER_BLOCK_ENTITY = BlockEntityType.Builder.of(ShrinkerBlockEntity::new, BlockContent.SHRINKER_BLOCK).build(null);
     
@@ -130,6 +131,8 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
     public static final BlockEntityType<EnergyAcceptorAddonBlockEntity> ENERGY_ACCEPTOR_ADDON_ENTITY = BlockEntityType.Builder.of(EnergyAcceptorAddonBlockEntity::new, BlockContent.MACHINE_ACCEPTOR_ADDON).build(null);
     
     public static final BlockEntityType<RedstoneAddonBlockEntity> REDSTONE_ADDON_ENTITY = BlockEntityType.Builder.of(RedstoneAddonBlockEntity::new, BlockContent.MACHINE_REDSTONE_ADDON).build(null);
+    
+    public static final BlockEntityType<CombiAddonEntity> COMBI_ADDON_ENTITY = BlockEntityType.Builder.of(CombiAddonEntity::new, BlockContent.MACHINE_COMBI_ADDON).build(null);
     
     @AssignSidedFluid
     public static final BlockEntityType<SteamBoilerAddonBlockEntity> STEAM_BOILER_ADDON_ENTITY = BlockEntityType.Builder.of(SteamBoilerAddonBlockEntity::new, BlockContent.STEAM_BOILER_ADDON).build(null);
@@ -235,7 +238,6 @@ public class BlockEntitiesContent implements ArchitecturyRegistryContainer<Block
       BlockContent.MACHINE_HUNTER_ADDON,
       BlockContent.QUARRY_ADDON,
       BlockContent.MACHINE_SILK_TOUCH_ADDON,
-      BlockContent.MACHINE_COMBI_ADDON,
       BlockContent.MACHINE_BURST_ADDON
     ).build(null);
     

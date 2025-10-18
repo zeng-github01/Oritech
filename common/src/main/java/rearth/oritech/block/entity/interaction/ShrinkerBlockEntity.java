@@ -1,40 +1,53 @@
 package rearth.oritech.block.entity.interaction;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.Vec3i;
+import net.minecraft.core.*;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
@@ -43,8 +56,9 @@ import java.util.List;
 import java.util.Objects;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
+import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, GeoBlockEntity, ExtendedMenuProvider,
+public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, ExtendedMenuProvider,
                                                                            ScreenProvider, MultiblockMachineController, MachineAddonController {
     
     public static final RawAnimation SHRINK = RawAnimation.begin().thenPlay("work");
@@ -68,7 +82,12 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyA
     @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> openSlots = new ArrayList<>();
     @SyncField(SyncType.GUI_OPEN)
-    private BaseAddonData addonData = MachineAddonController.DEFAULT_ADDON_DATA;
+    private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
+    
+    @SyncField(SyncType.GUI_OPEN)
+    public ShrunkAddonData currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, false, false);
+    
+    private boolean wasRedstoneActive = false;
     
     public ShrinkerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY, pos, state);
@@ -77,11 +96,92 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyA
     @Override
     public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
     
+        var currentRedstone = world.hasNeighborSignal(pos);
+        
+        if (currentRedstone && !wasRedstoneActive) {
+            // recently enabled redstone
+            System.out.println("triggered redstone shrink");
+            doShrink();
+        }
+        
+        wasRedstoneActive = currentRedstone;
+        
     }
     
     public void doShrink() {
-        System.out.println("shrinking");
+        
+        if (energyStorage.getAmount() < getDefaultCapacity()) return;
+        
+        initAddons();
+        
+        if (currentCandidate == null || connectedAddons.isEmpty() || !inventory.isEmpty()) return;
+        
+        var createdStack = new ItemStack(BlockContent.MACHINE_COMBI_ADDON.asItem());
+        createdStack.set(ComponentContent.ADDON_DATA.get(), currentCandidate);
+        
+        inventory.setStackInSlot(0, createdStack);
+        
+        for (var addonPos : connectedAddons.reversed()) {
+            
+            level.setBlock(addonPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            
+            if (level instanceof ServerLevel serverWorld) {
+                var spawnAt = addonPos.getCenter();
+                serverWorld.sendParticles(ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
+                serverWorld.playSound(null, worldPosition, SoundEvents.SMALL_AMETHYST_BUD_PLACE, SoundSource.BLOCKS, 2f, 0.5f);
+            }
+        }
         triggerAnim("machine", "work");
+        
+    }
+    
+    @Override
+    public void gatherAddonStats(List<AddonBlock> addons) {
+        MachineAddonController.super.gatherAddonStats(addons);
+        
+        if (addons.isEmpty()) {
+            currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, false, false);;
+            return;
+        }
+        
+        // collect all data
+        var data = getBaseAddonData();
+        var fluid = false;
+        var quarryCount = 0;
+        var yieldCount = 0;
+        var cropFilter = false;
+        var silk = false;
+        
+        for (var addon : addons) {
+            if (addon.addonBlock().equals(BlockContent.MACHINE_FLUID_ADDON)) fluid = true;
+            if (addon.addonBlock().equals(BlockContent.QUARRY_ADDON)) quarryCount++;
+            if (addon.addonBlock().equals(BlockContent.MACHINE_YIELD_ADDON)) yieldCount++;
+            if (addon.addonBlock().equals(BlockContent.CROP_FILTER_ADDON)) cropFilter = true;
+            if (addon.addonBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON)) silk = true;
+        }
+        
+        currentCandidate = new ShrunkAddonData(data, fluid, quarryCount, yieldCount, cropFilter, silk);
+    }
+    
+    @Override
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
+        addMultiblockToNbt(nbt);
+        writeAddonToNbt(nbt);
+        nbt.putLong("energy_stored", energyStorage.amount);
+        nbt.putBoolean("redstone", wasRedstoneActive);
+    }
+    
+    @Override
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
+        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
+        loadMultiblockNbtData(nbt);
+        loadAddonNbtData(nbt);
+        
+        energyStorage.amount = nbt.getLong("energy_stored");
+        wasRedstoneActive = nbt.getBoolean("redstone");
+        
+        updateEnergyContainer();
     }
     
     @Override
@@ -92,13 +192,18 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyA
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "machine", 3, state -> {
-            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
-                var targetAnim = isActive(getBlockState()) ? MachineBlockEntity.IDLE : MachineBlockEntity.PACKAGED;
-                state.resetCurrentAnimation();
-                return state.setAndContinue(targetAnim);
+            if (state.isCurrentAnimation(SETUP)) {
+                if (state.getController().hasAnimationFinished()) {
+                    state.setAndContinue(IDLE);
+                } else {
+                    return state.setAndContinue(SETUP);
+                }
+            }
+            
+            if (isActive(getBlockState())) {
+                return state.setAndContinue(IDLE);
             } else {
-                // playing animation, keep going
-                return PlayState.CONTINUE;
+                return state.setAndContinue(PACKAGED);
             }
         })
                           .triggerableAnim("work", SHRINK)
@@ -195,7 +300,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyA
     
     @Override
     public long getDefaultInsertRate() {
-        return getDefaultCapacity() / 60;
+        return 5_000_000L;
     }
     
     @Override
@@ -294,6 +399,42 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyA
         var candidate = world.getBlockEntity(packet.pos(), BlockEntitiesContent.SHRINKER_BLOCK_ENTITY);
         candidate.ifPresent(ShrinkerBlockEntity::doShrink);
         
+    }
+    
+    @Override
+    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+        return inventory;
+    }
+    
+    @Override
+    public boolean hasRedstoneControlAvailable() {
+        return true;
+    }
+    
+    public record ShrunkAddonData(BaseAddonData data, boolean fluid, int quarryCount, int yieldCount,
+                                  boolean cropFilter, boolean silk) {
+        
+        public static final Codec<ShrunkAddonData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+          BaseAddonData.CODEC.fieldOf("data").forGetter(ShrunkAddonData::data),
+          Codec.BOOL.fieldOf("fluid").forGetter(ShrunkAddonData::fluid),
+          Codec.INT.fieldOf("quarry_count").forGetter(ShrunkAddonData::quarryCount),
+          Codec.INT.fieldOf("yield_count").forGetter(ShrunkAddonData::yieldCount),
+          Codec.BOOL.fieldOf("crop_filter").forGetter(ShrunkAddonData::cropFilter),
+          Codec.BOOL.fieldOf("silk").forGetter(ShrunkAddonData::silk)
+        ).apply(instance, ShrunkAddonData::new));
+        
+        public static final StreamCodec<RegistryFriendlyByteBuf, ShrunkAddonData> STREAM_CODEC = NetworkManager.getAutoCodec(ShrunkAddonData.class);
+        
+        @Override
+        public @NotNull String toString() {
+            return "ShrunkAddonData{" +
+                     "data=" + data +
+                     ", fluid=" + fluid +
+                     ", quarryCount=" + quarryCount +
+                     ", yieldCount=" + yieldCount +
+                     ", cropFilter=" + cropFilter +
+                     '}';
+        }
     }
     
     public record ShrinkerPlayerUsePacket(BlockPos pos) implements CustomPacketPayload {

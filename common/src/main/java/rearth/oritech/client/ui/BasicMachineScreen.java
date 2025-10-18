@@ -1,12 +1,7 @@
 package rearth.oritech.client.ui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.*;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
 import dev.architectury.platform.Platform;
@@ -23,11 +18,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
@@ -39,7 +31,6 @@ import rearth.oracle.Oracle;
 import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.FluidApi.SingleSlotStorage;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
@@ -48,9 +39,6 @@ import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.client.renderers.LaserArmModel;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.ScreenProvider.ArrowConfiguration;
-import rearth.oritech.util.ScreenProvider.BarConfiguration;
-import rearth.oritech.util.ScreenProvider.GuiSlot;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.Optional;
@@ -326,9 +314,10 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
         var percentage = (float) amount / max;
         var energyFill = String.format("%.1f", percentage * 100);
         var storedAmount = TooltipHelper.getEnergyText(amount);
+        var usageText = TooltipHelper.getEnergyText(showedUsage);
         var maxAmount = TooltipHelper.getEnergyText(max);
         var transfer = TooltipHelper.getEnergyText(showedTransfer);
-        return Component.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, showedUsage, transfer);
+        return Component.translatable("tooltip.oritech.energy_usage", storedAmount, maxAmount, energyFill, usageText, transfer);
     }
     
     public void updateSettingsButtons() {
