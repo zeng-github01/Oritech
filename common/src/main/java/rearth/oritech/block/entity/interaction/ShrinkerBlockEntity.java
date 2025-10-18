@@ -191,7 +191,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "machine", 3, state -> {
+        controllers.add(new AnimationController<>(this, "machine", 0, state -> {
             if (state.isCurrentAnimation(SETUP)) {
                 if (state.getController().hasAnimationFinished()) {
                     state.setAndContinue(IDLE);
