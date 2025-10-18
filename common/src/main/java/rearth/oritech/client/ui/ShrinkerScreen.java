@@ -25,7 +25,7 @@ public class ShrinkerScreen extends UpgradableMachineScreen<UpgradableMachineScr
         shrinkButton.renderer(ORITECH_BUTTON);
         shrinkButton.textShadow(false);
         
-        overlay.child(shrinkButton.positioning(Positioning.absolute(76, 38)));
+        overlay.child(shrinkButton.positioning(Positioning.absolute(75, 38)));
         
     }
     
