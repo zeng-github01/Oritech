@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 8,
+      "count": 4,
       "ingredient": {
         "tag": "c:ender_pearls"
-      }
-    },
-    {
-      "count": 32,
-      "ingredient": {
-        "tag": "c:obsidians/crying"
       }
     }
   ],
@@ -27,9 +21,9 @@
       }
     },
     {
-      "count": 48,
+      "count": 64,
       "ingredient": {
-        "tag": "c:obsidians/normal"
+        "item": "minecraft:obsidian"
       }
     },
     {

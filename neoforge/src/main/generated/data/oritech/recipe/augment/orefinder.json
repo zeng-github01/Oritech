@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:enderic_lens"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "item": "minecraft:redstone_torch"
       }
     }
   ],
@@ -35,12 +29,6 @@
       }
     },
     {
-      "ingredient": {
-        "item": "oritech:overcharged_crystal"
-      }
-    },
-    {
-      "count": 2,
       "ingredient": {
         "item": "oritech:prometheum_ingot"
       }

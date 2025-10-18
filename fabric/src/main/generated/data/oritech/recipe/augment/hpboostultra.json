@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 64,
+      "count": 4,
       "ingredient": {
-        "item": "oritech:duratium_dust"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "tag": "c:storage_blocks/redstone"
+        "item": "oritech:energite_ingot"
       }
     }
   ],

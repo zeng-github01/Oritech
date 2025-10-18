@@ -2,20 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
-        "item": "oritech:magnetic_coil"
-      }
-    },
-    {
-      "ingredient": {
-        "item": "oritech:overcharged_crystal"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "tag": "c:dusts/electrum"
+        "item": "oritech:energite_ingot"
       }
     }
   ],
@@ -31,13 +20,13 @@
   ],
   "researchCost": [
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "item": "oritech:energite_ingot"
       }
     },
     {
-      "count": 32,
+      "count": 16,
       "ingredient": {
         "item": "oritech:ion_thruster"
       }
@@ -49,7 +38,7 @@
       }
     }
   ],
-  "rfCost": 350000000,
+  "rfCost": 150000000,
   "time": 1800,
   "toggleable": true,
   "uiX": 55,

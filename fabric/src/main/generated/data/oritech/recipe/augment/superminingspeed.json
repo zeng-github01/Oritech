@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:energite_ingot"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "tag": "c:storage_blocks/redstone"
       }
     }
   ],
@@ -38,13 +32,13 @@
       }
     },
     {
-      "count": 64,
+      "count": 8,
       "ingredient": {
         "item": "oritech:duratium_ingot"
       }
     }
   ],
-  "rfCost": 450000000,
+  "rfCost": 250000000,
   "time": 2400,
   "toggleable": true,
   "uiX": 80,

@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:magnetic_coil"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "tag": "c:ingots/copper"
       }
     }
   ],
@@ -23,13 +17,13 @@
   ],
   "researchCost": [
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "item": "oritech:magnetic_coil"
       }
     },
     {
-      "count": 48,
+      "count": 32,
       "ingredient": {
         "item": "oritech:energite_ingot"
       }
@@ -41,7 +35,7 @@
       }
     }
   ],
-  "rfCost": 400000000,
+  "rfCost": 300000000,
   "time": 2400,
   "toggleable": true,
   "uiX": 105,

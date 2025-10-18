@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:enderic_lens"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "item": "minecraft:glowstone"
       }
     }
   ],
@@ -24,13 +18,13 @@
   ],
   "researchCost": [
     {
-      "count": 32,
+      "count": 8,
       "ingredient": {
         "item": "minecraft:ender_eye"
       }
     },
     {
-      "count": 8,
+      "count": 16,
       "ingredient": {
         "item": "oritech:enderic_lens"
       }
@@ -38,7 +32,7 @@
     {
       "count": 8,
       "ingredient": {
-        "tag": "c:gems/diamond"
+        "item": "minecraft:diamond"
       }
     }
   ],

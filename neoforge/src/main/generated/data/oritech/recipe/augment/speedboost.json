@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 16,
+      "count": 4,
       "ingredient": {
         "item": "oritech:motor"
-      }
-    },
-    {
-      "count": 32,
-      "ingredient": {
-        "tag": "c:ingots/iron"
       }
     }
   ],
@@ -23,21 +17,21 @@
   "requirements": [],
   "researchCost": [
     {
-      "count": 32,
+      "count": 16,
       "ingredient": {
         "item": "oritech:motor"
       }
     },
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "item": "oritech:biosteel_ingot"
       }
     },
     {
-      "count": 32,
+      "count": 64,
       "ingredient": {
-        "tag": "c:dusts/redstone"
+        "item": "minecraft:redstone"
       }
     }
   ],

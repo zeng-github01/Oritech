@@ -2,21 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 4,
-      "ingredient": {
-        "item": "oritech:enderic_lens"
-      }
-    },
-    {
       "count": 8,
       "ingredient": {
-        "item": "minecraft:glowstone"
-      }
-    },
-    {
-      "count": 8,
-      "ingredient": {
-        "item": "minecraft:redstone_lamp"
+        "item": "minecraft:glowstone_dust"
       }
     }
   ],
@@ -30,7 +18,7 @@
     {
       "count": 64,
       "ingredient": {
-        "tag": "c:ingots/gold"
+        "item": "minecraft:gold_ingot"
       }
     },
     {
@@ -42,7 +30,7 @@
     {
       "count": 64,
       "ingredient": {
-        "item": "minecraft:glowstone"
+        "item": "minecraft:glowstone_dust"
       }
     }
   ],

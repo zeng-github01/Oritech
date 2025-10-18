@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:magnetic_coil"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "tag": "c:storage_blocks/iron"
       }
     }
   ],
@@ -25,7 +19,7 @@
   ],
   "researchCost": [
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "item": "oritech:magnetic_coil"
       }
@@ -37,9 +31,9 @@
       }
     },
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
-        "tag": "c:storage_blocks/redstone"
+        "item": "minecraft:ender_pearl"
       }
     }
   ],

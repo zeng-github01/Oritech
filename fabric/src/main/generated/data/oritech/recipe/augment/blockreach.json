@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:motor"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "tag": "c:ingots/copper"
       }
     }
   ],
@@ -35,9 +29,9 @@
       }
     },
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
-        "tag": "c:storage_blocks/copper"
+        "item": "minecraft:ender_pearl"
       }
     }
   ],

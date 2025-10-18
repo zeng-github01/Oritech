@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:enderic_compound"
-      }
-    },
-    {
-      "count": 32,
-      "ingredient": {
-        "tag": "c:storage_blocks/gold"
       }
     }
   ],
@@ -35,12 +29,6 @@
       "count": 64,
       "ingredient": {
         "item": "oritech:fluxite"
-      }
-    },
-    {
-      "count": 32,
-      "ingredient": {
-        "tag": "c:rods/blaze"
       }
     }
   ],

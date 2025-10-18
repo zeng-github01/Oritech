@@ -2,20 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:adamant_ingot"
-      }
-    },
-    {
-      "ingredient": {
-        "item": "oritech:overcharged_crystal"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "item": "oritech:fluxite"
       }
     }
   ],
@@ -31,13 +20,13 @@
   ],
   "researchCost": [
     {
-      "count": 64,
+      "count": 32,
       "ingredient": {
         "item": "oritech:adamant_ingot"
       }
     },
     {
-      "count": 8,
+      "count": 4,
       "ingredient": {
         "item": "minecraft:nether_star"
       }

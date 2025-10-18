@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "tag": "c:silicon"
-      }
-    },
-    {
-      "count": 32,
-      "ingredient": {
-        "tag": "c:storage_blocks/redstone"
       }
     }
   ],
@@ -27,23 +21,23 @@
     {
       "count": 64,
       "ingredient": {
-        "item": "oritech:silicon_wafer"
+        "item": "minecraft:copper_ingot"
       }
     },
     {
-      "count": 32,
+      "count": 8,
       "ingredient": {
         "item": "oritech:processing_unit"
       }
     },
     {
-      "count": 16,
+      "count": 32,
       "ingredient": {
-        "tag": "c:storage_blocks/gold"
+        "item": "minecraft:gold_ingot"
       }
     }
   ],
-  "rfCost": 50000000,
+  "rfCost": 20000000,
   "time": 400,
   "toggleable": true,
   "uiX": 30,

@@ -6,12 +6,6 @@
       "ingredient": {
         "tag": "c:carbon_fibre"
       }
-    },
-    {
-      "count": 4,
-      "ingredient": {
-        "item": "oritech:duratium_ingot"
-      }
     }
   ],
   "effect": {
@@ -39,7 +33,7 @@
     {
       "count": 4,
       "ingredient": {
-        "tag": "c:gems/diamond"
+        "item": "minecraft:diamond"
       }
     }
   ],

@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:enderic_lens"
-      }
-    },
-    {
-      "count": 64,
-      "ingredient": {
-        "tag": "c:obsidians/normal"
       }
     }
   ],
@@ -33,13 +27,7 @@
     {
       "count": 16,
       "ingredient": {
-        "tag": "c:ender_pearls"
-      }
-    },
-    {
-      "count": 16,
-      "ingredient": {
-        "tag": "c:storage_blocks/diamond"
+        "item": "minecraft:ender_pearl"
       }
     }
   ],

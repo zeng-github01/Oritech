@@ -2,15 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
-        "item": "oritech:flux_gate"
-      }
-    },
-    {
-      "count": 8,
-      "ingredient": {
-        "item": "oritech:plutonium_pellet"
+        "item": "oritech:ion_thruster"
       }
     }
   ],

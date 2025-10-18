@@ -2,14 +2,9 @@
   "type": "oritech:augment_data",
   "applyCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": {
         "item": "oritech:biosteel_ingot"
-      }
-    },
-    {
-      "ingredient": {
-        "tag": "minecraft:fishes"
       }
     }
   ],
@@ -21,13 +16,13 @@
   "requirements": [],
   "researchCost": [
     {
-      "count": 64,
+      "count": 8,
       "ingredient": {
         "item": "minecraft:prismarine_crystals"
       }
     },
     {
-      "count": 48,
+      "count": 32,
       "ingredient": {
         "item": "oritech:biosteel_ingot"
       }
