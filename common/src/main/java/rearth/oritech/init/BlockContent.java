@@ -256,6 +256,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block MACHINE_SILK_TOUCH_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_SILK_TOUCH_ADDON_SHAPE));
     public static final Block MACHINE_BURST_ADDON = new MachineAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBurstTicks(20 * 8).withBoundingShape(MachineAddonBlock.MACHINE_BURST_ADDON_SHAPE)); // todo config settings
     
+    @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.none)
     public static final Block MACHINE_COMBI_ADDON = new CombiAddonBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion(), AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_COMBI_ADDON_SHAPE));
     
