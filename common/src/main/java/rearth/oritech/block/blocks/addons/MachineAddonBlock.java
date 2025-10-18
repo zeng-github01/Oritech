@@ -296,6 +296,8 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                 tooltip.add(Component.translatable("tooltip.oritech.processing_addon_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON)
                 tooltip.add(Component.translatable("tooltip.oritech.addon_silk_touch_desc").withStyle(ChatFormatting.GRAY));
+            if (blockType == BlockContent.MACHINE_BURST_ADDON)
+                tooltip.add(Component.translatable("tooltip.oritech.addon_burst_desc").withStyle(ChatFormatting.GRAY));
             
             if (addonSettings.extender()) {
                 tooltip.add(Component.translatable("tooltip.oritech.addon_extender_desc").withStyle(ChatFormatting.GRAY));
