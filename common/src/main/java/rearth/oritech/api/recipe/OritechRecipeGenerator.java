@@ -4,13 +4,7 @@ import dev.architectury.fluid.FluidStack;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeBuilder;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -18,11 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.AbstractCookingRecipe;
-import net.minecraft.world.item.crafting.BlastingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
@@ -31,7 +21,6 @@ import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
 import rearth.oritech.init.*;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -536,6 +525,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // withered rose
         offerMachineFrameRecipe(exporter, BlockContent.WITHER_CROP_BLOCK.asItem(), of(Items.WITHER_ROSE), of(ItemTags.FLOWERS), 1, "witherrose");
         
+        // shrinker
+        offerTankRecipe(exporter, BlockContent.SHRINKER_BLOCK.asItem(), of(ItemContent.DUBIOS_CONTAINER), of(FluidContent.STILL_STRANGE_MATTER_BUCKET.get()), of(BlockContent.SUPERCONDUCTOR), "shrinker");
+        
         // particle accelerator
         // motor
         offerParticleMotorRecipe(exporter, BlockContent.ACCELERATOR_MOTOR.asItem(), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.SUPERCONDUCTOR.asItem()), of(ItemContent.DURATIUM_INGOT), of(ItemContent.ION_THRUSTER), "particlemotor");
@@ -553,6 +545,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_PROCESSING_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.SUPER_AI_CHIP), of(ItemContent.FLUX_GATE), of(TagContent.PLATINUM_INGOTS), of(ItemContent.MOTOR), "addon/processing");
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_PROCESSING_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.UNHOLY_INTELLIGENCE), of(Items.COMPARATOR), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.MOTOR), "addon/processingalt");
         offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_ULTIMATE_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.HEISENBERG_COMPENSATOR), of(BlockContent.MACHINE_SPEED_ADDON), of(BlockContent.MACHINE_EFFICIENCY_ADDON), of(ItemContent.OVERCHARGED_CRYSTAL), "addon/ultimate");
+        offerAtomicForgeRecipe(exporter, BlockContent.MACHINE_BURST_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.METAL_GIRDER_BLOCK), of(TagContent.STEEL_INGOTS), of(Items.REDSTONE), "addon/burst");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_EFFICIENCY_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.CARBON_FIBRE), of(TagContent.ELECTRUM_INGOTS), of(TagContent.PLASTIC_PLATES), "addon/eff");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_CAPACITOR_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.ENERGITE_INGOT), of(ItemContent.MAGNETIC_COIL), of(TagContent.PLASTIC_PLATES), "addon/capacitor");
         offerGeneratorRecipe(exporter, BlockContent.MACHINE_ACCEPTOR_ADDON.asItem(), of(TagContent.MACHINE_PLATING), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENERGITE_INGOT), of(TagContent.PLASTIC_PLATES), "addon/acceptor");
