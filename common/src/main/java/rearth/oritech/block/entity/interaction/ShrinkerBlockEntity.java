@@ -3,9 +3,11 @@ package rearth.oritech.block.entity.interaction;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
@@ -32,6 +35,7 @@ import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
 import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
@@ -42,6 +46,8 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyApi.BlockProvider, GeoBlockEntity, ExtendedMenuProvider,
                                                                            ScreenProvider, MultiblockMachineController, MachineAddonController {
+    
+    public static final RawAnimation SHRINK = RawAnimation.begin().thenPlay("work");
     
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     
@@ -73,6 +79,11 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyA
     
     }
     
+    public void doShrink() {
+        System.out.println("shrinking");
+        triggerAnim("machine", "work");
+    }
+    
     @Override
     public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
@@ -90,7 +101,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyA
                 return PlayState.CONTINUE;
             }
         })
-                          .triggerableAnim("work", MachineBlockEntity.WORKING)
+                          .triggerableAnim("work", SHRINK)
                           .triggerableAnim("deploy", MachineBlockEntity.SETUP)
                           .setSoundKeyframeHandler(new AutoPlayingSoundKeyframeHandler<>()));
     }
@@ -275,5 +286,23 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements EnergyA
     @Override
     public boolean showProgress() {
         return false;
+    }
+    
+    public static void onPlayerUse(ShrinkerPlayerUsePacket packet, Player player, RegistryAccess registryAccess) {
+        
+        var world = player.level();
+        var candidate = world.getBlockEntity(packet.pos(), BlockEntitiesContent.SHRINKER_BLOCK_ENTITY);
+        candidate.ifPresent(ShrinkerBlockEntity::doShrink);
+        
+    }
+    
+    public record ShrinkerPlayerUsePacket(BlockPos pos) implements CustomPacketPayload {
+        
+        public static final CustomPacketPayload.Type<ShrinkerPlayerUsePacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("shrink"));
+        
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
     }
 }

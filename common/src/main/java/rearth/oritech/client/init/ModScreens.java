@@ -76,7 +76,7 @@ public class ModScreens implements ArchitecturyRegistryContainer<MenuType<?>> {
         MenuRegistry.registerScreenFactory(PLACER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(FERTILIZER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
         MenuRegistry.registerScreenFactory(LASER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
-        MenuRegistry.registerScreenFactory(SHRINKER_SCREEN, UpgradableMachineScreen<UpgradableMachineScreenHandler>::new);
+        MenuRegistry.registerScreenFactory(SHRINKER_SCREEN, ShrinkerScreen::new);
         
         MenuRegistry.registerScreenFactory(INVENTORY_PROXY_SCREEN, InventoryProxyScreen::new);
         MenuRegistry.registerScreenFactory(REACTOR_SCREEN, ReactorScreen::new);

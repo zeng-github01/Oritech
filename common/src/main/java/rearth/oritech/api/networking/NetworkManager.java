@@ -4,33 +4,6 @@ import com.mojang.serialization.Codec;
 import dev.architectury.fluid.FluidStack;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.apache.logging.log4j.util.TriConsumer;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2i;
-import rearth.oritech.Oritech;
-import rearth.oritech.OritechPlatform;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
-import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
-import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
-import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
-import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
-import rearth.oritech.block.entity.augmenter.PlayerAugments;
-import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
-import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
-import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
-import rearth.oritech.item.tools.PortableLaserItem;
-import rearth.oritech.item.tools.armor.JetpackItem;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -49,6 +22,34 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.apache.logging.log4j.util.TriConsumer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
+import rearth.oritech.Oritech;
+import rearth.oritech.OritechPlatform;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
+import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
+import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
+import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
+import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
+import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
+import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.item.tools.PortableLaserItem;
+import rearth.oritech.item.tools.armor.JetpackItem;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 
 public class NetworkManager {
     
@@ -123,6 +124,7 @@ public class NetworkManager {
         registerToServer(PlayerAugments.LoadPlayerAugmentsToMachinePacket.PACKET_ID, getAutoCodec(PlayerAugments.LoadPlayerAugmentsToMachinePacket.class), PlayerAugments::receivePlayerLoadMachine);
         registerToServer(PlayerAugments.OpenAugmentScreenPacket.PACKET_ID, getAutoCodec(PlayerAugments.OpenAugmentScreenPacket.class), PlayerAugments::receiveOpenAugmentScreen);
         registerToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
+        registerToServer(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.PACKET_ID, getAutoCodec(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.class), ShrinkerBlockEntity::onPlayerUse);
         
         
         registerToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
