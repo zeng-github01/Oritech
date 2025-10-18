@@ -92,7 +92,7 @@ dependencies {
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
     /// runtime-only
-    implementation 'org.ow2.asm:asm-tree:9.8'
+    compileOnly 'org.ow2.asm:asm-tree:9.8'
 
     // This adds the ASM library to the runtime classpath for all runs (client, server, data)
     additionalRuntimeClasspath 'org.ow2.asm:asm-tree:9.8'

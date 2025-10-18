@@ -61,23 +61,7 @@ public final class OritechModNeoForge {
     
     class EventHandler {
         
-        // see ComponentContent.java for why this is incredibly stupid but required
         public static final DeferredRegister.DataComponents COMPONENT_REGISTRAR = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Oritech.MOD_ID);
-        
-        public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> IS_AOE_ACTIVE = COMPONENT_REGISTRAR.registerComponentType(
-          "is_aoe_active",
-          builder -> builder.persistent(PrimitiveCodec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
-        );
-        
-        public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockPos>> TARGET_POSITION = COMPONENT_REGISTRAR.registerComponentType(
-          "target_position",
-          builder -> builder.persistent(BlockPos.CODEC).networkSynchronized(BlockPos.STREAM_CODEC)
-        );
-        
-        public static final DeferredHolder<DataComponentType<?>, DataComponentType<FluidStack>> STORED_FLUID = COMPONENT_REGISTRAR.registerComponentType(
-          "stored_fluid",
-          builder -> builder.persistent(FluidStack.CODEC).networkSynchronized(FluidStack.STREAM_CODEC)
-        );
         
         public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> NEO_ENERGY_COMPONENT = COMPONENT_REGISTRAR.registerComponentType(
           "energy",

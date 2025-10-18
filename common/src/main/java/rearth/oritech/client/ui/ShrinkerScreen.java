@@ -19,13 +19,13 @@ public class ShrinkerScreen extends UpgradableMachineScreen<UpgradableMachineScr
     public void fillOverlay(FlowLayout overlay) {
         super.fillOverlay(overlay);
         
-        var shrinkButton = Components.button(Component.translatable("text.oritech.shrink").withStyle(ChatFormatting.DARK_GRAY), event -> {
+        var shrinkButton = Components.button(Component.translatable("text.oritech.shrink").withColor(BasicMachineScreen.GRAY_TEXT_COLOR), event -> {
             onShrinkPressed();
         });
         shrinkButton.renderer(ORITECH_BUTTON);
         shrinkButton.textShadow(false);
         
-        overlay.child(shrinkButton.positioning(Positioning.absolute(75, 38)));
+        overlay.child(shrinkButton.positioning(Positioning.absolute(74, 38)));
         
     }
     

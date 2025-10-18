@@ -71,6 +71,8 @@ public final class Oritech {
         TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
         TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.overworld()));
         
+        ComponentContent.COMPONENTS.register();
+        
         // for player augment ticks
         TickEvent.SERVER_PRE.register(event -> event.getAllLevels().forEach(world -> world.players().forEach(PlayerAugments::serverTickAugments)));
         LOGGER.info("Oritech initialization complete");
@@ -107,7 +109,6 @@ public final class Oritech {
         res.put(Registries.BLOCK_ENTITY_TYPE.location(), () -> ArchitecturyRegistryContainer.register(BlockEntitiesContent.class, MOD_ID, false));
         res.put(Registries.SOUND_EVENT.location(), () -> ArchitecturyRegistryContainer.register(SoundContent.class, MOD_ID, false));
         res.put(Registries.ITEM.location(), () -> ArchitecturyRegistryContainer.register(ToolsContent.class, MOD_ID, false));
-        res.put(Registries.DATA_COMPONENT_TYPE.location(), ComponentContent::registerComponents);
         res.put(Registries.FEATURE.location(), () -> ArchitecturyRegistryContainer.register(FeatureContent.class, MOD_ID, false));
         res.put(Registries.LOOT_FUNCTION_TYPE.location(), () -> ArchitecturyRegistryContainer.register(LootContent.class, MOD_ID, false));
         res.put(Registries.ENTITY_TYPE.location(), () -> ArchitecturyRegistryContainer.register(EntitiesContent.class, MOD_ID, false));

@@ -48,7 +48,7 @@ dependencies {
     compileOnly("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}") { transitive = false }
     // Mixin
     compileOnly 'org.spongepowered:mixin:0.8.5'
-    implementation 'org.ow2.asm:asm-tree:9.8'
+    compileOnly 'org.ow2.asm:asm-tree:9.8'
     // Mixin Extras
     compileOnly 'io.github.llamalad7:mixinextras-common:0.3.5'
     annotationProcessor 'io.github.llamalad7:mixinextras-common:0.3.5'
