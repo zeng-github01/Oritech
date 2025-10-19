@@ -298,12 +298,12 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @Override
     public long getDefaultCapacity() {
-        return 50_000_000L;
+        return Oritech.CONFIG.addonConfig.addonShrinkerRF();
     }
     
     @Override
     public long getDefaultInsertRate() {
-        return 5_000_000L;
+        return Oritech.CONFIG.addonConfig.addonShrinkerRF() / 60;
     }
     
     @Override

@@ -217,6 +217,10 @@ public class Config {
         public float ultimateAddonSpeed = 0.25f;
         public float ultimateAddonEfficiency = 1.1f;
         public float chamberAddonEfficiency = 1.5f;
+        public float burstAddonSpeedMultiplier = 8f;
+        public float burstAddonThrottleMultiplier = 1.2f;
+        public int burstAddonTicks = 240;
+        public long addonShrinkerRF = 50_000_000;
     }
     
     public static class CentrifugeConfig {

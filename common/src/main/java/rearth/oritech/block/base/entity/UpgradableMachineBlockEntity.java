@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -162,12 +163,11 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
         return remainingBurstTicks < 0;
     }
     
-    // todo config settings, wiki, recipes
     public float getBurstBonus() {
         if (isBurstAvailable()) {
-            return 1/8f;
+            return 1 / Oritech.CONFIG.addonConfig.burstAddonSpeedMultiplier();
         } else if(isBurstThrottled()) {
-            return 1.5f;
+            return Oritech.CONFIG.addonConfig.burstAddonThrottleMultiplier();
         } else {
             return 1f;
         }
