@@ -46,16 +46,24 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     protected void useEnergy() {
         super.useEnergy();
         
+        consumeBurstTicks();
+        
+    }
+    
+    public void consumeBurstTicks() {
         // consume burst tick with each tick that we progress (which uses energy once)
         remainingBurstTicks -= 2;
         remainingBurstTicks = Math.max(remainingBurstTicks, -addonData.maxBurstTicks());
-        
     }
     
     @Override
     public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         super.serverTick(world, pos, state, blockEntity);
         
+        addBurstTicks();
+    }
+    
+    public void addBurstTicks() {
         remainingBurstTicks++;
         remainingBurstTicks = Math.min(remainingBurstTicks, addonData.maxBurstTicks());
     }

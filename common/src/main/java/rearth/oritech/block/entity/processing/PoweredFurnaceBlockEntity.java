@@ -90,6 +90,8 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
             if (progress > 0) resetProgress();
         }
         
+        addBurstTicks();
+        
         if (world.getGameTime() % 18 == 0)
             updateFurnaceState(state);
         
