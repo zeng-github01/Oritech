@@ -1,5 +1,6 @@
 package rearth.oritech.init;
 
+import net.minecraft.world.item.enchantment.Enchantment;
 import rearth.oritech.Oritech;
 
 import static rearth.oritech.util.TagUtils.*;
@@ -111,6 +112,9 @@ public class TagContent {
     
     // feeder blacklist
     public static final TagKey<Item> FEEDER_BLACKLIST = oritechItemTag("feeder_blacklist");
+    
+    // catalyst blacklist, if you want to be boring
+    public static final TagKey<Enchantment> CATALYST_ENCHANTMENT_BLACKLIST = TagKey.create(Registries.ENCHANTMENT, Oritech.id("catalyst_blacklist"));
 
     // dyes
     public static final TagKey<Item> RAW_WHITE_DYE = cItemTag("raw_materials/dyes/white");

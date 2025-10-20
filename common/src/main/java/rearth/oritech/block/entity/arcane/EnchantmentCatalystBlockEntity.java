@@ -14,6 +14,7 @@ import rearth.oritech.client.init.ParticleContent.SoulParticleData;
 import rearth.oritech.client.ui.CatalystScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 
+import rearth.oritech.init.TagContent;
 import rearth.oritech.util.AutoPlayingSoundKeyframeHandler;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.InventoryInputMode;
@@ -261,6 +262,8 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             var enchantment = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).keySet().stream().findFirst().get();
             var maxLevel = enchantment.value().getMaxLevel();
             var level = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).getLevel(enchantment);
+            
+            if (enchantment.is(TagContent.CATALYST_ENCHANTMENT_BLACKLIST)) return false;
             
             // yes this does not check if the item can be enchanted with this enchantment. This is intentional, allowing you to skip the normal limitations
             var inputStack = inventory.getItem(1);
