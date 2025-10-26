@@ -1,3 +1,0 @@
-- Fix burst addon not working for powered furnace
-- Add workaround for JEI crashing with addon splicer
-- Add blacklist for arcane catalyst enchantments
