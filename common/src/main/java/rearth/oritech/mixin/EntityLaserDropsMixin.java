@@ -18,7 +18,7 @@ import rearth.oritech.util.FakePlayerMarker;
 
 
 @Mixin(Entity.class)
-public abstract class EntityLaserDropsMixin implements Attackable {
+public abstract class EntityLaserDropsMixin {
 
 
     @Shadow public abstract boolean isAlive();
