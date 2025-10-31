@@ -1,10 +1,5 @@
 package rearth.oritech.block.blocks.pipes;
 
-import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
-import rearth.oritech.item.tools.Wrench;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -16,18 +11,27 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
+import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.item.tools.Wrench;
 
-public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wrench.Wrenchable {
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wrench.Wrenchable, SimpleWaterloggedBlock {
     
     // 0 = no connection, 1 = connection (pipe->pipe or pipe->machine)
     public static int NO_CONNECTION = 0;
@@ -78,12 +82,13 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
                                .setValue(getWestProperty(), 0)
                                .setValue(getUpProperty(), 0)
                                .setValue(getDownProperty(), 0)
-                               .setValue(STRAIGHT, false));
+                               .setValue(STRAIGHT, false)
+                                    .setValue(BlockStateProperties.WATERLOGGED, false));
     }
     
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(getNorthProperty(), getEastProperty(), getSouthProperty(), getWestProperty(), getUpProperty(), getDownProperty(), STRAIGHT);
+        builder.add(getNorthProperty(), getEastProperty(), getSouthProperty(), getWestProperty(), getUpProperty(), getDownProperty(), STRAIGHT, BlockStateProperties.WATERLOGGED);
     }
     
     protected VoxelShape getShape(BlockState state) {
@@ -145,9 +150,12 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     
     // also known as 'getStateForNeighborUpdate'
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
+    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
         var world = (Level) worldAccess;
         if (world.isClientSide) return state;
+        
+        if (state.getValue(BlockStateProperties.WATERLOGGED))
+            world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
         
         // transform to interface when machine is placed as neighbor
         if (hasMachineInDirection(direction, world, pos, apiValidationFunction())) {
@@ -173,6 +181,11 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             onBlockRemoved(pos, state, world);
         }
         
+    }
+    
+    @Override
+    protected @NotNull FluidState getFluidState(BlockState state) {
+        return state.getValue(BlockStateProperties.WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
     }
     
     /**
@@ -301,6 +314,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         if (!newState.is(getConnectionBlock().getBlock()) && createConnection && hasMachineInDirection(side, world, pos, apiValidationFunction())) {
             var connectionState = getConnectionBlock();
             var interfaceState = ((GenericPipeBlock) connectionState.getBlock()).addConnectionStates(connectionState, world, pos, side);
+            interfaceState = addFluidState(interfaceState, pos, world);
             world.setBlockAndUpdate(pos, interfaceState);
         } else {
             world.setBlockAndUpdate(pos, newState);
@@ -327,6 +341,9 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @return The updated block-state
      */
     public BlockState addConnectionStates(BlockState state, Level world, BlockPos pos, boolean createConnection) {
+        
+        state = addFluidState(state, pos, world);
+        
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, world, createConnection);
@@ -353,7 +370,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             var connection = shouldConnect(state, direction, pos, world, direction.equals(createDirection));
             state = state.setValue(property, connection ? CONNECTION : NO_CONNECTION);
         }
-        return addStraightState(state);
+        return addFluidState(addStraightState(state), pos, world);
     }
     
     /**
