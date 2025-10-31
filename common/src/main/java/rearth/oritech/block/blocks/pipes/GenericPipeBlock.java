@@ -5,7 +5,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -19,12 +21,15 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.Wrench;
 
 import java.util.ArrayList;
@@ -220,6 +225,17 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             onBlockRemoved(pos, state, world);
         }
         return super.playerWillDestroy(world, pos, state, player);
+    }
+    
+    @Override
+    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        
+        if (!level.isClientSide() && stack.is(TagContent.WRENCHES) && !stack.is(ItemContent.WRENCH)) {
+            this.onWrenchUse(state, level, pos, player, hand);
+            return ItemInteractionResult.SUCCESS;
+        }
+        
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
     
     @Override

@@ -1,18 +1,17 @@
 package rearth.oritech.init;
 
-import net.minecraft.world.item.enchantment.Enchantment;
-import rearth.oritech.Oritech;
-
-import static rearth.oritech.util.TagUtils.*;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import rearth.oritech.Oritech;
+
+import static rearth.oritech.util.TagUtils.*;
 
 public class TagContent {
     
@@ -90,6 +89,9 @@ public class TagContent {
 
     // carbon fibre
     public static final TagKey<Item> CARBON_FIBRE = cItemTag("carbon_fibre");
+    
+    // wrenches
+    public static final TagKey<Item> WRENCHES = cItemTag("tools/wrench");
     
     // blocks
     public static final TagKey<Block> DRILL_MINEABLE = oritechBlockTag("mineable/drill");
