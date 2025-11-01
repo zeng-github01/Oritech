@@ -98,6 +98,7 @@ public class TagContent {
     public static final TagKey<Block> RESOURCE_NODES = oritechBlockTag("resource_nodes");
     public static final TagKey<Block> LASER_PASSTHROUGH = oritechBlockTag("laser_passthrough");
     public static final TagKey<Block> LASER_ACCELERATED = oritechBlockTag("laser_accelerated");
+    public static final TagKey<Block> LASER_FAST_BREAKING = oritechBlockTag("laser_fast_break");
 
     // trees
     public static final TagKey<Block> CUTTER_LOGS_MINEABLE = oritechBlockTag("mineable/cutter_logs");

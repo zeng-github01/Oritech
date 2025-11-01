@@ -535,6 +535,10 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         }
         
         this.targetBlockEnergyNeeded = (int) (BLOCK_BREAK_ENERGY * Math.pow(blockHardness, Oritech.CONFIG.blockBreakHardnessExponentialFactor()) * addonData.efficiency());
+        
+        if (targetState.is(TagContent.LASER_FAST_BREAKING))
+            targetBlockEnergyNeeded /= 8;
+        
         this.currentTarget = targetPos;
         
         if (alsoSetDirection) {
