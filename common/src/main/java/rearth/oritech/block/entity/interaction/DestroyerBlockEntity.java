@@ -338,7 +338,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @Override
     public float getWorkTime() {
         var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
-        return (float) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness, 0.5f) * quarrySpeedBonus);
+        return (float) (Oritech.CONFIG.destroyerConfig.workDuration() * this.getSpeedMultiplier() * Math.pow(targetHardness, Oritech.CONFIG.blockBreakHardnessExponentialFactor()) * quarrySpeedBonus);
     }
 
     @Override
