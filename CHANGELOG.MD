@@ -1,0 +1,16 @@
+- Add support for FTB Filters in Item Filter blocks
+- Make pipes waterloggable
+- Add overloads for recipe builders with different namespaces
+- Allow wrenches from other mods to be used on pipes
+- Add config option for block hardness scaling
+- Add block tag for fast laser breaking
+- Add support for berry bushes to crop filter addon
+- Update translations from crowdIn
+- Fix glowing portable tank drop issues
+- Fix crash when connecting item pipes to pump
+- Fix crash in augmenter tooltip when augment hotkey is unbound
+- Fix refinery module crafting recipe not using silicon tag
+- Fix edge-case crash when saving machine gantry block entities
+- Fix souls in arcane catalyst sometimes not being saved
+- Fix pipe connection recreation not working right
+- Fix brown mushrooms not being fully harvested by treefeller
