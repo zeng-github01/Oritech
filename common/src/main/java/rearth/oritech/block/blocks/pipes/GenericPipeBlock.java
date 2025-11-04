@@ -81,13 +81,13 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     public GenericPipeBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(defaultBlockState()
-                               .setValue(getNorthProperty(), 0)
-                               .setValue(getEastProperty(), 0)
-                               .setValue(getSouthProperty(), 0)
-                               .setValue(getWestProperty(), 0)
-                               .setValue(getUpProperty(), 0)
-                               .setValue(getDownProperty(), 0)
-                               .setValue(STRAIGHT, false)
+                                    .setValue(getNorthProperty(), 0)
+                                    .setValue(getEastProperty(), 0)
+                                    .setValue(getSouthProperty(), 0)
+                                    .setValue(getWestProperty(), 0)
+                                    .setValue(getUpProperty(), 0)
+                                    .setValue(getDownProperty(), 0)
+                                    .setValue(STRAIGHT, false)
                                     .setValue(BlockStateProperties.WATERLOGGED, false));
     }
     
@@ -246,7 +246,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             return InteractionResult.SUCCESS;
         }
         
-        return !toggleSideConnection(state, getInteractDirection(state, pos, player), world, pos) ? InteractionResult.FAIL : InteractionResult.SUCCESS;
+        return toggleSideConnection(state, getInteractDirection(state, pos, player), world, pos) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
     
     @Override
@@ -266,6 +266,9 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             var hitResult = shape.clip(start, end, pos);
             if (hitResult == null) continue;
             
+            // skip center if we already matched one of the outer ones
+            if (shape.equals(shapes.getLast()) && distance < Double.MAX_VALUE) continue;
+            
             var shapeDistance = hitResult.getLocation().distanceTo(start);
             if (shapeDistance < distance) {
                 distance = shapeDistance;
@@ -283,6 +286,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         return Direction.getNearest(diff.x, diff.y, diff.z);
     }
     
+    // only returns the outside shapes
     private List<VoxelShape> getActiveShapes(BlockState state) {
         
         var shapes = new ArrayList<VoxelShape>();
@@ -299,8 +303,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         if (state.getValue(getDownProperty()) != NO_CONNECTION)
             shapes.add(Block.box(5, 0, 5, 11, 5, 11));
         
-        if (shapes.isEmpty())
-            shapes.add(Block.box(5, 5, 5, 11, 11, 11));
+        shapes.add(Block.box(5, 5, 5, 11, 11, 11));
         
         return shapes;
     }
