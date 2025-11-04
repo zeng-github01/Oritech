@@ -249,6 +249,11 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         lastWorkedAt = world.getGameTime();
     }
     
+    @Override
+    public int getTickUpdateInterval() {
+        return 1;
+    }
+    
     private boolean isBlockAvailable(BlockPos target) {
         if (!occupiedAreas.containsKey(areaMin)) {
             occupiedAreas.put(areaMin, new HashMap<>(1));
