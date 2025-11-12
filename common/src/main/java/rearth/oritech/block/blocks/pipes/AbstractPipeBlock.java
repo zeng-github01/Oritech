@@ -68,6 +68,7 @@ public abstract class AbstractPipeBlock extends Block {
     }
     
     public BlockState addFluidState(BlockState state, BlockPos pos, Level level) {
+        if (!state.hasProperty(BlockStateProperties.WATERLOGGED)) return state;
         return state.setValue(BlockStateProperties.WATERLOGGED, level.getFluidState(pos).is(Fluids.WATER));
     }
     
