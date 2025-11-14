@@ -9,9 +9,6 @@ import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import io.wispforest.owo.ui.core.Color;
-import rearth.oritech.Oritech;
-
-import java.util.List;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -21,6 +18,10 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
+import rearth.oritech.Oritech;
+import rearth.oritech.block.fluid.SheolFireFluidBlock;
+
+import java.util.List;
 
 public class FluidContent {
     
@@ -107,6 +108,7 @@ public class FluidContent {
                                                                          .bucketItemSupplier(() -> FluidContent.STILL_STEAM_BUCKET)
                                                                          .sourceTexture(Oritech.id("block/fluid/fluid_steam"))
                                                                          .flowingTexture(Oritech.id("block/fluid/fluid_steam"))
+                                                                         .lighterThanAir(true)
                                                                          .color(Color.WHITE.argb());
     
     public static final ArchitecturyFluidAttributes HEAVY_OIL_ATTRIBUTES = SimpleArchitecturyFluidAttributes.ofSupplier(() -> FluidContent.FLOWING_HEAVY_OIL, () -> FluidContent.STILL_HEAVY_OIL)
@@ -271,7 +273,7 @@ public class FluidContent {
     // sheol fire
     public static final RegistrySupplier<FlowingFluid> STILL_SHEOL_FIRE = FLUIDS.register("still_sheol_fire", () -> cast(new ArchitecturyFlowingFluid.Source(SHEOL_FIRE_ATTRIBUTES)));
     public static final RegistrySupplier<FlowingFluid> FLOWING_SHEOL_FIRE = FLUIDS.register("flowing_sheol_fire", () -> cast(new ArchitecturyFlowingFluid.Flowing(SHEOL_FIRE_ATTRIBUTES)));
-    public static final RegistrySupplier<LiquidBlock> STILL_SHEOL_FIRE_BLOCK = BLOCKS.register("still_sheol_fire_block", () -> new ArchitecturyLiquidBlock(STILL_SHEOL_FIRE, BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final RegistrySupplier<LiquidBlock> STILL_SHEOL_FIRE_BLOCK = BLOCKS.register("still_sheol_fire_block", () -> new SheolFireFluidBlock(STILL_SHEOL_FIRE, BlockBehaviour.Properties.ofFullCopy(Blocks.LAVA)));
     public static final RegistrySupplier<Item> STILL_SHEOL_FIRE_BUCKET = ITEMS.register("still_sheol_fire_bucket", () -> new ArchitecturyBucketItem(STILL_SHEOL_FIRE, new Item.Properties().stacksTo(1).craftRemainder(Items.BUCKET)));
     
     // strange matter
