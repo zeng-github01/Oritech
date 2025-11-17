@@ -1,0 +1,9 @@
+- Add particles and entity damage to sheol fire fluid
+- Add missing translation entries for fluid source blocks
+- Add missing nugget recipes and tags
+- Doc improvements (@Tctiancan)
+- Update item pipe tooltip to use dynamic motor item name hint
+- Remove elytra render mixin debug annotation (@ChiefArug)
+- Fix crash when placing ducted pipe variants
+- Fix case with machine core interactions in some rare edge cases
+- Update translations from crowdin
