@@ -159,6 +159,7 @@ would fit, so for content and balance changes please reach out to me first (via 
   after you edit the *README.md* file with necessary changes.
 * Please make sure you check your spelling and grammar.
 * Create individual PR for each suggestion.
+* **Please add translation on crowdIn [crowdin](https://crowdin.com/project/oritech)**
 
 ## Credits
 

@@ -68,6 +68,12 @@ public class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
           .add(ItemContent.COAL_DUST)
           .add(ItemContent.STEEL_DUST);
         
+        // nuggets
+        getOrCreateTagBuilder(ConventionalItemTags.NUGGETS)
+          .add(ItemContent.NICKEL_NUGGET)
+          .add(ItemContent.COPPER_NUGGET)
+          .add(ItemContent.PLATINUM_NUGGET);
+        
         getOrCreateTagBuilder(getDustTag("nickel")).add(ItemContent.NICKEL_DUST);
         getOrCreateTagBuilder(getDustTag("platinum")).add(ItemContent.PLATINUM_DUST);
         getOrCreateTagBuilder(getDustTag("biosteel")).add(ItemContent.BIOSTEEL_DUST);

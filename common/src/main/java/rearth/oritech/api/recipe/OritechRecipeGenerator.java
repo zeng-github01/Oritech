@@ -785,6 +785,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .timeMultiplier(1.5f)
           .vanillaProcessing()
           .export(exporter);
+        
     }
     
     private void addAlloys(RecipeOutput exporter) {

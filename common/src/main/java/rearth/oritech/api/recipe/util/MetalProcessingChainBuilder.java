@@ -336,8 +336,10 @@ public class MetalProcessingChainBuilder {
             }
             if (clumpItem != null && smallClumpItem != null)
                 OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
-            if (nuggetItem != null && !skipCompactingRecipes)    // to avoid duplicate vanilla nugget -> item recipes
+            if (nuggetItem != null && !skipCompactingRecipes) {    // to avoid duplicate vanilla nugget -> item recipes
                 OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
+                OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, nuggetItem, ingotItem);
+            }
         }
     }
     
