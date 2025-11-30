@@ -166,5 +166,7 @@ public class TagContent {
     public static final TagKey<Fluid> NAPHTHA = cFluidTag("naphtha");
     public static final TagKey<Fluid> DIESEL = cFluidTag("diesel");
     public static final TagKey<Fluid> TURBOFUEL = cFluidTag("turbofuel");
+    
+    public static final TagKey<Fluid> STEAM = cFluidTag("steam");
 
 }
