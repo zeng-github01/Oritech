@@ -700,6 +700,8 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addCompactingRecipe(exporter, BlockContent.SILICON_BLOCK, ItemContent.SILICON, of(TagContent.SILICON), of(getStorageBlockTag("silicon")));
         addCompactingRecipe(exporter, BlockContent.RAW_NICKEL_BLOCK, ItemContent.RAW_NICKEL, of(TagContent.NICKEL_RAW_MATERIALS), of(getStorageBlockTag("raw_nickel")));
         addCompactingRecipe(exporter, BlockContent.RAW_PLATINUM_BLOCK, ItemContent.RAW_PLATINUM, of(TagContent.PLATINUM_RAW_MATERIALS), of(getStorageBlockTag("raw_platinum")));
+        addCompactingRecipe(exporter, BlockContent.RAW_URANIUM_BLOCK, ItemContent.RAW_URANIUM, of(TagContent.URANIUM_RAW_MATERIALS), of(getStorageBlockTag("raw_uranium")));
+        addCompactingRecipe(exporter, BlockContent.URANIUM_DUST_BLOCK, ItemContent.URANIUM_DUST, of(TagContent.URANIUM_DUSTS), of(getStorageBlockTag("uranium_dust")));
         
     }
 

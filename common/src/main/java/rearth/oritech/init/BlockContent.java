@@ -427,9 +427,13 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block SILICON_BLOCK = new SlimeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.SLIME_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block RAW_NICKEL_BLOCK = new SlimeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    public static final Block RAW_NICKEL_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
-    public static final Block RAW_PLATINUM_BLOCK = new SlimeBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    public static final Block RAW_PLATINUM_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block RAW_URANIUM_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    public static final Block URANIUM_DUST_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     //endregion
     
     @Override

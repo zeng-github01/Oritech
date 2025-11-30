@@ -217,6 +217,8 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createTrivialCube(BlockContent.SILICON_BLOCK);
         blockStateModelGenerator.createTrivialCube(BlockContent.RAW_NICKEL_BLOCK);
         blockStateModelGenerator.createTrivialCube(BlockContent.RAW_PLATINUM_BLOCK);
+        blockStateModelGenerator.createTrivialCube(BlockContent.RAW_URANIUM_BLOCK);
+        blockStateModelGenerator.createTrivialCube(BlockContent.URANIUM_DUST_BLOCK);
         
         var machinePlatingPool = blockStateModelGenerator.family(BlockContent.MACHINE_PLATING_BLOCK);
         machinePlatingPool.stairs(BlockContent.MACHINE_PLATING_STAIRS);
