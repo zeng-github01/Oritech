@@ -1008,13 +1008,13 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .export(exporter, "dwarf");
         
         AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.RAW_BIOPOLYMER, 64)
-          .researchCost(ItemContent.SMALL_URANIUM_DUST, 4)
+          .researchCost(ItemContent.RAW_BIOPOLYMER, 32)
+          .researchCost(TagContent.URANIUM_DUSTS, 4)
           .applyCost(ItemContent.RAW_BIOPOLYMER, 8)
           .requirement(Oritech.id("augment/dwarf"))
           .requirement(Oritech.id("augment/armor"))
           .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-          .uiX(55).uiY(90).time(1600).rfCost(80_000_000)
+          .uiX(55).uiY(90).time(1600).rfCost(40_000_000)
           .modifierDefinition(Attributes.SCALE, 1f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
           .toggleable()
           .export(exporter, "giant");
