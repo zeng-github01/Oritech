@@ -204,7 +204,7 @@ public class ReactorScreen extends BaseOwoHandledScreen<FlowLayout, ReactorScree
         
         // gather stats
         var sumProducedEnergy = menu.reactorEntity.componentStats.values().stream()
-                                  .mapToInt(data -> data.receivedPulses() * ReactorControllerBlockEntity.RF_PER_PULSE * stackHeight).sum() * 1000000;
+                                  .mapToInt(data -> data.receivedPulses() * ReactorControllerBlockEntity.RF_PER_PULSE * stackHeight).sum();
         
         
         var sumProducedHeat = menu.reactorEntity.componentStats.values().stream()
