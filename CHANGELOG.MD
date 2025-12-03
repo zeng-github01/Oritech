@@ -1,0 +1,5 @@
+- Add slight glowing effect to uranium block
+- Add specific neoforge version range requirement to mod metadata
+- Improve machine gantry rendering performance (and fix some bugs with it)
+- Fix reactor screens showing 1_000_000 times the produced energy amount
+- Improve publishing process
