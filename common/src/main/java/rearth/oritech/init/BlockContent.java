@@ -94,6 +94,8 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @NoBlockItem
     public static final Block TRANSPARENT_ITEM_PIPE_CONNECTION = new ItemPipeConnectionBlock.TransparentItemPipeConnectionBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     
+    public static final Block POWER_POLE_BLOCK = new PowerPoleBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    
     @NoBlockItem
     public static final Block FRAME_GANTRY_ARM = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.CHAIN).noOcclusion());
     @NoBlockItem

@@ -4,6 +4,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ComponentContent;
 import java.util.List;
@@ -56,9 +57,7 @@ public class LaserTargetDesignator extends Item {
                     context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
                 return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
             }
-        }
-        
-        if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
+        } else if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
               && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof DronePortEntity dronePortEntity
               && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
             var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
@@ -70,6 +69,12 @@ public class LaserTargetDesignator extends Item {
                 context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_invalid"));
             }
             return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+        } else if (context.getLevel().getBlockEntity(context.getClickedPos()) instanceof PowerPoleEntity powerPole && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
+            
+            var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
+            powerPole.assignNewTarget(target);
+            context.getItemInHand().remove(ComponentContent.TARGET_POSITION.get());
+            return InteractionResult.SUCCESS;
         }
         
         if (!targetBlockState.getBlock().equals(Blocks.AIR)) {

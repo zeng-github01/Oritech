@@ -71,6 +71,8 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createNonTemplateHorizontalBlock(BlockContent.DESTROYER_BLOCK);
         blockStateModelGenerator.createNonTemplateHorizontalBlock(BlockContent.FERTILIZER_BLOCK);
         
+        blockStateModelGenerator.createNonTemplateHorizontalBlock(BlockContent.POWER_POLE_BLOCK);
+        
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.PUMP_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.CHARGER_BLOCK);
         
