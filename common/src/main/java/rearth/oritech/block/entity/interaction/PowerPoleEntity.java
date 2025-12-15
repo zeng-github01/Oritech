@@ -5,7 +5,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -29,6 +31,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
+import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MultiblockMachineController;
@@ -91,12 +94,37 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         }
     }
     
-    public void assignNewTarget(BlockPos target) {
+    public void assignNewTarget(BlockPos target, Player player) {
         Oritech.LOGGER.info("Assigning new power pole target");
         
+        // adjust for core blocks
+        var targetState = level.getBlockState(target);
+        if (targetState.getBlock() instanceof MachineCoreBlock && targetState.getValue(MachineCoreBlock.USED)) {
+            target = MachineCoreBlock.getControllerPos(level, target);
+        }
+        
+        var dist = target.distManhattan(worldPosition);
+        
         var targetEntityCandidate = level.getBlockEntity(target, BlockEntitiesContent.POWER_POLE_ENTITY);
-        if (targetEntityCandidate.isEmpty()) return;
+        if (targetEntityCandidate.isEmpty() || target.equals(worldPosition) || dist < 50) {
+            player.sendSystemMessage(Component.translatable("message.oritech.target_designator.pole_position_invalid"));
+            return;
+        }
         var targetEntity = targetEntityCandidate.get();
+        
+        if (this.connections.stream().anyMatch(elem -> elem.pos().equals(targetEntity.worldPosition))) {
+            this.removeIncomingConnection(target);
+            targetEntity.removeIncomingConnection(worldPosition);
+            
+            var netData = getNetworkData();
+            var net = netData.getNetwork(worldPosition);
+            this.updateConnectionsInState(net);
+            targetEntity.updateConnectionsInState(net);
+            
+            netData.updateNetworkSplit(Set.of(worldPosition, target), getNetwork());
+            player.sendSystemMessage(Component.translatable("message.oritech.target_designator.removing_pole_connection"));
+            return;
+        }
         
         connections.add(targetEntity.getConnectionData());
         targetEntity.assignIncomingConnection(this);
@@ -138,6 +166,8 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         this.setChanged(false);
         this.sendUpdate(SyncType.CUSTOM);
+        
+        player.sendSystemMessage(Component.translatable("message.oritech.target_designator.connected_poles"));
     }
     
     private void joinNetwork(PoleNetwork target, PoleNetworkData data) {
@@ -578,6 +608,30 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             
         }
         
+        public void updateNetworkSplit(Set<BlockPos> removedConnections, PoleNetwork existingNet) {
+            
+            var newNets = new HashSet<Map<BlockPos, Set<BlockPos>>>();
+            
+            for (var deletedConnection : removedConnections) {
+                var newConnectionNet = FloodFillNetwork(existingNet, deletedConnection);
+                newNets.add(newConnectionNet);
+                
+            }
+            
+            System.out.println("split into: " + newNets.size());
+            
+            if (newNets.size() == 1) return;    // no split needed, there's other connections doing the same
+            
+            var newNetCount = newNets.size();
+            var newNetPower = existingNet.storedEnergy / newNetCount;
+            
+            for (var newNetData : newNets) {
+                var newNet = new PoleNetwork(newNetData, newNetPower);
+                for (var polePos : newNet.getPoles())
+                    activeNetworks.put(polePos, newNet);
+            }
+        }
+        
         public void removePole(BlockPos removeAt) {
             
             System.out.println("removing pole");
@@ -597,28 +651,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             
             if (removedPoleConnections.size() <= 1) return; // no split needed
             
-            // potential split needed
-            var newNets = new HashSet<Map<BlockPos, Set<BlockPos>>>();
-            
-            for (var deletedConnection : removedPoleConnections) {
-                
-                var newConnectionNet = FloodFillNetwork(existingNet, deletedConnection);
-                newNets.add(newConnectionNet);
-                
-            }
-            
-            System.out.println("split into: " + newNets.size());
-            
-            if (newNets.size() == 1) return;    // no split needed, there's other connections doing the same
-            
-            var newNetCount = newNets.size();
-            var newNetPower = existingNet.storedEnergy / newNetCount;
-            
-            for (var newNetData : newNets) {
-                var newNet = new PoleNetwork(newNetData, newNetPower);
-                for (var polePos : newNet.getPoles())
-                    activeNetworks.put(polePos, newNet);
-            }
+            updateNetworkSplit(removedPoleConnections, existingNet);
             
         }
         
