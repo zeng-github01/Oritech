@@ -47,7 +47,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     @SyncField(SyncType.GUI_OPEN)
     private float coreQuality = 1f;
     @SyncField({SyncType.INITIAL, SyncType.CUSTOM})
-    private final Set<BlockPos> connections = new HashSet<>();
+    private final Set<ConnectionTarget> connections = new HashSet<>();
     
     // storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
@@ -98,7 +98,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         if (targetEntityCandidate.isEmpty()) return;
         var targetEntity = targetEntityCandidate.get();
         
-        connections.add(target);
+        connections.add(targetEntity.getConnectionData());
         targetEntity.assignIncomingConnection(this);
         
         var allNetworks = getNetworkData();
@@ -155,7 +155,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     public void assignIncomingConnection(PowerPoleEntity from) {
-        this.connections.add(from.worldPosition);
+        this.connections.add(from.getConnectionData());
         this.markDirty(false);
         this.sendUpdate(SyncType.CUSTOM);
     }
@@ -166,15 +166,19 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         this.sendUpdate(SyncType.CUSTOM);
     }
     
-    public Set<BlockPos> getConnections() {
+    public ConnectionTarget getConnectionData() {
+        return new ConnectionTarget(worldPosition, getFacingForMultiblock());
+    }
+    
+    public Set<ConnectionTarget> getConnections() {
         return connections;
     }
     
     public void onRemoved() {
         
         // remove connection from targets (if loaded)
-        for (var targetPos : connections) {
-            if (level.isLoaded(targetPos) && level.getBlockEntity(targetPos) instanceof PowerPoleEntity powerPole) {
+        for (var target: connections) {
+            if (level.isLoaded(target.pos) && level.getBlockEntity(target.pos) instanceof PowerPoleEntity powerPole) {
                 powerPole.removeIncomingConnection(worldPosition);
             }
         }
@@ -210,8 +214,13 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         super.saveAdditional(tag, registries);
         addMultiblockToNbt(tag);
         
-        var connectionTag = new LongArrayTag(connections.stream().map(BlockPos::asLong).toList());
-        tag.put("connections", connectionTag);
+        var connectionList = new ListTag();
+        for (var connection : connections) {
+            var compound = new CompoundTag();
+            compound.putLong("p", connection.pos().asLong());
+            compound.putInt("d", connection.facing.ordinal());
+        }
+        tag.put("connectionData", connectionList);
     }
     
     @Override
@@ -219,9 +228,18 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         super.loadAdditional(tag, registries);
         loadMultiblockNbtData(tag);
         
-        if (tag.contains("connections")) {
-            var connectionData = tag.getLongArray("connections");
-            connections.addAll(Arrays.stream(connectionData).mapToObj(BlockPos::of).toList());
+        if (tag.contains("connectionData")) {
+            
+            connections.clear();
+            
+            var nbtList = tag.getList("connectionData", Tag.TAG_COMPOUND);
+            for (var nbtElem : nbtList) {
+                var elem = (CompoundTag) nbtElem;
+                var pos = BlockPos.of(elem.getLong("p"));
+                var dir = Direction.values()[elem.getInt("d")];
+                connections.add(new ConnectionTarget(pos, dir));
+            }
+            
         }
     }
     
@@ -461,7 +479,8 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         }
     }
     
-    // todo actually save the saved data
+    public record ConnectionTarget(BlockPos pos, Direction facing) {}
+    
     // this is kept separate from the block entities (and fully decoupled) so it works well across unloaded areas,
     // even if some poles are in the middle of it
     public static class PoleNetworkData extends SavedData {
@@ -657,8 +676,8 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         }
         
         // adds or updates a pole in a network
-        public void setPole(BlockPos pole, Set<BlockPos> connections) {
-            poles.put(pole, new HashSet<>(connections));
+        public void setPole(BlockPos pole, Set<ConnectionTarget> connections) {
+            poles.put(pole, new HashSet<>(connections.stream().map(elem -> elem.pos()).toList()));
         }
     }
 }
