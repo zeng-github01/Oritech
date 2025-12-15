@@ -1,16 +1,21 @@
 package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -33,6 +38,7 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
@@ -75,11 +81,20 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     @Override
     public void serverTick(Level world, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        // todo occasional electric particles while working
-        
         outputEnergy();
         
         energyStorage.tick(world.getGameTime());
+        
+        if (world.random.nextFloat() > 0.95f) {
+            
+            var stats = this.energyStorage.getCurrentStatistics(world.getGameTime());
+            var moved = stats.insertedLastTickTotal() + stats.extractedLastTickTotal();
+            
+            if (moved > 10 && world instanceof ServerLevel serverLevel) {
+                var at = worldPosition.getCenter().add(world.random.nextFloat() * 0.4, world.random.nextFloat() * 0.4, world.random.nextFloat() * 0.4);
+                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, world.random.nextFloat(), world.random.nextFloat(), world.random.nextFloat(), 0.15f);
+            }
+        }
         
     }
     
@@ -103,13 +118,22 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             target = MachineCoreBlock.getControllerPos(level, target);
         }
         
+        var pitch = 0.85f + level.random.nextFloat() * 0.3f;
+        level.playSound(null, worldPosition, SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS, 0.7f, pitch);
+        
         var dist = target.distManhattan(worldPosition);
         
+        if (dist < Oritech.CONFIG.poleConfig.minRange() || dist > Oritech.CONFIG.poleConfig.maxRange()) {
+            player.sendSystemMessage(Component.translatable("message.oritech.target_designator.pole_dist_invalid", Oritech.CONFIG.poleConfig.minRange(), Oritech.CONFIG.poleConfig.maxRange(), dist));
+            return;
+        }
+        
         var targetEntityCandidate = level.getBlockEntity(target, BlockEntitiesContent.POWER_POLE_ENTITY);
-        if (targetEntityCandidate.isEmpty() || target.equals(worldPosition) || dist < 50) {
+        if (targetEntityCandidate.isEmpty() || target.equals(worldPosition)) {
             player.sendSystemMessage(Component.translatable("message.oritech.target_designator.pole_position_invalid"));
             return;
         }
+        
         var targetEntity = targetEntityCandidate.get();
         
         if (this.connections.stream().anyMatch(elem -> elem.pos().equals(targetEntity.worldPosition))) {
@@ -406,17 +430,16 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             Arrays.fill(historicExtract, 0L);
         }
         
-        protected static final Long MAX_CAPACITY = 1_000_000L;
         
         private boolean isValid() {
-            return PowerPoleEntity.this.isConnected();
+            return level != null && PowerPoleEntity.this.isConnected();
         }
         
         @Override
         public long insert(long maxAmount, boolean simulate) {
             if (!isValid()) return 0;
             
-            var insertAmount = Math.min(maxAmount, MAX_CAPACITY - getAmount());
+            var insertAmount = Math.min(maxAmount, getCapacity() - getAmount());
             
             if (insertAmount > 0 && !simulate) {
                 var newAmount = getAmount() + insertAmount;
@@ -446,7 +469,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         public void setAmount(long amount) {
             if (!isValid()) return;
             
-            if (amount > MAX_CAPACITY || amount < 0) {
+            if (amount > getCapacity() || amount < 0) {
                 Oritech.LOGGER.error("tried setting invalid amount for pole network: " + amount);
                 return;
             }
@@ -476,8 +499,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         @Override
         public long getCapacity() {
-            if (!isValid()) return 0;
-            return MAX_CAPACITY;
+            return Oritech.CONFIG.poleConfig.energyCapacity();
         }
         
         @Override
@@ -598,7 +620,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             System.out.println("merging networks");
             
             // move all from netB to netA
-            netA.storedEnergy = Math.min(PowerPoleEnergyStorage.MAX_CAPACITY, netA.storedEnergy + netB.storedEnergy);
+            netA.storedEnergy = Math.min(Oritech.CONFIG.poleConfig.energyCapacity(), netA.storedEnergy + netB.storedEnergy);
             
             netA.poles.putAll(netB.poles);
             

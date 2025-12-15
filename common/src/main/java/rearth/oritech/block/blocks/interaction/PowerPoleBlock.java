@@ -2,6 +2,8 @@ package rearth.oritech.block.blocks.interaction;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import dev.architectury.registry.menu.MenuRegistry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -25,8 +27,10 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
 import java.util.Objects;
@@ -133,6 +137,17 @@ public class PowerPoleBlock extends Block implements EntityBlock {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, Item.@NotNull TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
+        var showExtra = Screen.hasControlDown();
+        
+        if (!showExtra)
+            tooltip.add(Component.translatable("tooltip.oritech.power_pole.short").withStyle(ChatFormatting.GRAY));
+        
         addMachineTooltip(tooltip, this, this);
+        
+        if (showExtra) {
+            tooltip.add(Component.translatable("tooltip.oritech.power_pole.1").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.power_pole.2").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.oritech.power_pole.3", Oritech.CONFIG.poleConfig.minRange(), Oritech.CONFIG.poleConfig.maxRange(), TooltipHelper.getEnergyText(Oritech.CONFIG.poleConfig.energyCapacity())).withStyle(ChatFormatting.GRAY));
+        }
     }
 }
