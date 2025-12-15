@@ -161,7 +161,11 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     public void removeIncomingConnection(BlockPos source) {
-        this.connections.remove(source);
+        
+        var removed = this.connections.stream().filter(elem -> elem.pos().equals(source)).toList();
+        
+        removed.forEach(this.connections::remove);
+        
         this.markDirty(false);
         this.sendUpdate(SyncType.CUSTOM);
     }
@@ -219,6 +223,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             var compound = new CompoundTag();
             compound.putLong("p", connection.pos().asLong());
             compound.putInt("d", connection.facing.ordinal());
+            connectionList.add(compound);
         }
         tag.put("connectionData", connectionList);
     }

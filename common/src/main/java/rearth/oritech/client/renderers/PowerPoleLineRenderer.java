@@ -24,18 +24,19 @@ public class PowerPoleLineRenderer implements BlockEntityRenderer<PowerPoleEntit
         var connections = blockEntity.getConnections();
         if (connections.isEmpty() || blockEntity.isRemoved()) return;
         
-        var offsetRight = Geometry.getForward(blockEntity.getFacingForMultiblock());
-        
         var camPos = Minecraft.getInstance().cameraEntity.blockPosition();
-        
-        var startPos = blockEntity.getBlockPos().offset(offsetRight);
-        var startPosB = blockEntity.getBlockPos().offset(offsetRight.multiply(-1));
-        var startVec = Vec3.atCenterOf(startPos);
-        var startVecB = Vec3.atCenterOf(startPosB);
-        
         var poleDist = blockEntity.getBlockPos().distSqr(camPos);
         
         var consumer = bufferSource.getBuffer(RenderType.entitySolid(CABLE_TEXTURE));
+        var ownPos = blockEntity.getBlockPos();
+        
+        var ownFacing = blockEntity.getFacingForMultiblock();
+        var ownSideVec = Vec3.atLowerCornerOf(Geometry.getForward(ownFacing));
+        
+        var centerPos = new Vec3(0.5, 0.5, 0.5);
+        
+        poseStack.pushPose();
+        poseStack.translate(0, 0.35f, 0);
         
         for (var target : connections) {
             if (target == null) continue;
@@ -43,50 +44,81 @@ public class PowerPoleLineRenderer implements BlockEntityRenderer<PowerPoleEntit
             var targetDist = target.pos().distSqr(camPos);
             if (targetDist < poleDist) continue;    // only render connections from the closer side
             
-            // todo assign target A and B to closest A & B, to avoid crossing lines (calculate total length in both variants, and choose smaller one)
-            var targetA = target.pos().offset(Geometry.getRight(target.facing()));
-            var targetB = target.pos().offset(Geometry.getLeft(target.facing()));
+            var startWorldA = Vec3.atCenterOf(ownPos).add(ownSideVec);
+            var startWorldB = Vec3.atCenterOf(ownPos).subtract(ownSideVec);
             
-            var targetVec = Vec3.atCenterOf(targetA);
-            var targetVecB = Vec3.atCenterOf(targetB);
-            var offset = targetVec.subtract(startVec);
-            var offsetB = targetVecB.subtract(startVecB);
+            var targetArmVec = Vec3.atLowerCornerOf(Geometry.getForward(target.facing()));
             
-            var thickness = 0.05f;
+            var targetWorldA = Vec3.atCenterOf(target.pos()).add(targetArmVec);
+            var targetWorldB = Vec3.atCenterOf(target.pos()).subtract(targetArmVec);
             
-            // todo fix render methods not respecting the start and end offset
-            renderHangingCable(poseStack, consumer, offset, thickness, packedLight);
-            // renderHangingCable(poseStack, consumer, offsetB, thickness, packedLight);
+            var distDirect = startWorldA.distanceToSqr(targetWorldA) + startWorldB.distanceToSqr(targetWorldB);
+            var distCross = startWorldA.distanceToSqr(targetWorldB) + startWorldB.distanceToSqr(targetWorldA);
+            
+            Vec3 targetForStartA;
+            Vec3 targetForStartB;
+            
+            if (distDirect < distCross) {
+                targetForStartA = targetWorldA;
+                targetForStartB = targetWorldB;
+            } else {
+                targetForStartA = targetWorldB;
+                targetForStartB = targetWorldA;
+            }
+            
+            var localStartA = centerPos.add(ownSideVec);
+            var localStartB = centerPos.subtract(ownSideVec);
+            
+            var localTargetA = targetForStartA.subtract(ownPos.getX(), ownPos.getY(), ownPos.getZ());
+            var localTargetB = targetForStartB.subtract(ownPos.getX(), ownPos.getY(), ownPos.getZ());
+            
+            float thickness = 0.05f;
+            
+            renderHangingCable(poseStack, consumer, localStartA, localTargetA, thickness, packedLight);
+            renderHangingCable(poseStack, consumer, localStartB, localTargetB, thickness, packedLight);
         }
+        
+        poseStack.popPose();
     }
     
-    private void renderHangingCable(PoseStack poseStack, VertexConsumer consumer, Vec3 totalOffset, float thickness, int packedLight) {
+    /**
+     * Renders a cable hanging between two points in local render space.
+     * @param startPos The start position relative to the BlockEntity origin (e.g. 0.5, 0.5, 0.5 is center).
+     * @param endPos   The end position relative to the BlockEntity origin.
+     */
+    private void renderHangingCable(PoseStack poseStack, VertexConsumer consumer, Vec3 startPos, Vec3 endPos, float thickness, int packedLight) {
         poseStack.pushPose();
         
-        poseStack.translate(0.5, 0.5, 0.5);
+        // Calculate the full vector from start to end
+        var totalOffset = endPos.subtract(startPos);
         
         var segments = 8;
         var totalLength = (float) totalOffset.length();
-        var sag = totalLength * 0.1f;
+        var sag = totalLength * 0.05f; // Sag amount based on distance
+        sag = Math.min(sag, 4);
         
-        var currentPos = Vec3.ZERO;
+        var currentPos = startPos; // Start drawing exactly at the start offset
         
         for (int i = 0; i < segments; i++) {
             var t = (float) (i + 1) / segments;
             
-            // Linear interpolation
-            var nextPos = totalOffset.scale(t);
+            // Linear interpolation from Start to End
+            var nextPos = startPos.add(totalOffset.scale(t));
             
             // Parabolic Sag to Y component
-            // Formula: 4 * sag * t * (1-t)
+            // Formula: -4 * sag * t * (1-t)
+            // We use (t * (1-t)) which peaks at t=0.5 with value 0.25. Multiplied by 4 gives 1.0.
             var sagY = -sag * 4 * t * (1 - t);
             nextPos = nextPos.add(0, sagY, 0);
             
             // Calculate vector for this specific segment
-            var scaling = 1.01f;
-            var segmentDelta = nextPos.subtract(currentPos).multiply(scaling, scaling, scaling);
+            var segmentDelta = nextPos.subtract(currentPos);
             
-            drawSegment(poseStack, consumer, currentPos, segmentDelta, thickness, packedLight);
+            // To prevent gaps between segments due to rotation, we can slightly overscale length,
+            // or rely on the specific joint math. Simple scaling usually works fine.
+            var drawDelta = segmentDelta.scale(1.02); // 2% overlap to hide cracks
+            
+            drawSegment(poseStack, consumer, currentPos, drawDelta, thickness, packedLight);
             
             currentPos = nextPos;
         }
@@ -102,8 +134,8 @@ public class PowerPoleLineRenderer implements BlockEntityRenderer<PowerPoleEntit
         
         // Calculate rotations to align the Y-axis (length) with the segment delta
         var xzLen = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-        var yRot = (float) (-Math.atan2(-delta.x, delta.z));
-        var xRot = (float) (-Math.atan2(delta.y, xzLen));
+        var yRot = (float) (-Math.atan2(-delta.x, delta.z)); // Standard MC Yaw calculation
+        var xRot = (float) (-Math.atan2(delta.y, xzLen));    // Standard MC Pitch calculation
         
         poseStack.mulPose(Axis.YP.rotation(yRot));
         poseStack.mulPose(Axis.XP.rotation(xRot + (float) (Math.PI / 2)));
