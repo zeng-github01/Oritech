@@ -239,7 +239,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
         this.currentColor = color;
         
         if (this.level != null && !this.level.isClientSide()) {
-            this.markDirty(false);
+            this.setChanged(false);
             this.sendUpdate(SyncType.SPARSE_TICK);
         }
     }

@@ -202,7 +202,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         this.currentColor = color;
         
         if (this.level != null && !this.level.isClientSide()) {
-            this.markDirty(false);
+            this.setChanged(false);
             this.sendUpdate(SyncType.SPARSE_TICK);
         }
     }

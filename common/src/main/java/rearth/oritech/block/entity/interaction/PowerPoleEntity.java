@@ -136,7 +136,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         updateConnectionsInState(Objects.requireNonNull(getNetwork()));
         targetEntity.updateConnectionsInState(getNetwork());
         
-        this.markDirty(false);
+        this.setChanged(false);
         this.sendUpdate(SyncType.CUSTOM);
     }
     
@@ -156,7 +156,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     public void assignIncomingConnection(PowerPoleEntity from) {
         this.connections.add(from.getConnectionData());
-        this.markDirty(false);
+        this.setChanged(false);
         this.sendUpdate(SyncType.CUSTOM);
     }
     
@@ -166,7 +166,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         removed.forEach(this.connections::remove);
         
-        this.markDirty(false);
+        this.setChanged(false);
         this.sendUpdate(SyncType.CUSTOM);
     }
     
@@ -191,13 +191,13 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         allNetworks.removePole(worldPosition);
         allNetworks.setDirty();
         
-        this.markDirty(false);
+        this.setChanged(false);
         
     }
     
     @Override
-    public void markDirty(boolean updateComparator) {
-        super.markDirty(updateComparator);
+    public void setChanged(boolean updateComparator) {
+        super.setChanged(updateComparator);
         getNetworkData().setDirty();
     }
     
@@ -453,7 +453,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         @Override
         public void update() {
             if (!isValid()) return;
-            PowerPoleEntity.this.markDirty(false);
+            PowerPoleEntity.this.setChanged(false);
         }
         
         public void tick(long worldTicks) {
