@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.interaction;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,6 +13,8 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -32,11 +35,15 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.networking.UpdatableField;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.UpgradableMachineScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.InventoryInputMode;
@@ -58,7 +65,11 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     @SyncField({SyncType.INITIAL, SyncType.CUSTOM})
     private final Set<ConnectionTarget> connections = new HashSet<>();
     
+    private PoleNetworkData netDataRef = null;
+    
     // storage
+    @SyncField(SyncType.GUI_TICK)
+    public DynamicStatisticEnergyStorage.EnergyStatistics currentStats = DynamicStatisticEnergyStorage.EnergyStatistics.EMPTY;
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     protected final PowerPoleEnergyStorage energyStorage = new PowerPoleEnergyStorage();
     
@@ -73,6 +84,8 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             return 0L;
         }
     };
+    
+    private final SimpleInventoryStorage basicInv = new SimpleInventoryStorage(0, this::setChanged);
     
     public PowerPoleEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.POWER_POLE_ENTITY, pos, state);
@@ -96,6 +109,12 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             }
         }
         
+    }
+    
+    @Override
+    public void preNetworkUpdate(SyncType type) {
+        super.preNetworkUpdate(type);
+        currentStats = energyStorage.getCurrentStatistics(level.getGameTime());
     }
     
     private void outputEnergy() {
@@ -140,7 +159,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             this.removeIncomingConnection(target);
             targetEntity.removeIncomingConnection(worldPosition);
             
-            var netData = getNetworkData();
+            var netData = getCachedNetData();
             var net = netData.getNetwork(worldPosition);
             this.updateConnectionsInState(net);
             targetEntity.updateConnectionsInState(net);
@@ -153,7 +172,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         connections.add(targetEntity.getConnectionData());
         targetEntity.assignIncomingConnection(this);
         
-        var allNetworks = getNetworkData();
+        var allNetworks = getCachedNetData();
         
         var ownNet = getNetwork();
         var isConnected = isConnected();
@@ -232,6 +251,14 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         return connections;
     }
     
+    public PoleNetworkData getCachedNetData() {
+        if (netDataRef == null) {
+            netDataRef = POLE_NETWORK_DATA.computeIfAbsent(level.dimension().location(), data -> new PoleNetworkData());
+        }
+        
+        return netDataRef;
+    }
+    
     public void onRemoved() {
         
         // remove connection from targets (if loaded)
@@ -241,7 +268,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             }
         }
         
-        var allNetworks = getNetworkData();
+        var allNetworks = getCachedNetData();
         allNetworks.removePole(worldPosition);
         allNetworks.setDirty();
         
@@ -252,19 +279,15 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     @Override
     public void setChanged(boolean updateComparator) {
         super.setChanged(updateComparator);
-        getNetworkData().setDirty();
+        getCachedNetData().setDirty();
     }
     
     private boolean isConnected() {
         return getNetwork() != null;
     }
     
-    private PoleNetworkData getNetworkData() {
-        return POLE_NETWORK_DATA.computeIfAbsent(level.dimension().location(), data -> new PoleNetworkData());
-    }
-    
-    private @Nullable PoleNetwork getNetwork() {
-        return getNetworkData().getNetwork(worldPosition);
+    private PoleNetwork getNetwork() {
+        return getCachedNetData().getNetwork(worldPosition);
     }
     
     @Override
@@ -305,6 +328,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     @Override
     public void saveExtraData(FriendlyByteBuf buf) {
         this.sendUpdate(SyncType.GUI_OPEN);
+        buf.writeBlockPos(worldPosition);
     }
     
     @Override
@@ -314,7 +338,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     @Override
     public @Nullable AbstractContainerMenu createMenu(int containerId, @NotNull Inventory playerInventory, @NotNull Player player) {
-        return null;    // todo
+        return new UpgradableMachineScreenHandler(containerId, playerInventory, this);
     }
     
     @Override
@@ -387,6 +411,16 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     @Override
+    public float getDisplayedEnergyTransfer() {
+        return Oritech.CONFIG.poleConfig.energyCapacity();
+    }
+    
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(7, 6, 18, 54 + 18);
+    }
+    
+    @Override
     public float getProgress() {
         return 0;
     }
@@ -408,27 +442,17 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     @Override
     public Container getDisplayedInventory() {
-        return null;
+        return basicInv;
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return null;    // todo
+        return ModScreens.POWER_POLE_SCREEN;
     }
     
-    protected class PowerPoleEnergyStorage extends EnergyApi.EnergyStorage {
+    protected class PowerPoleEnergyStorage extends EnergyApi.EnergyStorage implements UpdatableField<PowerPoleEnergyStorage, Long> {
         
-        private final List<Long> inserted = new ArrayList<>();  // just for this tick
-        private final List<Long> extracted = new ArrayList<>();
-        private final Long[] historicInsert = new Long[20];
-        private final Long[] historicExtract = new Long[20];
-        private int currentInsertSources = 0;
-        private long lastTickedAt = 0;
-        
-        private PowerPoleEnergyStorage() {
-            Arrays.fill(historicInsert, 0L);
-            Arrays.fill(historicExtract, 0L);
-        }
+        private long clientShownEnergy;
         
         
         private boolean isValid() {
@@ -444,7 +468,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             if (insertAmount > 0 && !simulate) {
                 var newAmount = getAmount() + insertAmount;
                 setAmount(newAmount);
-                this.inserted.add(insertAmount);
+                getNetwork().inserted.add(insertAmount);
             }
             
             return insertAmount;
@@ -459,7 +483,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             if (extractAmount > 0 && !simulate) {
                 var newAmount = getAmount() - extractAmount;
                 setAmount(newAmount);
-                this.extracted.add(extractAmount);
+                getNetwork().extracted.add(extractAmount);
             }
             
             return extractAmount;
@@ -486,6 +510,8 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         @Override
         public long getAmount() {
+            if (level.isClientSide()) return clientShownEnergy;
+            
             if (!isValid()) return 0;
             
             var network = PowerPoleEntity.this.getNetwork();
@@ -509,30 +535,68 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         }
         
         public void tick(long worldTicks) {
-            if (worldTicks <= lastTickedAt) return;
-            var index = (int) (worldTicks % 20);
-            historicInsert[index] = inserted.stream().mapToLong(Long::longValue).sum();
-            historicExtract[index] = extracted.stream().mapToLong(Long::longValue).sum();
-            currentInsertSources = inserted.size();
+            var net = getNetwork();
             
-            inserted.clear();
-            extracted.clear();
-            lastTickedAt = worldTicks;
+            if (worldTicks <= net.lastTickedAt) return;
+            var index = (int) (worldTicks % 20);
+            net.historicInsert[index] = net.inserted.stream().mapToLong(Long::longValue).sum();
+            net.historicExtract[index] = net.extracted.stream().mapToLong(Long::longValue).sum();
+            net.currentInsertSources = net.inserted.size();
+            
+            net.inserted.clear();
+            net.extracted.clear();
+            net.lastTickedAt = worldTicks;
         }
         
         public DynamicStatisticEnergyStorage.EnergyStatistics getCurrentStatistics(long worldTicks) {
             var index = (int) (worldTicks % 20);
+            var net = getNetwork();
             
             return new DynamicStatisticEnergyStorage.EnergyStatistics(
-              (float) Arrays.stream(historicInsert).mapToLong(Long::longValue).average().orElse(0),
-              (float) Arrays.stream(historicExtract).mapToLong(Long::longValue).average().orElse(0),
-              historicInsert[index],
-              historicExtract[index],
-              currentInsertSources,
-              Arrays.stream(historicInsert).mapToLong(Long::longValue).max().orElse(0),
-              Arrays.stream(historicExtract).mapToLong(Long::longValue).max().orElse(0)
+              (float) Arrays.stream(net.historicInsert).mapToLong(Long::longValue).average().orElse(0),
+              (float) Arrays.stream(net.historicExtract).mapToLong(Long::longValue).average().orElse(0),
+              net.historicInsert[index],
+              net.historicExtract[index],
+              net.currentInsertSources,
+              Arrays.stream(net.historicInsert).mapToLong(Long::longValue).max().orElse(0),
+              Arrays.stream(net.historicExtract).mapToLong(Long::longValue).max().orElse(0)
             );
             
+        }
+        
+        @Override
+        public Long getDeltaData() {
+            return getAmount();
+        }
+        
+        @Override
+        public PowerPoleEnergyStorage getFullData() {
+            return this;
+        }
+        
+        @Override
+        public StreamCodec<? extends ByteBuf, Long> getDeltaCodec() {
+            return ByteBufCodecs.VAR_LONG;
+        }
+        
+        @Override
+        public StreamCodec<? extends ByteBuf, PowerPoleEnergyStorage> getFullCodec() {
+            return null;
+        }
+        
+        @Override
+        public boolean useDeltaOnly(SyncType type) {
+            return true;
+        }
+        
+        @Override
+        public void handleFullUpdate(PowerPoleEnergyStorage updatedData) {
+        
+        }
+        
+        @Override
+        public void handleDeltaUpdate(Long updatedData) {
+            this.clientShownEnergy = updatedData;
         }
     }
     
@@ -545,8 +609,12 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         // runtime lookup map. Pole positions are also stored in the network, so for saving the keys can be reconstructed later here
         private final Map<BlockPos, PoleNetwork> activeNetworks = new HashMap<>();
         
-        public @Nullable PoleNetwork getNetwork(BlockPos pos) {
-            return activeNetworks.get(pos);
+        public @NotNull PoleNetwork getNetwork(BlockPos pos) {
+            return activeNetworks.computeIfAbsent(pos, elem -> {
+                var data = new HashMap<BlockPos, Set<BlockPos>>();
+                data.put(elem, Set.of());
+                return new PoleNetwork(data, 0);
+            });
         }
         
         public static Factory<PoleNetworkData> TYPE = new Factory<>(PoleNetworkData::new, PoleNetworkData::fromNbt, null);
@@ -716,15 +784,27 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         public long storedEnergy = 0L;
         
+        // network stats
+        private final List<Long> inserted = new ArrayList<>();  // just for this tick
+        private final List<Long> extracted = new ArrayList<>();
+        private final Long[] historicInsert = new Long[20];
+        private final Long[] historicExtract = new Long[20];
+        private int currentInsertSources = 0;
+        private long lastTickedAt = 0;
+        
         // constructor for codec
         private PoleNetwork(Map<BlockPos, Set<BlockPos>> loadedPoles, long storedEnergy) {
             this.poles = new HashMap<>(loadedPoles);
             this.storedEnergy = storedEnergy;
+            Arrays.fill(historicInsert, 0L);
+            Arrays.fill(historicExtract, 0L);
         }
         
         // default constructor
         public PoleNetwork() {
             this.poles = new HashMap<>();
+            Arrays.fill(historicInsert, 0L);
+            Arrays.fill(historicExtract, 0L);
         }
         
         public Set<BlockPos> getPoles() {

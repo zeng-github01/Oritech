@@ -210,7 +210,7 @@ public class Config {
     public static class PowerPoleConfig {
         public long energyCapacity = 1_000_000;
         public int minRange = 50;
-        public int maxRange = 500;
+        public int maxRange = 1000;
     }
     
     public static class DeepDrillConfig {
