@@ -9,6 +9,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
@@ -184,7 +186,12 @@ public class PowerPoleLineRenderer implements BlockEntityRenderer<PowerPoleEntit
     }
     
     @Override
-    public boolean shouldRenderOffScreen(@NotNull PowerPoleEntity blockEntity) {
+    public int getViewDistance() {
+        return 256;
+    }
+    
+    @Override
+    public boolean shouldRenderOffScreen(PowerPoleEntity blockEntity) {
         return true;
     }
 }

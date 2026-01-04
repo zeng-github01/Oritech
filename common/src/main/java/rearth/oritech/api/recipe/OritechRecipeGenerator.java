@@ -527,6 +527,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // withered rose
         offerMachineFrameRecipe(exporter, BlockContent.WITHER_CROP_BLOCK.asItem(), of(Items.WITHER_ROSE), of(ItemTags.FLOWERS), 1, "witherrose");
         
+        // energy transmission pole
+        offerPowerPoleRecipe(exporter, BlockContent.POWER_POLE_BLOCK.asItem(), of(ItemContent.MAGNETIC_COIL), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.SMALL_STORAGE_BLOCK), of(ItemContent.CARBON_FIBRE_STRANDS), "_pole");
+        
         // shrinker
         offerTankRecipe(exporter, BlockContent.SHRINKER_BLOCK.asItem(), of(ItemContent.DUBIOS_CONTAINER), of(FluidContent.STILL_STRANGE_MATTER_BUCKET.get()), of(BlockContent.SUPERCONDUCTOR), "shrinker");
         
@@ -1418,6 +1421,14 @@ public class OritechRecipeGenerator extends RecipeProvider {
                         .pattern("fff")
                         .pattern("mcm")
                         .pattern("sbs");
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
+    }
+    
+    public void offerPowerPoleRecipe(RecipeOutput exporter, Item output, Ingredient coil, Ingredient sides, Ingredient inner, Ingredient base, String suffix) {
+        var builder = ShapedRecipeBuilder.shaped(RecipeCategory.MISC, output, 1).define('c', coil).define('s', sides).define('i', inner).define('b', base)
+                        .pattern("c c")
+                        .pattern("sis")
+                        .pattern("bbb");
         builder.unlockedBy(getHasName(output), has(output)).save(exporter, Oritech.id("crafting/" + suffix));
     }
     

@@ -45,7 +45,6 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     public static final RenderType.CompositeRenderType CUSTOM_LINES = RenderType.create("lines", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 1536, RenderType.CompositeState.builder().setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER).setLayeringState(VIEW_OFFSET_Z_LAYERING).setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY).setOutputState(RenderStateShard.ITEM_ENTITY_TARGET).setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE).setCullState(RenderStateShard.NO_CULL).createCompositeState(false));
     private static final HashMap<Long, Vec3> cachedOffsets = new HashMap<>();
     
-    
     @Override
     public int getViewDistance() {
         return 128;
