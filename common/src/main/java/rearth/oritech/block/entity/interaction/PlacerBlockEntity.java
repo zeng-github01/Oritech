@@ -96,14 +96,13 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     
     @Override
     public float getMoveTime() {
-        return Oritech.CONFIG.placerConfig.moveDuration();
+        return Oritech.CONFIG.placerConfig.moveDuration() * this.getSpeedMultiplier();
     }
     
     @Override
     public float getWorkTime() {
-        return Oritech.CONFIG.placerConfig.workDuration();
+        return Oritech.CONFIG.placerConfig.workDuration() * this.getSpeedMultiplier();
     }
-    
     
     @Override
     public int getMoveEnergyUsage() {

@@ -181,12 +181,12 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     @Override
     public float getMoveTime() {
-        return Oritech.CONFIG.fertilizerConfig.moveDuration();
+        return Oritech.CONFIG.fertilizerConfig.moveDuration() * this.getSpeedMultiplier();
     }
     
     @Override
     public float getWorkTime() {
-        return Oritech.CONFIG.fertilizerConfig.workDuration();
+        return Oritech.CONFIG.fertilizerConfig.workDuration() * this.getSpeedMultiplier();
     }
     
     @Override
