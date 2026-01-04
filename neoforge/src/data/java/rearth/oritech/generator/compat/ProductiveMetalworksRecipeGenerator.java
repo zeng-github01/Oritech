@@ -157,6 +157,12 @@ public class ProductiveMetalworksRecipeGenerator {
         BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_DURATIUM.get()), 810), new ItemStack(BlockContent.DURATIUM_BLOCK.asItem()))
                                  .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/duratium"));
 
+        // adamant
+        ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_ADAMANT.get()), 90), new ItemStack(ItemContent.ADAMANT_INGOT), false)
+                                .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/adamant"));
+        BlockCastingRecipeBuilder.of(new SizedFluidIngredient(FluidIngredient.of(FluidContent.STILL_MOLTEN_ADAMANT.get()), 810), new ItemStack(BlockContent.ADAMANT_BLOCK.asItem()))
+                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/block/adamant"));
+
         // electrum
         ItemCastingRecipeBuilder.of(of(MetalworksRegistrator.CAST_INGOT.get()), new SizedFluidIngredient(FluidIngredient.of(MetalworksRegistrator.MOLTEN_ELECTRUM.get()), 90), new ItemStack(ItemContent.ELECTRUM_INGOT), false)
                                 .save(exporter, Oritech.id("compat/productivemetalworks/casting/ingot/electrum"));
