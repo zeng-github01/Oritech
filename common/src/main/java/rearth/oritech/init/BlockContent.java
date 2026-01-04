@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.PushReaction;
+import oshi.util.tuples.Pair;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
@@ -480,7 +481,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
         }
 
         if (field.isAnnotationPresent(Compostable.class)) {
-            ComposterBlock.add(field.getAnnotation(Compostable.class).value(), value.asItem());
+            Oritech.COMPOSTABLES_DATA.add(new Pair<>(value, field.getAnnotation(Compostable.class).value()));
         }
         
         ItemGroups.add(targetGroup, value);

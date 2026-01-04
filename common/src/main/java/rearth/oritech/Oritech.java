@@ -9,8 +9,10 @@ import io.wispforest.owo.serialization.endec.MinecraftEndecs;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.ItemLike;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import oshi.util.tuples.Pair;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
@@ -32,6 +34,9 @@ import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class Oritech {
     
     public static final String MOD_ID = "oritech";
@@ -39,6 +44,7 @@ public final class Oritech {
     public static final OritechConfig CONFIG = OritechConfig.createAndLoad();
     
     public static final Multimap<ResourceLocation, Runnable> EVENT_MAP = initEventMap();
+    public static Set<Pair<ItemLike, Float>> COMPOSTABLES_DATA = new HashSet<>();
     
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);

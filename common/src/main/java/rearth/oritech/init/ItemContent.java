@@ -8,7 +8,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.ComposterBlock;
+import oshi.util.tuples.Pair;
+import rearth.oritech.Oritech;
 import rearth.oritech.item.UnstableContainerItem;
 import rearth.oritech.item.other.ColorCartridgeItem;
 import rearth.oritech.item.other.CustomTooltipItem;
@@ -31,7 +32,7 @@ import java.util.Set;
 public class ItemContent implements ArchitecturyRegistryContainer<Item> {
     
     public static Set<Item> autoRegisteredModels = new HashSet<>();
-
+    
     @ItemGroupTarget(Groups.components)
     @Compostable(0.65F)
     public static final Item BANANA = new Item(new Item.Properties().food(Foods.APPLE));
@@ -169,7 +170,7 @@ public class ItemContent implements ArchitecturyRegistryContainer<Item> {
         }
 
         if (field.isAnnotationPresent(Compostable.class)) {
-            ComposterBlock.add(field.getAnnotation(Compostable.class).value(), value);
+            Oritech.COMPOSTABLES_DATA.add(new Pair<>(value, field.getAnnotation(Compostable.class).value()));
         }
 
         ItemGroups.add(targetGroup, value);

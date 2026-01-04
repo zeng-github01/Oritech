@@ -5,11 +5,8 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.ComposterBlock;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.item.tools.armor.JetpackElytraItem;
 import rearth.oritech.item.tools.armor.JetpackExoElytraItem;
@@ -27,6 +24,10 @@ public final class OritechFabricMod implements ModInitializer {
         Oritech.initialize();
         
         registerFabricEvents();
+        
+        for (var pair : Oritech.COMPOSTABLES_DATA) {
+            ComposterBlock.add(pair.getB(), pair.getA());
+        }
         
     }
     
