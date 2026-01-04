@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.init.TagContent;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -64,7 +65,7 @@ public class MachineFrameBlock extends Block {
     private VoxelShape getShape(BlockState state) {
         return boundingShapes[packStates(state)];
     }
-
+    
     private static int packStates(BlockState state) {
         int i = 0;
         if (state.getValue(NORTH)) i |= 1;
@@ -90,13 +91,13 @@ public class MachineFrameBlock extends Block {
     
     protected VoxelShape[] createShapes() {
         return GenericPipeBlock.createShapes(
-                Block.box(5, 5, 5, 11, 11, 11),
-                Block.box(5, 5, 0, 11, 11, 5),
-                Block.box(0, 5, 5, 5, 11, 11),
-                Block.box(5, 5, 11, 11, 11, 16),
-                Block.box(11, 5, 5, 16, 11, 11),
-                Block.box(5, 5, 5, 11, 16, 11),
-                Block.box(5, 0, 5, 11, 5, 11)
+          Block.box(5, 5, 5, 11, 11, 11),
+          Block.box(5, 5, 0, 11, 11, 5),
+          Block.box(11, 5, 5, 16, 11, 11),
+          Block.box(5, 5, 11, 11, 11, 16),
+          Block.box(0, 5, 5, 5, 11, 11),
+          Block.box(5, 5, 5, 11, 16, 11),
+          Block.box(5, 0, 5, 11, 5, 11)
         );
     }
     
