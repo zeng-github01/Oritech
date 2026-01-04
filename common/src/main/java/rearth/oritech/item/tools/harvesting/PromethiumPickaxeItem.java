@@ -182,11 +182,27 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
         return EventResult.pass();
     }
     
-    @Override
-    public ItemAttributeModifiers getDefaultAttributeModifiers() {
-        return super.getDefaultAttributeModifiers()
-                 .withModifierAdded(Attributes.BLOCK_INTERACTION_RANGE, new AttributeModifier(Oritech.id("pick_block_range"), 2, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
-                 .withModifierAdded(Attributes.ENTITY_INTERACTION_RANGE, new AttributeModifier(Oritech.id("pick_entity_range"), 2, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND);
+    public static ItemAttributeModifiers createPromethiumAttributes(Tier tier, float attackDamage, float attackSpeed, float range) {
+        return ItemAttributeModifiers.builder()
+                 .add(
+                   Attributes.ATTACK_DAMAGE,
+                   new AttributeModifier(BASE_ATTACK_DAMAGE_ID, attackDamage + tier.getAttackDamageBonus(), AttributeModifier.Operation.ADD_VALUE),
+                   EquipmentSlotGroup.MAINHAND
+                 )
+                 .add(
+                   Attributes.ATTACK_SPEED,
+                   new AttributeModifier(BASE_ATTACK_SPEED_ID, attackSpeed, AttributeModifier.Operation.ADD_VALUE),
+                   EquipmentSlotGroup.MAINHAND
+                 )
+                 .add(
+                   Attributes.BLOCK_INTERACTION_RANGE,
+                   new AttributeModifier(Oritech.id("pick_block_range"), range, AttributeModifier.Operation.ADD_VALUE),
+                   EquipmentSlotGroup.MAINHAND)
+                 .add(
+                   Attributes.ENTITY_INTERACTION_RANGE,
+                   new AttributeModifier(Oritech.id("pick_entity_range"), range, AttributeModifier.Operation.ADD_VALUE),
+                   EquipmentSlotGroup.MAINHAND)
+                 .build();
     }
     
     @Override
