@@ -13,6 +13,7 @@ import rearth.oritech.init.TagContent;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.CompletableFuture;
 
 import static rearth.oritech.util.TagUtils.cBlockTag;
@@ -31,8 +32,8 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         
         // sort auto registered drops before writing to pickaxe.json to keep pickaxe.json
         // from being changed every time datagen is run.
-        var blockDrops = new ArrayList<Block>(BlockContent.autoRegisteredDrops);
-        Collections.sort(blockDrops, (b1, b2) -> b1.toString().compareTo(b2.toString()));
+        var blockDrops = new ArrayList<>(BlockContent.autoRegisteredDrops);
+        Collections.sort(blockDrops, Comparator.comparing(Block::toString));
         for (var block : blockDrops) {
             pickaxeBuilder.add(block);
         }
@@ -51,6 +52,10 @@ public class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
         pickaxeBuilder.add(BlockContent.MACHINE_COMBI_ADDON);
         pickaxeBuilder.add(BlockContent.PUMP_TRUNK_BLOCK);
         pickaxeBuilder.add(BlockContent.MACHINE_CORE_HIDDEN);
+        pickaxeBuilder.add(BlockContent.CARBON_PLATING_SLAB);
+        pickaxeBuilder.add(BlockContent.IRON_PLATING_SLAB);
+        pickaxeBuilder.add(BlockContent.MACHINE_PLATING_SLAB);
+        pickaxeBuilder.add(BlockContent.NICKEL_PLATING_SLAB);
         
         pickaxeBuilder
           .add(BlockContent.NICKEL_ORE)

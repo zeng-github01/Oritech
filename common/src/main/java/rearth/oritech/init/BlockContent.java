@@ -363,6 +363,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block MACHINE_PLATING_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    @NoAutoDrop
     public static final Block MACHINE_PLATING_SLAB = new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block MACHINE_PLATING_STAIRS = new StairBlock(MACHINE_PLATING_BLOCK.defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
@@ -371,6 +372,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block IRON_PLATING_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    @NoAutoDrop
     public static final Block IRON_PLATING_SLAB = new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block IRON_PLATING_STAIRS = new StairBlock(IRON_PLATING_BLOCK.defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
@@ -379,6 +381,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block CARBON_PLATING_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    @NoAutoDrop
     public static final Block CARBON_PLATING_SLAB = new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block CARBON_PLATING_STAIRS = new StairBlock(CARBON_PLATING_BLOCK.defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
@@ -387,6 +390,7 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_BLOCK = new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
+    @NoAutoDrop
     public static final Block NICKEL_PLATING_SLAB = new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.decorative)
     public static final Block NICKEL_PLATING_STAIRS = new StairBlock(NICKEL_PLATING_BLOCK.defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));

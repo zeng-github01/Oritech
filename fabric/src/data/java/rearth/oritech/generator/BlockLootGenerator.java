@@ -67,6 +67,11 @@ public class BlockLootGenerator extends FabricBlockLootTableProvider {
         addCustomDataDrop(BlockContent.CREATIVE_STORAGE_BLOCK);
         addCustomDataDrop(BlockContent.MACHINE_COMBI_ADDON);
         
+        add(BlockContent.CARBON_PLATING_SLAB, createSlabItemTable(BlockContent.CARBON_PLATING_SLAB));
+        add(BlockContent.NICKEL_PLATING_SLAB, createSlabItemTable(BlockContent.NICKEL_PLATING_SLAB));
+        add(BlockContent.MACHINE_PLATING_SLAB, createSlabItemTable(BlockContent.MACHINE_PLATING_SLAB));
+        add(BlockContent.IRON_PLATING_SLAB, createSlabItemTable(BlockContent.IRON_PLATING_SLAB));
+        
         LootItemCondition.Builder cropDropBuilder = LootItemBlockStatePropertyCondition.hasBlockStateProperties(BlockContent.WITHER_CROP_BLOCK)
                                                   .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(CropBlock.AGE, 7));
         add(BlockContent.WITHER_CROP_BLOCK, createCropDrops(BlockContent.WITHER_CROP_BLOCK, Blocks.TWISTING_VINES_PLANT.asItem(), BlockContent.WITHER_CROP_BLOCK.asItem(), cropDropBuilder));
