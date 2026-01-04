@@ -397,6 +397,10 @@ public class OritechRecipeGenerator extends RecipeProvider {
         offerSlabRecipe(exporter, BlockContent.NICKEL_PLATING_SLAB.asItem(), of(BlockContent.NICKEL_PLATING_BLOCK.asItem()), "nickel");
         offerStairsRecipe(exporter, BlockContent.NICKEL_PLATING_STAIRS.asItem(), of(BlockContent.NICKEL_PLATING_BLOCK.asItem()), "nickel");
         offerPressurePlateRecipe(exporter, BlockContent.NICKEL_PLATING_PRESSURE_PLATE.asItem(), of(BlockContent.NICKEL_PLATING_BLOCK.asItem()), "nickel");
+        // carbon plated stairs, slabs, pressure plates
+        offerSlabRecipe(exporter, BlockContent.CARBON_PLATING_SLAB.asItem(), of(BlockContent.CARBON_PLATING_BLOCK.asItem()), "carbon");
+        offerStairsRecipe(exporter, BlockContent.CARBON_PLATING_STAIRS.asItem(), of(BlockContent.CARBON_PLATING_BLOCK.asItem()), "carbon");
+        offerPressurePlateRecipe(exporter, BlockContent.CARBON_PLATING_PRESSURE_PLATE.asItem(), of(BlockContent.CARBON_PLATING_BLOCK.asItem()), "carbon");
     }
     
     private void addMachines(RecipeOutput exporter) {
