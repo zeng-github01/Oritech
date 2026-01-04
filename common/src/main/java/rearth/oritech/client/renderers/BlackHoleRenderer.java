@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -69,19 +70,17 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
           entity.getBlockPos(),
           entity.getLevel(),
           matrices,
-          vertexConsumers.getBuffer(RenderType.endGateway()),
+          vertexConsumers.getBuffer(RenderType.endPortal()),
           true,
           entity.getLevel().random
         );
         
-        Minecraft.getInstance().getBlockRenderer().renderBatched(
+        Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
           BlockContent.BLACK_HOLE_MIDDLE.defaultBlockState(),
-          entity.getBlockPos(),
-          entity.getLevel(),
           matrices,
-          vertexConsumers.getBuffer(ItemBlockRenderTypes.getChunkRenderType(BlockContent.BLACK_HOLE_MIDDLE.defaultBlockState())),
-          true,
-          entity.getLevel().random
+          vertexConsumers,
+          LightTexture.FULL_BRIGHT,
+          LightTexture.FULL_BRIGHT
         );
         
         matrices.popPose();
