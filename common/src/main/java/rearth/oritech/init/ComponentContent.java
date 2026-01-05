@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 
 public class ComponentContent {
@@ -23,7 +24,7 @@ public class ComponentContent {
       COMPONENTS.register("target_position", () -> DataComponentType.<BlockPos>builder().persistent(BlockPos.CODEC).networkSynchronized(BlockPos.STREAM_CODEC).build());
     
     public static final RegistrySupplier<DataComponentType<FluidStack>> STORED_FLUID =
-      COMPONENTS.register("stored_fluid", () -> DataComponentType.<FluidStack>builder().persistent(FluidStack.CODEC).networkSynchronized(FluidStack.STREAM_CODEC).build());
+      COMPONENTS.register("stored_fluid", () -> DataComponentType.<FluidStack>builder().persistent(NetworkManager.FLUID_STACK_CODEC).networkSynchronized(NetworkManager.FLUID_STACK_STREAM_CODEC).build());
     
     public static final RegistrySupplier<DataComponentType<ShrinkerBlockEntity.ShrunkAddonData>> ADDON_DATA =
       COMPONENTS.register("addon_data", () -> DataComponentType.<ShrinkerBlockEntity.ShrunkAddonData>builder()
