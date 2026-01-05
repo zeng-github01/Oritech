@@ -2,22 +2,6 @@ package rearth.oritech.block.base.entity;
 
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
-import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.FluidContent;
-import rearth.oritech.init.recipes.OritechRecipe;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -32,6 +16,19 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.entity.generators.SteamEngineEntity;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.recipes.OritechRecipe;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBlockEntity {
     
@@ -66,6 +63,9 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         
         if (world.isClientSide || !isActive(state) || disabledViaRedstone) return;
         
+        if (progress == 0 && canFitEnergy())
+            tryConsumeInput();
+        
         // progress var is used as remaining burn time
         if (progress > 0) {
             if (canFitEnergy()) {
@@ -79,9 +79,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
                 }
                 setChanged();
             }
-        } else if (canFitEnergy()) {
-            // try consume new item
-            tryConsumeInput();
         }
         
         outputEnergy();
