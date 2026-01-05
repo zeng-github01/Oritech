@@ -1,18 +1,5 @@
 package rearth.oritech.block.entity.pipes;
 
-import org.apache.commons.lang3.time.StopWatch;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.ItemApi.InventoryStorage;
-import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
-import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.BlockEntitiesContent;
-import java.util.*;
-import java.util.stream.IntStream;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.RegistryAccess;
@@ -22,6 +9,19 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.time.StopWatch;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
+import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
+import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
+import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.BlockEntitiesContent;
+
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
@@ -124,7 +124,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                     cachedTransferPaths.clear();
                 }
                 
-                var toMove = stackToMove.getCount();
+                var remainingToMove = stackToMove.getCount();
                 var moved = 0;
                 
                 for (var storagePair : filteredTargetItemStorages) {
@@ -134,15 +134,15 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                     var targetStorage = storagePair.getA();
                     var wasEmptyStorage = IntStream.range(0, targetStorage.getSlotCount()).allMatch(slot -> targetStorage.getStackInSlot(slot).isEmpty());
                     
-                    var inserted = targetStorage.insert(stackToMove, false);
-                    toMove -= inserted;
+                    var inserted = targetStorage.insert(stackToMove.copyWithCount(remainingToMove), false);
+                    remainingToMove -= inserted;
                     moved += inserted;
                     
                     if (inserted > 0) {
                         onItemMoved(this.worldPosition, takenFrom, storagePair.getB(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.worldPosition, 0), new HashSet<>()), world, stackToMove.getItem(), inserted, wasEmptyStorage);
                     }
                     
-                    if (toMove <= 0) break;  // target has been found for all items
+                    if (remainingToMove <= 0) break;  // target has been found for all items
                 }
                 var extracted = moveFromInventory.extract(stackToMove.copyWithCount(moved), false);
                 
