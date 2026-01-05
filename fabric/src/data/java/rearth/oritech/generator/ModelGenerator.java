@@ -138,7 +138,6 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.TREEFELLER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.STEAM_ENGINE_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.PIPE_BOOSTER_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
-        blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.PARTICLE_COLLECTOR_BLOCK, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.REACTOR_EXPLOSION_SMALL, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.REACTOR_EXPLOSION_MEDIUM, BlockContent.MACHINE_SPEED_ADDON);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.REACTOR_EXPLOSION_LARGE, BlockContent.MACHINE_SPEED_ADDON);
@@ -174,6 +173,7 @@ public class ModelGenerator extends FabricModelProvider {
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.BLACK_HOLE_INNER);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.BLACK_HOLE_MIDDLE);
         blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.BLACK_HOLE_OUTER);
+        blockStateModelGenerator.createNonTemplateModelBlock(BlockContent.PARTICLE_COLLECTOR_BLOCK);
         
         // metals
         blockStateModelGenerator.createTrivialCube(BlockContent.NICKEL_ORE);

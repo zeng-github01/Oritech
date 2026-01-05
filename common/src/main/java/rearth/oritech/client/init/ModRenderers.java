@@ -46,7 +46,6 @@ public class ModRenderers {
         BlockEntityRenderers.register(BlockEntitiesContent.TREEFELLER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/treefeller_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.ENCHANTER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/enchanter_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.PIPE_BOOSTER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/pipe_booster_block"));
-        BlockEntityRenderers.register(BlockEntitiesContent.PARTICLE_COLLECTOR_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/particle_collector_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/enchantment_catalyst_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.PUMP_BLOCK, ctx -> new MachineRenderer<>("models/pump_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.PLACER_BLOCK_ENTITY, ctx -> new MachineGantryRenderer());

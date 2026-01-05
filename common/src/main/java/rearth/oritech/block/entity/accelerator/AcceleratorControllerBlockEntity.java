@@ -2,32 +2,8 @@ package rearth.oritech.block.entity.accelerator;
 
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.wispforest.owo.util.VectorRandomUtils;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
-import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.client.ui.AcceleratorScreenHandler;
-import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.SoundContent;
-import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.*;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.Vec3i;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -52,6 +28,23 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.api.item.containers.InOutInventoryStorage;
+import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.ui.AcceleratorScreenHandler;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.SoundContent;
+import rearth.oritech.init.recipes.RecipeContent;
+import rearth.oritech.util.*;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 // networking: last event could be automated. Inject event can just be called on server, and let vanilla handle sounds. Trail should be sent normally,
 // so maybe everything could just be moved to manually sent packets
@@ -180,8 +173,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
         }
         
-        NetworkManager.sendBlockHandle(this, new LastEventPacket(worldPosition, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
-        NetworkManager.sendBlockHandle(this, new LastEventPacket(secondControllerEntity.getBlockPos(), ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        NetworkManager.sendBlockHandle(this, new LastEventPacket(worldPosition, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(collision), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        NetworkManager.sendBlockHandle(this, new LastEventPacket(secondControllerEntity.getBlockPos(), ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(collision), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
         this.removeParticleDueToCollision();
         secondControllerEntity.removeParticleDueToCollision();
@@ -195,7 +188,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     
     private void createCollisionParticles(int collisionEnergy, Vec3 collisionPosition, int shotCount) {
         
-        var energyMultiplier = 3 * Oritech.CONFIG.tachyonCollisionEnergyFactor();
+        var energyMultiplier = 4 * Oritech.CONFIG.tachyonCollisionEnergyFactor();
         int energyPotential = (int) (Math.pow(collisionEnergy / 2f, 2) * energyMultiplier * Oritech.CONFIG.accelerationRFCost());    // exactly N times the amount of energy used to accelerate
         var energyPerRay = energyPotential / shotCount;
         var rayRange = shotCount / 3;
@@ -209,7 +202,6 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var impactPos = BlackHoleBlockEntity.basicRaycast(collisionPosition.add(direction.scale(1.2)), direction, rayRange, level);
             if (impactPos != null) {
                 ParticleContent.BLACK_HOLE_EMISSION.spawn(level, collisionPosition, impactPos.getCenter());
-                // ParticleContent.DEBUG_BLOCK.spawn(world, Vec3d.of(impactPos));
                 
                 var candidate = level.getBlockEntity(impactPos);
                 if (candidate instanceof ParticleCollectorBlockEntity collectorEntity) {

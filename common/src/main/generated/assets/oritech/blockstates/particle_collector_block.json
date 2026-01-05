@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "oritech:block/machine_speed_addon"
+      "model": "oritech:block/particle_collector_block"
     }
   }
 }

@@ -223,7 +223,6 @@ public class BlockContent implements ArchitecturyBlockRegistryContainer {
     public static final Block ACCELERATOR_SENSOR = new AcceleratorSensorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final Block BLACK_HOLE_BLOCK = new BlackHoleBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.END_PORTAL).lightLevel(item -> 12).noOcclusion().forceSolidOn());
     
-    @UseGeoBlockItem(scale = 0.7f)
     public static final Block PARTICLE_COLLECTOR_BLOCK = new ParticleCollectorBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).noOcclusion());
     
     @UseGeoBlockItem(scale = 0.7f)
