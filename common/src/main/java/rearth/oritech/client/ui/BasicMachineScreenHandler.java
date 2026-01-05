@@ -1,20 +1,6 @@
 package rearth.oritech.client.ui;
 
 import io.wispforest.owo.client.screens.SlotGenerator;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.generators.SteamEngineEntity;
-import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.ScreenProvider.GuiSlot;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,6 +13,20 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
+import rearth.oritech.block.entity.generators.SteamEngineEntity;
+import rearth.oritech.util.ScreenProvider;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class BasicMachineScreenHandler extends AbstractContainerMenu {
     
@@ -137,20 +137,37 @@ public class BasicMachineScreenHandler extends AbstractContainerMenu {
     
     @Override
     public ItemStack quickMoveStack(Player player, int invSlot) {
-        
-        var newStack = ItemStack.EMPTY;
-        
         var slot = this.slots.get(invSlot);
         
         if (slot.hasItem()) {
             var originalStack = slot.getItem();
-            newStack = originalStack.copy();
-            if (invSlot < this.inventory.getContainerSize() || invSlot >= this.inventory.getContainerSize() + 36) {  // second condition is for machines adding extra slots afterwards, which are treated as part of the machine
-                if (!this.moveItemStackTo(originalStack, getPlayerInvStartSlot(newStack), getPlayerInvEndSlot(newStack), true)) {
+            var newStack = originalStack.copy();
+            
+            int machineSize = this.inventory.getContainerSize();
+            int playerInvStart = getPlayerInvStartSlot(newStack);
+            int playerInvEnd = getPlayerInvEndSlot(newStack);
+            int totalSize = this.slots.size();   // Includes armor/offhand if enabled
+            
+            // case 1: Slot is inside the Machine (Output/Input)
+            if (invSlot < machineSize) {
+                // Move to Player Main Inventory
+                if (!this.moveItemStackTo(originalStack, playerInvStart, playerInvEnd, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(originalStack, getMachineInvStartSlot(newStack), getMachineInvEndSlot(newStack), false)) {
-                return ItemStack.EMPTY;
+            }
+            // case 2: Slot is inside Player Main Inventory (Storage + Hotbar)
+            else if (invSlot >= playerInvStart && invSlot < playerInvEnd) {
+                // Move to Machine Inventory
+                if (!this.moveItemStackTo(originalStack, 0, machineSize, false)) {
+                    return ItemStack.EMPTY;
+                }
+            }
+            // case 3: Slot is an Armor or Offhand slot
+            else if (invSlot >= playerInvEnd && invSlot < totalSize) {
+                // Move to Player Main Inventory ONLY.
+                if (!this.moveItemStackTo(originalStack, playerInvStart, playerInvEnd, true)) {
+                    return ItemStack.EMPTY;
+                }
             }
             
             if (originalStack.isEmpty()) {
@@ -158,9 +175,11 @@ public class BasicMachineScreenHandler extends AbstractContainerMenu {
             } else {
                 slot.setChanged();
             }
+            
+            return newStack;
         }
         
-        return newStack;
+        return ItemStack.EMPTY;
     }
     
     // order is:
@@ -174,10 +193,7 @@ public class BasicMachineScreenHandler extends AbstractContainerMenu {
     
     public int getPlayerInvEndSlot(ItemStack stack) {
         
-        if (screenData.showArmor()) {
-            return this.slots.size() - 1;   // don't include offhand slot
-        }
-        return this.slots.size();
+        return getPlayerInvStartSlot(stack) + 36;
     }
     
     public int getMachineInvStartSlot(ItemStack stack) {
