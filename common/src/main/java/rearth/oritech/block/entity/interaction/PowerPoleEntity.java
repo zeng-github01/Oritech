@@ -193,7 +193,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         } else if (isConnected && targetConnected) {
             if (targetNet == ownNet) {
                 // in same network, nothing to do
-                System.out.println("Same net, no work");
             } else {
                 // merge networks
                 allNetworks.mergeNetworks(ownNet, targetNet);
@@ -215,7 +214,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     private void joinNetwork(PoleNetwork target, PoleNetworkData data) {
         data.activeNetworks.put(worldPosition, target);
-        System.out.println("Joining network");
     }
     
     private void updateConnectionsInState(PoleNetwork network) {
@@ -223,7 +221,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     private PoleNetwork createNetwork(PoleNetworkData data) {
-        System.out.println("Creating Network");
         return new PoleNetwork();
     }
     
@@ -621,8 +618,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         @Override
         public @NotNull CompoundTag save(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registryLookup) {
-            
-            System.out.println("Saving power pole data!");
             
             var networksList = new ListTag();
             

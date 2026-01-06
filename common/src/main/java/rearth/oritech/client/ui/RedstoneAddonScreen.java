@@ -73,7 +73,6 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
         descriptionLabel.positioning(Positioning.absolute(0, 25));
         overlay.child(descriptionLabel);
         
-        System.out.println(activeMode);
         var slider = Components.discreteSlider(Sizing.fixed(160), 0, modes.length - 1);
         slider.positioning(Positioning.absolute(8, 63));
         slider.snap(true);
