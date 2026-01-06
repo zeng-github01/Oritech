@@ -46,7 +46,6 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
-    
     // these are shared between all jetpacks
     // set to the world time where last ground contact was recorded
     public static long LAST_GROUND_CONTACT = Long.MAX_VALUE;
@@ -63,6 +62,11 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
         
         if (world.isClientSide)
             tickJetpack(stack, entity, world);
+    }
+    
+    @Override
+    public int getDefaultMaxStackSize() {
+        return 1;
     }
     
     @Override

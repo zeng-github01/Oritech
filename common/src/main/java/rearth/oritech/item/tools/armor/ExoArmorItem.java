@@ -46,8 +46,8 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     }
     
     @Override
-    public DataComponentMap components() {
-        return super.components();
+    public int getDefaultMaxStackSize() {
+        return 1;
     }
     
     @Override

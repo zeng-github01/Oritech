@@ -27,7 +27,7 @@ public class SimpleItemFluidStorage extends SimpleFluidStorage {
         
         if (this.getStack().isEmpty()) {
             itemStack.remove(FluidApi.ITEM.getFluidComponent());
-            itemStack.set(DataComponents.MAX_STACK_SIZE, 64);
+            itemStack.set(DataComponents.MAX_STACK_SIZE, itemStack.getItem().getDefaultMaxStackSize());
             return;
         }
         

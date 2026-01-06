@@ -43,6 +43,11 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     }
     
     @Override
+    public int getDefaultMaxStackSize() {
+        return 1;
+    }
+    
+    @Override
     public boolean requireTakeoff() {
         return false;
     }
