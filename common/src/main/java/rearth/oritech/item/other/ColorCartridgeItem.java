@@ -1,7 +1,10 @@
 package rearth.oritech.item.other;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -13,7 +16,9 @@ import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.util.ColorableMachine;
+import rearth.oritech.util.MultiblockMachineController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ColorCartridgeItem extends Item {
@@ -62,7 +67,23 @@ public class ColorCartridgeItem extends Item {
             
             context.getLevel().playSound(null, targetBlock, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 1f, 0.6f);
             
-            return InteractionResult.CONSUME;
+            // create particles
+            var targetBlocks = new ArrayList<BlockPos>();
+            targetBlocks.add(targetBlock);
+            
+            if (targetEntity instanceof MultiblockMachineController multiblockMachineController) {
+                targetBlocks.addAll(multiblockMachineController.getConnectedCores());
+            }
+            
+            var level = context.getLevel();
+            if (context.getLevel() instanceof ServerLevel serverLevel) {
+                for (var pos : targetBlocks) {
+                    var at = pos.getCenter().add(level.random.nextFloat() * 0.1, level.random.nextFloat() * 0.1, level.random.nextFloat() * 0.1);
+                    serverLevel.sendParticles(ParticleTypes.GUST, at.x, at.y, at.z, 1, level.random.nextFloat(), level.random.nextFloat(), level.random.nextFloat(), 0.15f);
+                }
+            }
+            
+            return InteractionResult.SUCCESS;
         }
         
         return super.useOn(context);
