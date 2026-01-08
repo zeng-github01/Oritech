@@ -32,8 +32,12 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
     public void postRender(PoseStack matrices, PortableLaserItem animatable, BakedGeoModel model, MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
         super.postRender(matrices, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
         
+        
         var client = Minecraft.getInstance();
         var player = client.player;
+        
+        if (player == null) return;
+        
         var heldStack = client.player.getMainHandItem();
         var world = client.level;
         
