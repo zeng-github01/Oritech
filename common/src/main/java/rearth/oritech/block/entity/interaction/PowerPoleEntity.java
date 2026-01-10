@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.interaction;
 
+import com.google.common.collect.ImmutableCollection;
 import dev.architectury.registry.menu.ExtendedMenuProvider;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.particle.Particle;
@@ -647,8 +648,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         public static PoleNetworkData fromNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
             
-            System.out.println("reading power pole data!");
-            
             var data = new PoleNetworkData();
             
             if (!nbt.contains("networks")) return data;
@@ -680,8 +679,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         protected void mergeNetworks(PoleNetwork netA, PoleNetwork netB) {
             
-            System.out.println("merging networks");
-            
             // move all from netB to netA
             netA.storedEnergy = Math.min(Oritech.CONFIG.poleConfig.energyCapacity(), netA.storedEnergy + netB.storedEnergy);
             
@@ -703,8 +700,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
                 
             }
             
-            System.out.println("split into: " + newNets.size());
-            
             if (newNets.size() == 1) return;    // no split needed, there's other connections doing the same
             
             var newNetCount = newNets.size();
@@ -719,18 +714,11 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         public void removePole(BlockPos removeAt) {
             
-            System.out.println("removing pole");
-            
             // first, updating connections in network data
             var existingNet = activeNetworks.get(removeAt);
             if (existingNet == null) return;
             
             activeNetworks.remove(removeAt);
-            
-            // for all connections, remove any to the deleted pole
-            for (var connections : existingNet.poles.values()) {
-                connections.remove(removeAt);
-            }
             
             var removedPoleConnections = existingNet.poles.remove(removeAt);
             
@@ -754,6 +742,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
                 var next = new HashSet<BlockPos>();
                 for (var openPole : openChecks) {
                     var connections = existing.getConnections(openPole);
+                    if (connections == null) continue;
                     result.put(openPole, connections);
                     
                     // add all connections that we dont have already
@@ -764,7 +753,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
                 
                 openChecks = next;
             }
-            
             
             return result;
         }
