@@ -16,6 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
+import rearth.oritech.client.cablesurfer.ClientCableFinder;
+import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
 
@@ -61,7 +64,18 @@ public class Wrench extends Item {
     
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        
         var stack = user.getItemInHand(hand);
+        
+        if (world.isClientSide()) {
+            var hit = ClientCableFinder.findLookedAtCable(user, 6f);
+            if (hit != null) {
+                System.out.println("Hit: " + hit);
+                ClientZiplineHandler.start(hit.selectedStart(), hit.selectedEnd(), user.getSpeed());
+                return InteractionResultHolder.success(stack);
+            }
+        }
+        
         return useWrench(stack, user, hand) ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
     }
     
