@@ -256,9 +256,9 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     public void onRemoved() {
         
-        // remove connection from targets (if loaded)
+        // remove connection from targets
         for (var target: connections) {
-            if (level.isLoaded(target.pos) && level.getBlockEntity(target.pos) instanceof PowerPoleEntity powerPole) {
+            if (level.getBlockEntity(target.pos) instanceof PowerPoleEntity powerPole) {
                 powerPole.removeIncomingConnection(worldPosition);
             }
         }
