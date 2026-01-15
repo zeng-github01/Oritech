@@ -1,15 +1,12 @@
 package rearth.oritech.client.cablesurfer;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
@@ -17,7 +14,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import rearth.oritech.client.renderers.PowerPoleCableRenderer;
 
-// todo register on neoforge
 public class ActiveCableRenderer {
     
     public static void render(PoseStack poseStack, MultiBufferSource bufferSource) {
@@ -87,7 +83,7 @@ public class ActiveCableRenderer {
         float length = (float) delta.length() * 1.02f; // Slight overlap
         float r = thickness;
         
-        int light = LightTexture.FULL_BRIGHT; // Full Bright (always visible) or calculate per segment
+        int light = LightTexture.FULL_BRIGHT;
         
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal(); // Critical for rotating lighting

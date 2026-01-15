@@ -5,7 +5,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import rearth.oritech.Oritech;
-import rearth.oritech.item.tools.PortableLaserItem;
 
 import java.util.HashMap;
 import java.util.Map;

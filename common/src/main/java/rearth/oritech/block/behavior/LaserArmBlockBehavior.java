@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.EnergyApi.EnergyStorage;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;

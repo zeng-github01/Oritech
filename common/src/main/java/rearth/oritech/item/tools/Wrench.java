@@ -18,7 +18,6 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.client.cablesurfer.ClientCableFinder;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
-import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
 
