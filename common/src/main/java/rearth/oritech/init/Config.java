@@ -137,6 +137,12 @@ public class Config {
     public boolean showMachinePreview = true;
     @Sync(Option.SyncMode.NONE)
     public boolean enableHelpButton = true;
+    @Sync(Option.SyncMode.NONE)
+    public float maxZiplineSpeed = 8f;
+    @Sync(Option.SyncMode.NONE)
+    public float ziplineAcceleration = 0.1f;
+    @Sync(Option.SyncMode.NONE)
+    public boolean ziplineAutoJump = true;
     
     public static class ProcessingMachines {
         

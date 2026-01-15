@@ -10,6 +10,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -27,8 +28,6 @@ public class ClientZiplineHandler {
     private static double totalDistance;
     
     // Config
-    private static final float MAX_SPEED = 8f;     // Max speed
-    private static final float ACCELERATION = 0.1f; // Speed gained per tick holding W
     private static final float DRAG = 0.97f;         // Air resistance (slows you down if you release W)
     private static final float HANG_OFFSET = 1.65f;   // Distance below the wire (Eye height + arm length)
     private static final float GRAVITY_FORCE = 0.1f;
@@ -157,13 +156,16 @@ public class ClientZiplineHandler {
             directionMultiplier = -1;
         }
         
+        var maxSpeed = Oritech.CONFIG.maxZiplineSpeed();
+        var acceleration = Oritech.CONFIG.ziplineAcceleration();
+        
         // W -> Accelerate
         if (player.input.up) {
-            currentSpeed += ACCELERATION * directionMultiplier;
+            currentSpeed += acceleration * directionMultiplier;
         }
         // S -> Brake / Reverse
         else if (player.input.down) {
-            currentSpeed -= ACCELERATION * directionMultiplier;
+            currentSpeed -= acceleration * directionMultiplier;
         }
         
         // gravity calcs
@@ -179,7 +181,7 @@ public class ClientZiplineHandler {
         currentSpeed *= DRAG;
         
         // Clamp Speed
-        currentSpeed = Mth.clamp(currentSpeed, -MAX_SPEED, MAX_SPEED);
+        currentSpeed = Mth.clamp(currentSpeed, -maxSpeed, maxSpeed);
         
         // Convert speed (blocks/tick) to progress percentage (0.0-1.0)
         // distance = rate * time -> rate = distance / time (but here we step by speed)
@@ -202,7 +204,7 @@ public class ClientZiplineHandler {
         Vec3 nextPlayerPos = ropePos.add(0, -HANG_OFFSET, 0);
         
         // auto dismount near end
-        if (Math.abs(currentSpeed) > 0.6) { // todo add config var for threshold, enabled
+        if (Math.abs(currentSpeed) > 0.6 && Oritech.CONFIG.ziplineAutoJump()) {
             var blocksRemaining = (1.0f - progress) * totalDistance;
             if (directionMultiplier < 0) blocksRemaining = progress * totalDistance;
             

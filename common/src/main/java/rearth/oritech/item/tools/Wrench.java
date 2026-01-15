@@ -2,6 +2,7 @@ package rearth.oritech.item.tools;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -10,6 +11,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -119,6 +121,12 @@ public class Wrench extends Item {
         }
         
         return false;
+    }
+    
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        tooltipComponents.add(Component.translatable("tooltip.oritech.wrench"));
     }
     
     protected void onUsed(ItemStack item, Player player, InteractionHand hand) {
