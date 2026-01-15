@@ -263,7 +263,7 @@ public class ClientZiplineHandler {
         active = false;
         
         // Restore Camera
-        if (previousCamera != null &&  && Oritech.CONFIG.ziplineCameraSwitch()) {
+        if (previousCamera != null && Oritech.CONFIG.ziplineCameraSwitch()) {
             Minecraft.getInstance().options.setCameraType(previousCamera);
         }
         
