@@ -1,9 +1,0 @@
-- Add animations to color changes on machines
-- Add ziplining with wrench on power pole cables
-- Improve line renderers and clarity + shader compatibility on enderic laser, railgun and particle accelerators
-- Update ukrainian translations (@Kittysk)
-- Fix block removal issues with power poles
-- Fix crash when quick-moving fuel out of reactors
-- Fix fluid transfer amount issues when extracting fluids from cauldrons
-- Fix destroyer block crop addon not filtering saplings
-- Fix placer block using wrong block placement states in some cases
