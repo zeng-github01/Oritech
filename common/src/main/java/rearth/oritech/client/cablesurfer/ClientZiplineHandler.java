@@ -91,7 +91,7 @@ public class ClientZiplineHandler {
         
         // Force 3rd Person Camera for better view
         previousCamera = Minecraft.getInstance().options.getCameraType();
-        if (previousCamera == CameraType.FIRST_PERSON) {
+        if (previousCamera == CameraType.FIRST_PERSON && Oritech.CONFIG.ziplineCameraSwitch()) {
             Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_BACK);
         }
         
@@ -263,7 +263,7 @@ public class ClientZiplineHandler {
         active = false;
         
         // Restore Camera
-        if (previousCamera != null) {
+        if (previousCamera != null &&  && Oritech.CONFIG.ziplineCameraSwitch()) {
             Minecraft.getInstance().options.setCameraType(previousCamera);
         }
         

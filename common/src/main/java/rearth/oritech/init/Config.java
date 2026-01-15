@@ -143,6 +143,8 @@ public class Config {
     public float ziplineAcceleration = 0.1f;
     @Sync(Option.SyncMode.NONE)
     public boolean ziplineAutoJump = true;
+    @Sync(Option.SyncMode.NONE)
+    public boolean ziplineCameraSwitch = true;
     
     public static class ProcessingMachines {
         

@@ -1340,6 +1340,7 @@
   "text.config.oritech-config.option.maxZiplineSpeed": "Maximum Zipline Speed (in blocks/second)",
   "text.config.oritech-config.option.ziplineAcceleration": "Zipline Acceleration (higher = faster)",
   "text.config.oritech-config.option.ziplineAutoJump": "Enable Auto Jump at Zipline End",
+  "text.config.oritech-config.option.ziplineCameraSwitch": "Enable 3rd Person Camera while Ziplining",
   "text.config.oritech-config.section.particleAccelerator": "Particle Accelerator",
   "text.config.oritech-config.option.bendFactor": "Particle Curve Requirement Factor",
   "text.config.oritech-config.option.accelerationRFCost": "Base Particle RF Acceleration Cost",
