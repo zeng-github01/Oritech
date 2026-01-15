@@ -101,9 +101,6 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
             widthMultiplier = (float) (camDist / 20f);
         RenderSystem.lineWidth((float) (Math.sin((laserEntity.getLevel().getGameTime() + partialTick) * 0.3) * 2 + 7) / widthMultiplier);
         
-        // startOffset = new Vec3d(0, 2, 0);
-        // targetPosOffset = new Vec3d(0, 5, 0);
-        
         lineConsumer.addVertex(matrices.last().pose(), (float) startOffset.x, (float) startOffset.y, (float) startOffset.z)
           .setColor(138, 242, 223, 255)
           .setLight(packedLight)

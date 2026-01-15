@@ -16,7 +16,7 @@ import rearth.oritech.util.Geometry;
 
 public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEntity> {
     
-    private static final ResourceLocation CABLE_TEXTURE = ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
+    public static final ResourceLocation CABLE_TEXTURE = ResourceLocation.withDefaultNamespace("textures/block/white_concrete.png");
     
     public static final int CABLE_SEGMENT_COUNT = 12;
     

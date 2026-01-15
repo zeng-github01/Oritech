@@ -70,8 +70,7 @@ public class Wrench extends Item {
         if (world.isClientSide()) {
             var hit = ClientCableFinder.findLookedAtCable(user, 6f);
             if (hit != null) {
-                System.out.println("Hit: " + hit);
-                ClientZiplineHandler.start(hit.selectedStart(), hit.selectedEnd(), user.getSpeed() * 3);
+                ClientZiplineHandler.start(hit.selectedStart(), hit.selectedEnd(), hit.parallelStart(), hit.parallelEnd(), user.getSpeed() * 3);
                 return InteractionResultHolder.success(stack);
             }
         }

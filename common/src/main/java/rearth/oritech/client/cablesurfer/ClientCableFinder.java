@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class ClientCableFinder {
     
     private static final boolean DEBUG_DRAW = false;
-    private static final int POLE_SEARCH_RADIUS = 128;
+    private static final int POLE_SEARCH_RADIUS = 196;
     
     /**
      * @param poleA Origin Pole
@@ -23,7 +23,7 @@ public class ClientCableFinder {
      * @param selectedStart The specific Vec3 start point of the cable hit (Left or Right cable)
      * @param selectedEnd The specific Vec3 end point of the cable hit
      */
-    public record CableHit(BlockPos poleA, BlockPos poleB, Vec3 selectedStart, Vec3 selectedEnd) {}
+    public record CableHit(BlockPos poleA, BlockPos poleB, Vec3 selectedStart, Vec3 selectedEnd, Vec3 parallelStart, Vec3 parallelEnd) {}
     
     public static CableHit findLookedAtCable(Player player, float reachDistance) {
         var level = Minecraft.getInstance().level;
@@ -41,7 +41,7 @@ public class ClientCableFinder {
                 if (level.hasChunk(cx, cz)) {
                     for (var be : level.getChunk(cx, cz).getBlockEntities().values()) {
                         if (be instanceof PowerPoleEntity pole &&
-                              player.distanceToSqr(Vec3.atCenterOf(pole.getBlockPos())) < 4096) {
+                              player.distanceToSqr(Vec3.atCenterOf(pole.getBlockPos())) < POLE_SEARCH_RADIUS * POLE_SEARCH_RADIUS) {
                             nearbyPoles.add(pole);
                         }
                     }
@@ -103,7 +103,7 @@ public class ClientCableFinder {
                 var result1 = raycastCable(cable1Start, cable1End, eyePos, lookDir, reachDistance, level);
                 if (result1 != null && result1.distSq < bestDistSq) {
                     bestDistSq = result1.distSq;
-                    bestHit = new CableHit(startPos, endPos, cable1Start, cable1End);
+                    bestHit = new CableHit(startPos, endPos, cable1Start, cable1End, cable2Start, cable2End);
                     debugHitPos = result1.hitPos;
                 }
                 
@@ -111,7 +111,7 @@ public class ClientCableFinder {
                 var result2 = raycastCable(cable2Start, cable2End, eyePos, lookDir, reachDistance, level);
                 if (result2 != null && result2.distSq < bestDistSq) {
                     bestDistSq = result2.distSq;
-                    bestHit = new CableHit(startPos, endPos, cable2Start, cable2End);
+                    bestHit = new CableHit(startPos, endPos, cable2Start, cable2End, cable1Start, cable1End);
                     debugHitPos = result2.hitPos;
                 }
             }

@@ -76,7 +76,7 @@ public final class OritechClient {
         // interrupt left mouse for portable lasers (only seems to work on fabric)
         ClientRawInputEvent.MOUSE_CLICKED_PRE.register((client, button, action, mods) ->
                                                          handleMouseClicked(client, button, action, mods) ? EventResult.interruptTrue() : EventResult.pass());
-        
+                
         Oritech.LOGGER.info("Oritech client initialization done");
     }
     

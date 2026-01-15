@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.util.ServerZiplineHandler;
 
 public class ClientZiplineHandler {
@@ -20,6 +19,8 @@ public class ClientZiplineHandler {
     private static boolean active = false;
     private static Vec3 startPos;
     private static Vec3 endPos;
+    private static Vec3 parallelStart;
+    private static Vec3 parallelEnd;
     
     private static float progress;          // 0.0 (Start) to 1.0 (End)
     private static float currentSpeed;      // Blocks per tick
@@ -27,9 +28,10 @@ public class ClientZiplineHandler {
     
     // Config
     private static final float MAX_SPEED = 8f;     // Max speed
-    private static final float ACCELERATION = 0.15f; // Speed gained per tick holding W
-    private static final float DRAG = 0.98f;         // Air resistance (slows you down if you release W)
+    private static final float ACCELERATION = 0.1f; // Speed gained per tick holding W
+    private static final float DRAG = 0.97f;         // Air resistance (slows you down if you release W)
     private static final float HANG_OFFSET = 1.65f;   // Distance below the wire (Eye height + arm length)
+    private static final float GRAVITY_FORCE = 0.1f;
     
     private static CameraType previousCamera;
     
@@ -41,13 +43,23 @@ public class ClientZiplineHandler {
         return Math.abs(currentSpeed);
     }
     
-    /**
-     * Starts the zipline session.
-     * @param start The absolute world coordinate of the wire start.
-     * @param end The absolute world coordinate of the wire end.
-     * @param initialSpeed Initial velocity (e.g. 0.0 or 0.5).
-     */
-    public static void start(Vec3 start, Vec3 end, float initialSpeed) {
+    public static Vec3 getStartPos() {
+        return startPos;
+    }
+    
+    public static Vec3 getEndPos() {
+        return endPos;
+    }
+    
+    public static Vec3 getParallelStart() {
+        return parallelStart;
+    }
+    
+    public static Vec3 getParallelEnd() {
+        return parallelEnd;
+    }
+    
+    public static void start(Vec3 start, Vec3 end, Vec3 parStart, Vec3 parEnd, float initialSpeed) {
         if (active) return; // Already riding
         
         LocalPlayer player = Minecraft.getInstance().player;
@@ -57,6 +69,8 @@ public class ClientZiplineHandler {
         startPos = start;
         endPos = end;
         totalDistance = start.distanceTo(end);
+        parallelStart = parStart;
+        parallelEnd = parEnd;
         
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.IRON_TRAPDOOR_OPEN, 0.8F, 0.5F));
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_PLACE, 1.0F, 0.2F));
@@ -132,6 +146,7 @@ public class ClientZiplineHandler {
             return;
         }
         
+        
         var directionMultiplier = 1;
         var cableDir = endPos.subtract(startPos).normalize();
         var lookDir = player.getLookAngle();
@@ -150,6 +165,15 @@ public class ClientZiplineHandler {
         else if (player.input.down) {
             currentSpeed -= ACCELERATION * directionMultiplier;
         }
+        
+        // gravity calcs
+        float t = progress;
+        float tNext = Mth.clamp(t + 0.01f, 0.0f, 1.01f);
+        var p1 = CableMath.getAt(startPos, endPos, t);
+        var p2 = CableMath.getAt(startPos, endPos, tNext);
+        Vec3 tangent = p2.subtract(p1).normalize();
+        double slopeY = tangent.y; // -1 (Straight Down) to 1 (Straight Up)
+        currentSpeed -= (float) (slopeY * GRAVITY_FORCE);
         
         // Apply Drag (Friction)
         currentSpeed *= DRAG;
@@ -254,6 +278,15 @@ public class ClientZiplineHandler {
                 // Just drop with current momentum
                 player.playSound(SoundEvents.IRON_TRAPDOOR_CLOSE, 0.5f, 1.5f);
             }
+            
+            var gustPos = player.getPosition(0);
+            var random = player.level().random;
+            var gustVel = player.getDeltaMovement();
+            player.level().addParticle(
+              ParticleTypes.GUST,
+              gustPos.x, gustPos.y + 0.3, gustPos.z,
+              gustVel.x + random.nextFloat() * 0.3, gustVel.y + random.nextFloat() * 0.3, gustVel.z + random.nextFloat() * 0.3
+            );
         }
     }
     
