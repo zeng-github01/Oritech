@@ -30,6 +30,7 @@ import rearth.oritech.init.*;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
+import rearth.oritech.util.ServerZiplineHandler;
 import rearth.oritech.util.registry.ArchitecturyBlockRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRecipeRegistryContainer;
 import rearth.oritech.util.registry.ArchitecturyRegistryContainer;
@@ -72,6 +73,8 @@ public final class Oritech {
         TickEvent.SERVER_POST.register(elem -> AcceleratorParticleLogic.onTickEnd());
         TickEvent.SERVER_POST.register(elem -> AddonBlockEntity.completeInits());
         TickEvent.SERVER_POST.register(elem -> ElectricMaceItem.processLightningEvents(elem.overworld()));
+        
+        TickEvent.PLAYER_POST.register(ServerZiplineHandler::onPlayerTick);
         
         ComponentContent.COMPONENTS.register();
         

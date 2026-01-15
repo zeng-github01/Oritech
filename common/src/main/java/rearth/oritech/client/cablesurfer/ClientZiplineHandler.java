@@ -3,10 +3,17 @@ package rearth.oritech.client.cablesurfer;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.item.tools.PortableLaserItem;
+import rearth.oritech.util.ServerZiplineHandler;
 
 public class ClientZiplineHandler {
     
@@ -19,15 +26,19 @@ public class ClientZiplineHandler {
     private static double totalDistance;
     
     // Config
-    private static final float MAX_SPEED = 1.5f;     // Max speed
-    private static final float ACCELERATION = 0.1f; // Speed gained per tick holding W
+    private static final float MAX_SPEED = 8f;     // Max speed
+    private static final float ACCELERATION = 0.15f; // Speed gained per tick holding W
     private static final float DRAG = 0.98f;         // Air resistance (slows you down if you release W)
-    private static final float HANG_OFFSET = 1.95f;   // Distance below the wire (Eye height + arm length)
+    private static final float HANG_OFFSET = 1.65f;   // Distance below the wire (Eye height + arm length)
     
     private static CameraType previousCamera;
     
     public static boolean isActive() {
         return active;
+    }
+    
+    public static float getCurrentSpeed() {
+        return Math.abs(currentSpeed);
     }
     
     /**
@@ -47,27 +58,22 @@ public class ClientZiplineHandler {
         endPos = end;
         totalDistance = start.distanceTo(end);
         
-        var searchPos = player.position().add(0, HANG_OFFSET, 0);
-        var rawProgress = calculateClosestProgress(start, end, searchPos);
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.IRON_TRAPDOOR_OPEN, 0.8F, 0.5F));
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_PLACE, 1.0F, 0.2F));
+        Minecraft.getInstance().getSoundManager().play(new ZiplineSoundInstance(player));
         
-        var cableDir = end.subtract(start).normalize();
+        var searchPos = player.position().add(0, HANG_OFFSET, 0);
+        progress = calculateClosestProgress(start, end, searchPos);
+        
+        var cableDir = endPos.subtract(startPos).normalize();
         var lookDir = player.getLookAngle();
+        
+        currentSpeed = initialSpeed;
         
         // Dot Product < 0 means looking opposite to cable direction
         if (cableDir.dot(lookDir) < 0) {
-            // Player is looking backwards. Swap start/end.
-            startPos = end;
-            endPos = start;
-            // Invert progress (0.1 becomes 0.9)
-            progress = 1.0f - rawProgress;
-        } else {
-            // Player is looking forwards. Keep as is.
-            startPos = start;
-            endPos = end;
-            progress = rawProgress;
+            currentSpeed = -initialSpeed;
         }
-        
-        currentSpeed = Math.abs(initialSpeed);
         if (currentSpeed == 0) currentSpeed = 0.15f;
         
         // Force 3rd Person Camera for better view
@@ -112,6 +118,8 @@ public class ClientZiplineHandler {
             return;
         }
         
+        NetworkManager.sendToServer(new ServerZiplineHandler.ZiplinePlayerUsePacket());
+        
         // Shift -> Drop
         if (player.input.shiftKeyDown) {
             dismount(false);
@@ -124,13 +132,23 @@ public class ClientZiplineHandler {
             return;
         }
         
+        var directionMultiplier = 1;
+        var cableDir = endPos.subtract(startPos).normalize();
+        var lookDir = player.getLookAngle();
+        
+        // Dot Product < 0 means looking opposite to cable direction
+        if (cableDir.dot(lookDir) < 0) {
+            // Player is looking backwards. Swap start/end.
+            directionMultiplier = -1;
+        }
+        
         // W -> Accelerate
         if (player.input.up) {
-            currentSpeed += ACCELERATION;
+            currentSpeed += ACCELERATION * directionMultiplier;
         }
         // S -> Brake / Reverse
         else if (player.input.down) {
-            currentSpeed -= ACCELERATION;
+            currentSpeed -= ACCELERATION * directionMultiplier;
         }
         
         // Apply Drag (Friction)
@@ -159,18 +177,21 @@ public class ClientZiplineHandler {
         Vec3 ropePos = CableMath.getAt(startPos, endPos, progress);
         Vec3 nextPlayerPos = ropePos.add(0, -HANG_OFFSET, 0);
         
-        if (currentSpeed > 0.6) { // todo add config var
-            double blocksRemaining = (1.0f - progress) * totalDistance;
+        // auto dismount near end
+        if (Math.abs(currentSpeed) > 0.6) { // todo add config var for threshold, enabled
+            var blocksRemaining = (1.0f - progress) * totalDistance;
+            if (directionMultiplier < 0) blocksRemaining = progress * totalDistance;
             
             // Calculate ejection distance dynamically
             // Formula: Minimum Buffer + (Speed * Ticks_Ahead)
-            double dynamicEjectDist = 1.5 + (currentSpeed * 3);
+            double dynamicEjectDist = 1.5 + (Math.abs(currentSpeed) * 3);
             
             if (blocksRemaining < dynamicEjectDist) {
                 dismount(false);
                 var currentVel = player.getDeltaMovement();
                 player.setPos(nextPlayerPos.x, nextPlayerPos.y + 1, nextPlayerPos.z);
-                player.setDeltaMovement(currentVel.x * 1.2, 0.8, currentVel.z * 1.2);
+                player.setDeltaMovement(currentVel.x * 1.2, (currentVel.y > 0 ? currentVel.y * 1.2 : 0) + 0.7, currentVel.z * 1.2);
+                playWooshSound(player);
                 return;
             }
         }
@@ -193,6 +214,23 @@ public class ClientZiplineHandler {
         
         // Reset fall distance so we don't die on landing
         player.fallDistance = 0;
+        
+        var random = player.level().random;
+        
+        if (random.nextFloat() < (Math.abs(currentSpeed) / 2.0f)) {
+            
+            if (random.nextFloat() > 0.8)
+                player.level().playLocalSound(ropePos.x, ropePos.y, ropePos.z,
+                  SoundEvents.CHAIN_HIT, player.getSoundSource(), 0.3f, 2.0f, false);
+            
+            var particleVel = player.getDeltaMovement().multiply(2, 2, 2);
+            
+            player.level().addParticle(
+              ParticleTypes.ELECTRIC_SPARK,
+              ropePos.x, ropePos.y + 0.3, ropePos.z,
+              particleVel.x + random.nextFloat() * 0.3, particleVel.y + random.nextFloat() * 0.3, particleVel.z + random.nextFloat() * 0.3
+            );
+        }
     }
     
     private static void dismount(boolean jump) {
@@ -208,10 +246,18 @@ public class ClientZiplineHandler {
             if (jump) {
                 // Add a little hop upwards + carry forward momentum
                 Vec3 currentVel = player.getDeltaMovement();
-                player.setDeltaMovement(currentVel.x * 1.2, 0.6, currentVel.z * 1.2);
+                var playerPos = player.getPosition(0);
+                player.setPos(playerPos.x, playerPos.y + 1, playerPos.z);
+                player.setDeltaMovement(currentVel.x * 1.5, currentVel.y() * 1.2f + 0.6, currentVel.z * 1.5);
+                playWooshSound(player);
             } else {
                 // Just drop with current momentum
+                player.playSound(SoundEvents.IRON_TRAPDOOR_CLOSE, 0.5f, 1.5f);
             }
         }
+    }
+    
+    private static void playWooshSound(Player player) {
+        player.playSound(SoundEvents.BAT_TAKEOFF, 2f, 2.0f);
     }
 }

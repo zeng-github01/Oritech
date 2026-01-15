@@ -145,7 +145,7 @@ public class ClientCableFinder {
         double cableLength = p1.distanceTo(p2);
         int segments = Mth.clamp((int)(cableLength), 8, 128);
         
-        double hitRadius = 0.7;
+        double hitRadius = 1.5;
         double hitRadiusSq = hitRadius * hitRadius;
         double reachSq = reach * reach;
         
