@@ -56,7 +56,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
         }
         
         var bePos = Vec3.atLowerCornerOf(entity.getBlockPos());
-        var baseThickness = 0.1f;
+        var baseThickness = 0.07f;
         var beamConsumer = vertexConsumers.getBuffer(RenderType.eyes(LaserArmRenderer.BEAM_TEXTURE));
         
         for (int i = 0; i < line.size() - 1; i++) {

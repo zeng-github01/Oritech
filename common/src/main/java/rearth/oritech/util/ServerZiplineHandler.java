@@ -61,7 +61,7 @@ public class ServerZiplineHandler {
         var startTime = LAST_ZIPLINED_AT.getOrDefault(id, 0L);
         var age = player.level().getGameTime() - startTime;
         
-        if (age > 3) {  // todo higher number for players with bad ping?
+        if (age > 20) {
             LAST_ZIPLINED_AT.remove(id);
             if (AttachmentApi.getAttachmentValue(player, ZIPLINING_STATE))
                 AttachmentApi.setAttachment(player, ZIPLINING_STATE, false);
