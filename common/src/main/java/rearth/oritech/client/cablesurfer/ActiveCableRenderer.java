@@ -17,9 +17,10 @@ import rearth.oritech.client.renderers.PowerPoleCableRenderer;
 public class ActiveCableRenderer {
     
     public static void render(PoseStack poseStack, MultiBufferSource bufferSource) {
-        if (!ClientZiplineHandler.isActive()) return;
+        var mc = Minecraft.getInstance();
+        var player = mc.player;
+        if (player != null && !ClientZiplineHandler.isZiplining(player)) return;
         
-        Minecraft mc = Minecraft.getInstance();
         Vec3 camPos = mc.gameRenderer.getMainCamera().getPosition();
         
         Vec3 start = ClientZiplineHandler.getStartPos();

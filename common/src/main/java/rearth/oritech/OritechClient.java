@@ -11,6 +11,7 @@ import org.lwjgl.glfw.GLFW;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
+import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
@@ -71,6 +72,7 @@ public final class OritechClient {
         
         ClientTickEvent.CLIENT_POST.register((client) -> {
             ClientZiplineHandler.onClientTick();
+            ZiplineFxHandler.tick();
         });
         
         // interrupt left mouse for portable lasers (only seems to work on fabric)

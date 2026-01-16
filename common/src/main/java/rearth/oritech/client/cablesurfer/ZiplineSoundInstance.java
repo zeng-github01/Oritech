@@ -16,14 +16,15 @@ public class ZiplineSoundInstance extends AbstractTickableSoundInstance {
         this.player = player;
         this.looping = true;
         this.delay = 0;
-        this.volume = 0.1F; // Start quiet
-        this.pitch = 0.5F;  // Start low
+        this.volume = 0.1F;
+        this.pitch = 0.5F;
+        this.relative = false;  // basically means position is always at player
     }
     
     @Override
     public void tick() {
         // Stop if zipline stopped or player dead
-        if (!ClientZiplineHandler.isActive() || player.isRemoved()) {
+        if (!ClientZiplineHandler.isZiplining(player) || player.isRemoved()) {
             this.stop();
             return;
         }
@@ -32,12 +33,14 @@ public class ZiplineSoundInstance extends AbstractTickableSoundInstance {
         this.y = player.getY() + 2;
         this.z = player.getZ();
         
-        float speed = Math.abs(ClientZiplineHandler.getCurrentSpeed());
         
-        // Dynamic Volume: Silence when not moving, loud when fast
-        this.volume = Mth.clamp(speed * 0.8F, 0.0F, 0.8F);
+        float speed = (float) player.getDeltaMovement().length();
         
-        // Dynamic Pitch: 0.5 (low rumble) to 1.8 (high whine)
-        this.pitch = Mth.lerp(speed / 1.5F, 0.5F, 1.8F);
+        float targetPitch = (float) Mth.clamp(speed / 1.5f, 0.5, 1.8);
+        float targetVolume = (float) Mth.clamp(speed * 0.6, 0.0, 0.8);
+        
+        this.pitch = Mth.lerp(0.35F, this.pitch, targetPitch);
+        this.volume = Mth.lerp(0.35F, this.volume, targetVolume);
+        
     }
 }

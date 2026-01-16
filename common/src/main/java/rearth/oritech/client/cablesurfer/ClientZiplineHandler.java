@@ -2,8 +2,6 @@ package rearth.oritech.client.cablesurfer;
 
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -11,6 +9,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -28,19 +27,11 @@ public class ClientZiplineHandler {
     private static double totalDistance;
     
     // Config
+    public static final float HANG_OFFSET = 1.65f;   // Distance below the wire (Eye height + arm length)
     private static final float DRAG = 0.97f;         // Air resistance (slows you down if you release W)
-    private static final float HANG_OFFSET = 1.65f;   // Distance below the wire (Eye height + arm length)
     private static final float GRAVITY_FORCE = 0.1f;
     
     private static CameraType previousCamera;
-    
-    public static boolean isActive() {
-        return active;
-    }
-    
-    public static float getCurrentSpeed() {
-        return Math.abs(currentSpeed);
-    }
     
     public static Vec3 getStartPos() {
         return startPos;
@@ -58,10 +49,14 @@ public class ClientZiplineHandler {
         return parallelEnd;
     }
     
+    public static boolean isZiplining(Player player) {
+        return AttachmentApi.getAttachmentValue(player, ServerZiplineHandler.ZIPLINING_STATE);
+    }
+    
     public static void start(Vec3 start, Vec3 end, Vec3 parStart, Vec3 parEnd, float initialSpeed) {
         if (active) return; // Already riding
         
-        LocalPlayer player = Minecraft.getInstance().player;
+        var player = Minecraft.getInstance().player;
         if (player == null) return;
         
         active = true;
@@ -71,10 +66,6 @@ public class ClientZiplineHandler {
         parallelStart = parStart;
         parallelEnd = parEnd;
         
-        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.IRON_TRAPDOOR_OPEN, 0.8F, 0.5F));
-        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_PLACE, 1.0F, 0.2F));
-        Minecraft.getInstance().getSoundManager().play(new ZiplineSoundInstance(player));
-        
         var searchPos = player.position().add(0, HANG_OFFSET, 0);
         progress = calculateClosestProgress(start, end, searchPos);
         
@@ -83,21 +74,21 @@ public class ClientZiplineHandler {
         
         currentSpeed = initialSpeed;
         
-        // Dot Product < 0 means looking opposite to cable direction
+        // dot Product < 0 means looking opposite to cable direction
         if (cableDir.dot(lookDir) < 0) {
             currentSpeed = -initialSpeed;
         }
         if (currentSpeed == 0) currentSpeed = 0.15f;
         
-        // Force 3rd Person Camera for better view
+        // force 3rd Person Camera
         previousCamera = Minecraft.getInstance().options.getCameraType();
         if (previousCamera == CameraType.FIRST_PERSON && Oritech.CONFIG.ziplineCameraSwitch()) {
             Minecraft.getInstance().options.setCameraType(CameraType.THIRD_PERSON_BACK);
         }
         
         // Initial Snap
-        Vec3 ropePos = CableMath.getAt(startPos, endPos, progress);
-        Vec3 initialPos = ropePos.add(0, -HANG_OFFSET, 0);
+        var ropePos = CableMath.getAt(startPos, endPos, progress);
+        var initialPos = ropePos.add(0, -HANG_OFFSET, 0);
         player.setPos(initialPos.x, initialPos.y, initialPos.z);
         player.setDeltaMovement(player.getLookAngle().scale(currentSpeed));
     }
@@ -200,8 +191,8 @@ public class ClientZiplineHandler {
         }
         
         // Calculate Position on Catenary Curve
-        Vec3 ropePos = CableMath.getAt(startPos, endPos, progress);
-        Vec3 nextPlayerPos = ropePos.add(0, -HANG_OFFSET, 0);
+        var ropePos = CableMath.getAt(startPos, endPos, progress);
+        var nextPlayerPos = ropePos.add(0, -HANG_OFFSET, 0);
         
         // auto dismount near end
         if (Math.abs(currentSpeed) > 0.6 && Oritech.CONFIG.ziplineAutoJump()) {
@@ -210,7 +201,7 @@ public class ClientZiplineHandler {
             
             // Calculate ejection distance dynamically
             // Formula: Minimum Buffer + (Speed * Ticks_Ahead)
-            double dynamicEjectDist = 1.5 + (Math.abs(currentSpeed) * 3);
+            var dynamicEjectDist = 1.5 + (Math.abs(currentSpeed) * 3);
             
             if (blocksRemaining < dynamicEjectDist) {
                 dismount(false);
@@ -240,23 +231,6 @@ public class ClientZiplineHandler {
         
         // Reset fall distance so we don't die on landing
         player.fallDistance = 0;
-        
-        var random = player.level().random;
-        
-        if (random.nextFloat() < (Math.abs(currentSpeed) / 2.0f)) {
-            
-            if (random.nextFloat() > 0.8)
-                player.level().playLocalSound(ropePos.x, ropePos.y, ropePos.z,
-                  SoundEvents.CHAIN_HIT, player.getSoundSource(), 0.3f, 2.0f, false);
-            
-            var particleVel = player.getDeltaMovement().multiply(2, 2, 2);
-            
-            player.level().addParticle(
-              ParticleTypes.ELECTRIC_SPARK,
-              ropePos.x, ropePos.y + 0.3, ropePos.z,
-              particleVel.x + random.nextFloat() * 0.3, particleVel.y + random.nextFloat() * 0.3, particleVel.z + random.nextFloat() * 0.3
-            );
-        }
     }
     
     private static void dismount(boolean jump) {
@@ -267,7 +241,7 @@ public class ClientZiplineHandler {
             Minecraft.getInstance().options.setCameraType(previousCamera);
         }
         
-        LocalPlayer player = Minecraft.getInstance().player;
+        var player = Minecraft.getInstance().player;
         if (player != null) {
             if (jump) {
                 // Add a little hop upwards + carry forward momentum

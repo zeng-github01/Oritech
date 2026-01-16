@@ -26,10 +26,9 @@ public class HumanoidModelMixin<T extends LivingEntity> {
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
     public void oritech$ziplineAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
         
-        // Only apply to the local client player for now
-        if (entity instanceof Player player && player == Minecraft.getInstance().player) {
+        if (entity instanceof Player player) {
             
-            if (ClientZiplineHandler.isActive()) {
+            if (ClientZiplineHandler.isZiplining(player)) {
                 
                 // Raise arms overhead
                 // -3.14 (PI) is straight up. We do -2.9 to angle slightly forward
