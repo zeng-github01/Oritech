@@ -352,7 +352,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     @Override
     public Direction getFacingForMultiblock() {
-        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
     }
     
     @Override
