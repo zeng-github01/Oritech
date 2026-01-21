@@ -41,6 +41,7 @@ import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
 
+import java.util.Locale;
 import java.util.Optional;
 
 public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends BaseOwoHandledScreen<FlowLayout, S> {
@@ -323,7 +324,7 @@ public class BasicMachineScreen<S extends BasicMachineScreenHandler> extends Bas
     public void updateSettingsButtons() {
         
         var activeMode = menu.screenData.getInventoryInputMode();
-        var modeName = activeMode.name().toLowerCase();
+        var modeName = activeMode.name().toLowerCase(Locale.ROOT);
         
         if (activeMode.equals(InventoryInputMode.SIDED) && menu.blockEntity instanceof MachineBlockEntity machineBlock) {
             var tooltip = Component.translatable("tooltip.%s.input_mode_%s".formatted(Oritech.MOD_ID, modeName));

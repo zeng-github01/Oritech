@@ -13,6 +13,8 @@ import rearth.oritech.util.ScreenProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -153,11 +155,11 @@ public class RedstoneAddonScreen extends BaseOwoHandledScreen<FlowLayout, Redsto
     }
     
     private Component getModeText(RedstoneAddonBlockEntity.RedstoneMode mode) {
-        return Component.translatable("title.oritech.redstone_" + mode.toString().toLowerCase()).withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_GRAY);
+        return Component.translatable("title.oritech.redstone_" + mode.toString().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_GRAY);
     }
     
     private Component getDescriptionText(RedstoneAddonBlockEntity.RedstoneMode mode) {
-        return Component.translatable("tooltip.oritech.redstone_" + mode.toString().toLowerCase()).withStyle(ChatFormatting.BLACK);
+        return Component.translatable("tooltip.oritech.redstone_" + mode.toString().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.BLACK);
     }
     
     private void addTitle(FlowLayout overlay) {
