@@ -76,7 +76,7 @@ public class LaserArmBlockBehavior {
                     storageCandidate = unstableContainerBlockEntity.laserInputStorage;
                 
                 var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();
-                if (insertAmount <= 0)
+                if (insertAmount <= 0 || storageCandidate.getCapacity() <= 1)
                     return false;
                 
                 var transferCapacity = Math.min(insertAmount, laserEntity.energyRequiredToFire());
