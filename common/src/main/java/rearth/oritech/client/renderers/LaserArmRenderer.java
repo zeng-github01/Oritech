@@ -72,7 +72,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
             var moveZ = 0.5;
             if (startPos.x < targetPos.x) moveX = -0.5;
             if (startPos.z < targetPos.z) moveZ = -0.5;
-            targetPos = targetPos.add(moveX, 0.5, moveZ);
+            targetPos = targetPos.add(moveX, 0.2, moveZ);
         } else if (laserEntity.isTargetingDeepdrill(targetBlock)) {
             var offset = cachedOffsets.computeIfAbsent(laserEntity.getBlockPos().asLong(), id -> idToOffset(BlockPos.of(id), 0.5f, laserEntity.getLevel(), laserEntity.getCurrentTarget()));
             targetPos = targetPos.add(offset);
