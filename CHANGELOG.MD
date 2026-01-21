@@ -1,0 +1,13 @@
+- Make ziplining sounds / animations also display for other players in multiplayer servers
+- Make uranium patch re-usable by datapack makers
+- Improve atomic forge item tooltip, UI tooltips, UI slots
+- Improve enderic laser model alignment when targeting atomic forges
+- Change default beam size on particle accelerators
+- Change bedrock extractor sounds
+- Update translations from crowdin
+- Fix potential crash with power pole entities
+- Fix some entries not displaying in the wiki
+- Fix crash with painted machines for some different locales
+- Fix centrifuge fluid state not always being synced to the client
+- Fix cape being rendered with elytra variants
+- Fix crash when shifting items into bio-generators
