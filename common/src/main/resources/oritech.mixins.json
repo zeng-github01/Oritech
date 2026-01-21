@@ -15,6 +15,7 @@
     "requireAnnotations": true
   },
   "client": [
+    "client.CapeLayerMixin",
     "client.HumanoidModelMixin"
   ]
 }
